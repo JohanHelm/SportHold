@@ -1,3 +1,5 @@
-configuration/
 .idea/
 __pycache__
+.secrets
+/configuration/settings.toml
+/configuration/.secrets.toml
