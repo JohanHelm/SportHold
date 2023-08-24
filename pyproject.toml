@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "sporthold"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+aiogram = "3.0.0rc2"
+asyncpg = "^0.28.0"
+dynaconf = "^3.2.1"
+sentry-sdk = "^1.29.2"
+loguru = "^0.7.0"
+sqlalchemy = {extras = ["asyncio"], version = "^2.0.20"}
+fluentogram = "^1.1.6"
+alembic = "^1.11.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
