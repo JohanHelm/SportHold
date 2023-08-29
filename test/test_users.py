@@ -1,4 +1,6 @@
 from src.models.users import BaseUser
+from src.controllers.users import UserController
+
 
 
 def test_regular_user_creation():
@@ -8,6 +10,5 @@ def test_regular_user_creation():
         tg_id=123
     )
 
-    assert user.fname == "test fname"
-    assert user.lname == "test lname"
-    assert user.tg_id == 123
+    result = UserController.create_user(user)
+    assert result == user
