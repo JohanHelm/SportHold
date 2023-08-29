@@ -5,8 +5,7 @@ from src.models.users import BaseUser
 
 
 class BaseQueue(BaseModel):
-    owner_queue: List[BaseUser] = None
-    visitor_queue: List[BaseUser] = None
+    clients_queue: List[BaseUser] = None
 
 
 class GlobalQueue(BaseQueue):
