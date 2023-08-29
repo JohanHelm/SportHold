@@ -1,6 +1,7 @@
 
 from src.models.users import BaseUser
 from src.models.objects import BaseObject
+from src.models.schedules import BaseSchedule
 
 class InMemoryDB():
     DATABASE = {
@@ -35,43 +36,15 @@ class InMemoryDB():
         db_objects[object.name] = object
         return cls.DATABASE["objects"][object.name]
 
-    @staticmethod
-    def remove_object():
-        pass
 
-    @staticmethod
-    def get_shedule():
-        pass
+    @classmethod
+    def save_schedule(cls, schedule: BaseSchedule):
+        db_schedules = cls.DATABASE["schedules"]
+        db_schedules[schedule.id] = schedule
+        return schedule
 
-    @staticmethod
-    def save_shedule():
-        pass
-
-    @staticmethod
-    def remove_shedule():
-        pass
-
-
-    @staticmethod
-    def get_slots():
-        pass
-
-    @staticmethod
-    def save_slots():
-        pass
-
-    @staticmethod
-    def remove_slots():
-        pass
-
-    @staticmethod
-    def get_queue():
-        pass
-
-    @staticmethod
-    def save_queue():
-        pass
-
-    @staticmethod
-    def remove_queue():
-        pass
+    @classmethod
+    def get_schedule(cls, uuid):
+        db_schedules = cls.DATABASE["schedules"]
+        schedule = db_schedules[uuid]
+        return schedule
