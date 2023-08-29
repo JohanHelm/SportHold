@@ -1,10 +1,12 @@
-from src.controllers.memorydb import InMemoryDB
 from src.models.users import BaseUser
 
-db = InMemoryDB
-
 class UserController():
-    @staticmethod
-    def create_user(user: BaseUser):
-        result = db.save_user(user)
+    def __init__(self, db):
+        self.db = db
+    def save_user(self, user: BaseUser):
+        result = self.db.save_user(user)
         return result
+
+    def get_user_by_tg_id(self, tg_id):
+        user: BaseUser = self.db.get_user(tg_id)
+        return user
