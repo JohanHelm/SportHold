@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from schedules import BaseSchedule
+from src.models.schedules import BaseSchedule
 from typing import List
 
 

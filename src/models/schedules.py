@@ -2,11 +2,11 @@ from typing import List
 from datetime import time, timedelta
 from pydantic import BaseModel
 
-from slots import BaseSlot
+from src.models.slots import BaseSlot
 
 
 class BaseSchedule(BaseModel):
-    working_days: List = []
+    days_open: List = []
     open_from: time = None
     open_until: time = None
     min_book_time: timedelta = None
