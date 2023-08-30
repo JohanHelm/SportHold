@@ -17,7 +17,6 @@
   - до тех пор, пока начало слота меньше суммы текущего времени и интервала генерации
 
 ```python
-
 from datetime import datetime, timedelta
 
 timestep = timedelta(minutes=15)
@@ -33,24 +32,17 @@ first_slot = datetime(
     minute=0
 )
 
-while True:
-    if first_slot < now:
-        first_slot = first_slot + timestep
-    else:
-        break
+while first_slot < now:
+    first_slot = first_slot + timestep
 
 slots = []
 slots.append(first_slot)
 current_slot = first_slot + timestep
 
-while True:
-    if current_slot < now + generated_interval:
-        slots.append(current_slot)
-        current_slot = current_slot + timestep
-    else:
-        break
+while current_slot < now + generated_interval:
+    slots.append(current_slot)
+    current_slot = current_slot + timestep
 
 for slot in slots:
     print(slot)
-
 ```

@@ -1,3 +1,4 @@
+import datetime
 import uuid
 
 from src.models.schedules import BaseSchedule
@@ -32,9 +33,30 @@ def test_generate_slots():
         open_until=time(18, 0, 0),
         min_book_time=timedelta(minutes=15),
         max_book_time=timedelta(minutes=30),
-        slot_time_delta=timedelta(minutes=15),
+        time_step=timedelta(minutes=15),
     )
     test_schedule = schedule_control.save_schedule(test_schedule)
-    slots = schedule_control.generate_slots(test_schedule.id)
-    print("s " + str(slots))
+    generated_slots = schedule_control.generate_slots(
+        test_schedule.id,
+        interval=timedelta(hours=2),
+        dt_from=datetime.datetime(
+            year=2023,
+            month=10,
+            day=1,
+            hour=9,
+            minute=21
+        )
+    )
+    expected_result = [
+        datetime.datetime(2023, 10, 1, 9, 30),
+        datetime.datetime(2023, 10, 1, 9, 45),
+        datetime.datetime(2023, 10, 1, 10, 0),
+        datetime.datetime(2023, 10, 1, 10, 15),
+        datetime.datetime(2023, 10, 1, 10, 30),
+        datetime.datetime(2023, 10, 1, 10, 45),
+        datetime.datetime(2023, 10, 1, 11, 0),
+        datetime.datetime(2023, 10, 1, 11, 15)
+    ]
+
+    assert generated_slots == expected_result
 
