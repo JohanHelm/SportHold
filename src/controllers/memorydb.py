@@ -1,4 +1,3 @@
-
 from src.models.users import BaseUser
 from src.models.objects import BaseObject
 from src.models.schedules import BaseSchedule
