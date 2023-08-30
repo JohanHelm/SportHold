@@ -32,6 +32,6 @@ def test_regular_slot_adding_member():
 
     result_clot = slot_control.slot_add_member_to_queue(result_slot, user)
 
-    print(result_slot)
+    result_clot = slot_control.save_slot(result_slot)
     assert result_clot.queue.clients_queue[0].tg_id == user.tg_id
 
