@@ -14,4 +14,4 @@ class BaseSchedule(BaseModel):
     open_until: time = None
     min_book_time: timedelta = None
     max_book_time: timedelta = None
-    slot_time_delta : timedelta = None
+    time_step: timedelta = None
