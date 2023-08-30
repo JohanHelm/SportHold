@@ -4,6 +4,8 @@ from src.controllers.memorydb import InMemoryDB
 
 db = InMemoryDB
 object_control = ObjectController(db)
+
+
 def test_regular_object_create_retvive():
     test_object = BaseObject(
         name="Test object",
