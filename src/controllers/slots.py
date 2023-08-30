@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 
 from src.models.slots import BaseSlot
-from src.models.queues import BaseQueue
 from src.models.users import BaseUser
 
 
@@ -18,20 +17,17 @@ class SlotsController:
         return slot
 
     def create_slot(self, schedule_id, datetime_started: datetime, dt: timedelta):
-        empty_queue = BaseQueue(
-            clients_queue=[]
-        )
         current_slot = BaseSlot(
             schedule_id=schedule_id,
             start_date=datetime_started.date(),
             start_time=datetime_started.time(),
             timedelta=dt,
-            queue=empty_queue
+            queue=[]
         )
         return current_slot
 
     def slot_add_member_to_queue(self, current_slot: BaseSlot, member: BaseUser):
-        current_slot.queue.clients_queue.append(member)
+        current_slot.queue.append(member)
         return current_slot
 
 

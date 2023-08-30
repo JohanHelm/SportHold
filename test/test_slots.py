@@ -1,7 +1,6 @@
 import datetime
 from datetime import timedelta
 
-from src.models.queues import BaseQueue
 from src.models.slots import BaseSlot
 from src.controllers.slots import SlotsController
 from src.controllers.memorydb import InMemoryDB
@@ -9,10 +8,6 @@ from uuid import UUID, uuid4
 
 db = InMemoryDB
 slot_control = SlotsController(db)
-
-empty_queue = BaseQueue(
-    clients_queue=[]
-)
 
 def test_regular_slot_creation():
     result_slot: BaseSlot = slot_control.create_slot(
@@ -23,4 +18,4 @@ def test_regular_slot_creation():
         ),
         dt=timedelta(minutes=15)
     )
-    assert result_slot.queue == empty_queue
+    assert result_slot.queue == []

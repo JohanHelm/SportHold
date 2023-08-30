@@ -6,7 +6,7 @@ from src.models.slots import BaseSlot
 from src.controllers.slots import SlotsController
 from src.controllers.users import UserController
 from src.controllers.memorydb import InMemoryDB
-from uuid import UUID, uuid4
+from uuid import uuid4
 
 db = InMemoryDB
 slot_control = SlotsController(db)
@@ -33,5 +33,5 @@ def test_regular_slot_adding_member():
     result_clot = slot_control.slot_add_member_to_queue(result_slot, user)
 
     result_clot = slot_control.save_slot(result_slot)
-    assert result_clot.queue.clients_queue[0].tg_id == user.tg_id
+    assert result_clot.queue[0].tg_id == user.tg_id
 

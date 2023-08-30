@@ -1,8 +1,10 @@
 from datetime import date, time, timedelta
 from typing import List
+
 from pydantic import BaseModel, UUID4, Field
 from uuid import UUID, uuid4
-from src.models.queues import BaseQueue
+
+from src.models.users import BaseUser
 
 
 class BaseSlot(BaseModel):
@@ -11,4 +13,4 @@ class BaseSlot(BaseModel):
     start_date: date
     start_time: time
     timedelta: timedelta
-    queue: BaseQueue
+    queue: List[BaseUser]
