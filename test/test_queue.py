@@ -1,20 +1,18 @@
 import datetime
 from datetime import timedelta
 
-from src.models.queues import BaseQueue
+from src.models.users import BaseUser
 from src.models.slots import BaseSlot
 from src.controllers.slots import SlotsController
+from src.controllers.users import UserController
 from src.controllers.memorydb import InMemoryDB
 from uuid import UUID, uuid4
 
 db = InMemoryDB
 slot_control = SlotsController(db)
+user_control = UserController(db)
 
-empty_queue = BaseQueue(
-    clients_queue=[]
-)
-
-def test_regular_slot_creation():
+def test_regular_slot_adding_member():
     result_slot: BaseSlot = slot_control.create_slot(
         uuid4(),
         datetime.datetime(
@@ -23,4 +21,17 @@ def test_regular_slot_creation():
         ),
         dt=timedelta(minutes=15)
     )
-    assert result_slot.queue == empty_queue
+
+    user = BaseUser(
+        fname="test fname",
+        lname="test lname",
+        tg_id=123
+    )
+
+    user: BaseUser = user_control.save_user(user)
+
+    result_clot = slot_control.slot_add_member_to_queue(result_slot, user)
+
+    print(result_slot)
+    assert result_clot.queue.clients_queue[0].tg_id == user.tg_id
+

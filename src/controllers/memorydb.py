@@ -2,14 +2,14 @@
 from src.models.users import BaseUser
 from src.models.objects import BaseObject
 from src.models.schedules import BaseSchedule
+from src.models.slots import BaseSlot
 
 class InMemoryDB():
     DATABASE = {
         "users": {},
         "objects": {},
         "schedules": {},
-        "slots": {},
-        "queues": {}
+        "slots": {}
     }
 
     @classmethod
@@ -48,3 +48,17 @@ class InMemoryDB():
         db_schedules = cls.DATABASE["schedules"]
         schedule = db_schedules[uuid]
         return schedule
+
+    @classmethod
+    def save_slot(cls, slot: BaseSlot):
+        db_slots = cls.DATABASE["slots"]
+        db_slots[slot.id] = slot
+        return slot
+
+    @classmethod
+    def get_slot(cls, slot_id):
+        db_slots = cls.DATABASE["slots"]
+        slot = db_slots[slot_id]
+        return slot
+
+
