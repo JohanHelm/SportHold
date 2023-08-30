@@ -2,7 +2,7 @@ from typing import List
 from datetime import time, timedelta
 from uuid import UUID, uuid4
 
-from pydantic import BaseModel, UUID4, Field
+from pydantic import BaseModel, Field
 
 
 

@@ -1,6 +1,4 @@
 import datetime
-import math
-import time
 
 from src.models.schedules import BaseSchedule
 from datetime import timedelta
