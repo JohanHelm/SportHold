@@ -3,3 +3,4 @@ __pycache__
 .secrets
 /configuration/settings.toml
 /configuration/.secrets.toml
+.pytest_cache

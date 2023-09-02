@@ -6,7 +6,7 @@ from aiogram.types import TelegramObject
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.telegram.services.dao import DataAccessObject
+from app.telegram.services.dao import DataAccessObject
 
 logger = logging.getLogger(__name__)
 

@@ -1,6 +1,6 @@
-from src.models.objects import BaseObject
-from src.controllers.objects import ObjectController
-from src.controllers.memorydb import InMemoryDB
+from app.domain.models.objects import BaseObject
+from app.infra.db.inmemory.objects import ObjectController
+from app.infra.db.inmemory.dao import InMemoryDB
 
 db = InMemoryDB
 object_control = ObjectController(db)

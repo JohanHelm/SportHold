@@ -1,7 +1,7 @@
-from src.models.users import BaseUser
-from src.models.objects import BaseObject
-from src.models.schedules import BaseSchedule
-from src.models.slots import BaseSlot
+from app.domain.models.users import BaseUser
+from app.domain.models.objects import BaseObject
+from app.domain.models.schedules import BaseSchedule
+from app.domain.models.slots import BaseSlot
 
 class InMemoryDB():
     DATABASE = {

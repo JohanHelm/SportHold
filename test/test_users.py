@@ -1,6 +1,6 @@
-from src.models.users import BaseUser
-from src.controllers.users import UserController
-from src.controllers.memorydb import InMemoryDB
+from app.domain.models.users import BaseUser
+from app.infra.db import UserController
+from app.infra.db import InMemoryDB
 
 db = InMemoryDB
 user_control = UserController(db)

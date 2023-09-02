@@ -17,7 +17,7 @@ from typing import NoReturn, Union
 from sqlalchemy import select, Result
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
-from src.db.models import User
+from app.infra.db.sqlite.models.user import User
 
 logger = logging.getLogger(__name__)
 

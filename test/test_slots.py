@@ -1,10 +1,10 @@
 import datetime
 from datetime import timedelta
 
-from src.models.slots import BaseSlot
-from src.controllers.slots import SlotsController
-from src.controllers.memorydb import InMemoryDB
-from uuid import UUID, uuid4
+from app.domain.models.slots import BaseSlot
+from app.infra.db import SlotsController
+from app.infra.db import InMemoryDB
+from uuid import uuid4
 
 db = InMemoryDB
 slot_control = SlotsController(db)

@@ -1,6 +1,6 @@
 import datetime
 
-from src.models.schedules import BaseSchedule
+from app.domain.models.schedules import BaseSchedule
 from datetime import timedelta
 
 class SchedulesController:

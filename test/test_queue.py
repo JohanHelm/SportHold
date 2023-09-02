@@ -1,11 +1,11 @@
 import datetime
 from datetime import timedelta
 
-from src.models.users import BaseUser
-from src.models.slots import BaseSlot
-from src.controllers.slots import SlotsController
-from src.controllers.users import UserController
-from src.controllers.memorydb import InMemoryDB
+from app.domain.models.users import BaseUser
+from app.domain.models.slots import BaseSlot
+from app.infra.db import SlotsController
+from app.infra.db import UserController
+from app.infra.db import InMemoryDB
 from uuid import uuid4
 
 db = InMemoryDB

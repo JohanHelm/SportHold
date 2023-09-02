@@ -8,13 +8,13 @@ from dynaconf import Dynaconf
 from fluent_compiler.bundle import FluentBundle
 from fluentogram import TranslatorHub, FluentTranslator
 
-from src.config import load_config, get_url
-from src.db.connect import create_async_engine_db, async_connection_db
-from src.telegram.middlewares import (
+from app.utils.conf.config import load_config, get_url
+from app.infra.db import create_async_engine_db, async_connection_db
+from app.telegram.middlewares import (
     SessionMiddleware,
     RegisteredMiddleware,
 )
-from src.telegram.handlers import (
+from app.telegram.handlers import (
     commands,
 )
 

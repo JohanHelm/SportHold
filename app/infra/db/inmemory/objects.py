@@ -1,4 +1,4 @@
-from src.models.objects import BaseObject
+from app.domain.models.objects import BaseObject
 
 class ObjectController():
     def __init__(self, db):

@@ -1,10 +1,9 @@
 import datetime
-import uuid
 
-from src.models.schedules import BaseSchedule
+from app.domain.models import BaseSchedule
 from datetime import time, timedelta
-from src.controllers.schedules import SchedulesController
-from src.controllers.memorydb import InMemoryDB
+from app.infra.db import SchedulesController
+from app.infra.db import InMemoryDB
 
 db = InMemoryDB
 schedule_control = SchedulesController(db)

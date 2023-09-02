@@ -1,4 +1,4 @@
-from src.models.users import BaseUser
+from app.domain.models.users import BaseUser
 
 class UserController():
     def __init__(self, db):

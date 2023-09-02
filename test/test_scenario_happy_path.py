@@ -1,19 +1,17 @@
 from datetime import time, timedelta, datetime
 import random
 from pprint import pprint
-import json
 
-from src.models.users import BaseUser
-from src.models.objects import BaseObject
-from src.models.schedules import BaseSchedule
-from src.models.slots import BaseSlot
+from app.domain.models.users import BaseUser
+from app.domain.models.objects import BaseObject
+from app.domain.models import BaseSchedule
 
-from src.controllers.users import UserController
-from src.controllers.objects import ObjectController
-from src.controllers.schedules import SchedulesController
-from src.controllers.slots import SlotsController
+from app.infra.db import UserController
+from app.infra.db import ObjectController
+from app.infra.db import SchedulesController
+from app.infra.db import SlotsController
 
-from src.controllers.memorydb import InMemoryDB
+from app.infra.db import InMemoryDB
 
 db = InMemoryDB
 
