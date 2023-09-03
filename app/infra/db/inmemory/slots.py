@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 
 from app.domain.models.slots import BaseSlot
-from app.domain.models.users import BaseUser
+from app.domain.models.user.dto import BaseUser
 
 
 class SlotsController:

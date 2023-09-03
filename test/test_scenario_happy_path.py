@@ -2,7 +2,7 @@ from datetime import time, timedelta, datetime
 import random
 from pprint import pprint
 
-from app.domain.models.users import BaseUser
+from app.domain.models.user.dto import BaseUser
 from app.domain.models.objects import BaseObject
 from app.domain.models import BaseSchedule
 

@@ -1,7 +1,7 @@
 import datetime
 from datetime import timedelta
 
-from app.domain.models.users import BaseUser
+from app.domain.models.user.dto import BaseUser
 from app.domain.models.slots import BaseSlot
 from app.infra.db import SlotsController
 from app.infra.db import UserController

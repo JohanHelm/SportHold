@@ -1,4 +1,4 @@
-from app.domain.models.users import BaseUser
+from app.domain.models.user.dto import BaseUser
 from app.domain.models.objects import BaseObject
 from app.domain.models.schedules import BaseSchedule
 from app.domain.models.slots import BaseSlot

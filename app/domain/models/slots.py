@@ -4,7 +4,7 @@ from typing import List
 from pydantic import BaseModel, UUID4, Field
 from uuid import UUID, uuid4
 
-from app.domain.models.users import BaseUser
+from app.domain.models.user.dto import BaseUser
 
 
 class BaseSlot(BaseModel):

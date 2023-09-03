@@ -1,4 +1,4 @@
-from app.domain.models.users import BaseUser
+from app.domain.models.user.dto import BaseUser
 from app.infra.db import UserController
 from app.infra.db import InMemoryDB
 
