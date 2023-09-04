@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional
 
 
@@ -11,13 +11,12 @@ class UserBase(BaseModel):
     is_premium: Optional[bool]
     is_bot: Optional[bool]
 
-    class Config:
-        orm_mode = True
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UserCreate(UserBase):
     ...
+
 
 class UserGet(UserBase):
     id: int

@@ -9,7 +9,7 @@ def load_config(path_settings: str = "settings.toml",
     path_secrets_exists: bool = Path(path_secrets).exists()
 
     if not path_settings_exists or not path_secrets_exists:
-        raise OSError("The path for the configuration is incorrect")
+        raise OSError("The path for the conf is incorrect")
 
     settings: Dynaconf = Dynaconf(
         envvar="LOYLEDUCK",

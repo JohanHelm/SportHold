@@ -8,7 +8,7 @@ from dynaconf import Dynaconf
 from fluent_compiler.bundle import FluentBundle
 from fluentogram import TranslatorHub, FluentTranslator
 
-from app.utils.conf.config import load_config, get_url
+from utils.conf.config import load_config, get_url
 from app.infra.db import create_async_engine_db, async_connection_db
 from app.telegram.middlewares import (
     SessionMiddleware,
@@ -31,8 +31,8 @@ async def start_bot():
     logger.debug("-> Bot online")
 
     # -> Config
-    config: Dynaconf = load_config("configuration/settings.toml",
-                                   "configuration/.secrets.toml", )
+    config: Dynaconf = load_config("confconf/settings.toml",
+                                   "confconf/.secrets.toml", )
 
     # -> Storage
     storage = MemoryStorage()

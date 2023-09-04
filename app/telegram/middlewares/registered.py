@@ -5,7 +5,7 @@ from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject, user
 
 
-from app.infra.db.sqlite.models.user import User
+from app.infra.db.models import User
 from app.telegram.services.dao import DataAccessObject
 
 logger = logging.getLogger(__name__)
