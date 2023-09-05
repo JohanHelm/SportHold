@@ -3,15 +3,7 @@ import pytest
 import pytest_asyncio
 from app.infra.db.pgdb.dal import Builder
 
-URI_SYNC = "postgresql+psycopg2://postgres:qwerty123@127.0.0.1:5432/dev"
 URI_ASYNC = "postgresql+asyncpg://postgres:qwerty123@127.0.0.1:5432/dev"
-
-
-@pytest.fixture(scope="session")
-def pg_session():
-    repo = Builder(uri=URI_SYNC)
-    session = repo.get_sync_session()
-    return session
 
 
 @pytest_asyncio.fixture(scope="function")

@@ -1,6 +1,3 @@
-from sqlalchemy import select
-from sqlalchemy import update
-
 from app.domain.models.user.dto import UserCreate, UserGet
 from app.infra.db.models.user.schema import User
 
