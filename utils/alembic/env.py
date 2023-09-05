@@ -20,9 +20,13 @@ if config.config_file_name is not None:
 # target_metadata = mymodel.Base.metadata
 target_metadata = None
 
-from app.infra.db.models.user.schema import Base
+import app.infra.db.models.user.schema as user
+import app.infra.db.models.slot.schema as slot
 
-target_metadata = Base.metadata
+target_metadata = [
+    user.Base.metadata,
+    slot.Base.metadata
+]
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
