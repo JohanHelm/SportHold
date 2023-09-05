@@ -1,4 +1,5 @@
 from sqlalchemy import select
+from sqlalchemy import update
 
 from app.domain.models.user.dto import UserCreate, UserGet
 from app.infra.db.models.user.schema import User
@@ -17,10 +18,20 @@ class UsedDAO:
             print(get_user_pydantic)
             return get_user_pydantic
 
-    async def get(self, filter ):
+    async def get_by_id(self, id):
         async with self.session() as session:
-            result = await session.scalars(select(User).filter_by(**filter))
-            first_user_in_db = result.first()
-            print(first_user_in_db)
-            get_user_pydantic = UserGet.model_validate(first_user_in_db)
+            user = await session.get(User, id)
+            get_user_pydantic = UserGet.model_validate(user)
             return get_user_pydantic
+
+    async def update(self, updated_user: UserGet):
+        async with self.session() as session:
+            user = await session.get(User, updated_user.id)
+            kv = updated_user.model_dump()
+            for key, value in kv.items():
+                setattr(user, key, value)
+            await session.commit()
+            get_user_pydantic = UserGet.model_validate(user)
+            return get_user_pydantic
+
+
