@@ -4,9 +4,6 @@ from app.infra.db.models.user.dao import UsedDAO
 
 pytest_plugins = ('pytest_asyncio',)
 
-PK_ID = None
-
-
 @pytest.mark.asyncio
 async def test_user_add(async_db_session):
     session = await async_db_session

@@ -1,8 +1,5 @@
-from typing import Deque, Optional
 from datetime import date, time, timedelta
-from collections import deque
-
-from sqlalchemy import Integer, String, Date, Time
+from sqlalchemy import Integer, String
 from sqlalchemy.types import Interval
 from sqlalchemy.orm import Mapped, declarative_base
 from sqlalchemy.orm import mapped_column
@@ -18,3 +15,5 @@ class Slot(Base):
     start_time: Mapped[time]
     timedelta: Mapped[timedelta] = mapped_column(Interval)
     user_id_deque: Mapped[str] = mapped_column(String)
+
+#TODO https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.ARRAY -> user_id_deque: Mapped[str] = mapped_column(String)
