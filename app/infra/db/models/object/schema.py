@@ -1,9 +1,8 @@
 from sqlalchemy import String
-from sqlalchemy.orm import Mapped, declarative_base
+from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 
-Base = declarative_base()
-
+from ...models import Base
 class Object(Base):
     __tablename__ = "object"
 

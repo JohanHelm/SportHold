@@ -12,17 +12,9 @@ if config.config_file_name is not None:
 
 target_metadata = None
 
-import app.infra.db.models.user.schema as user
-import app.infra.db.models.slot.schema as slot
-import app.infra.db.models.object.schema as app_object
-import app.infra.db.models.schedule.schema as schedule
+from app.infra.db.models import Base
 
-target_metadata = [
-    user.Base.metadata,
-    slot.Base.metadata,
-    app_object.Base.metadata,
-    schedule.Base.metadata
-]
+target_metadata = Base.metadata
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.

@@ -1,10 +1,13 @@
 from datetime import time, timedelta
-from sqlalchemy import Integer, String, Time, ARRAY
+from typing import List
+
+from sqlalchemy import Integer, String, Time, ARRAY, Column
 from sqlalchemy.types import Interval
-from sqlalchemy.orm import Mapped, declarative_base
+from sqlalchemy.orm import Mapped, declarative_base, relationship
 from sqlalchemy.orm import mapped_column
 
-Base = declarative_base()
+from ...models import Base
+
 
 class Schedule(Base):
     __tablename__ = "schedule"
