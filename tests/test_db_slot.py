@@ -9,13 +9,13 @@ pytest_plugins = ('pytest_asyncio',)
 
 
 @pytest.mark.asyncio
-async def test_slot_add(async_db_session):
+async def test_slot_create(async_db_session):
     session = await async_db_session
     slot_dao = SlotDAO(session)
     queue_in = QueueController()
     queue_out = QueueController()
-    users_id_list = ["1", "2"]
-    data = queue_in.add_list(users_id_list).to_str()
+    users_id_list = [1, 2]
+    data = queue_in.add_list(users_id_list).to_list()
 
     test_slot_pydantic = SlotCreate(
         schedule_id=123,
@@ -29,22 +29,23 @@ async def test_slot_add(async_db_session):
         user_id_deque=data
     )
     created_slot: SlotGet = await slot_dao.create(test_slot_pydantic)
-    returned_deque_as_str = created_slot.user_id_deque
-    assert queue_in.get() == queue_out.from_str(returned_deque_as_str).get()
+    returned_deque_from_db = created_slot.user_id_deque
+    assert queue_in.get_deque() == queue_out.from_list(returned_deque_from_db).get_deque()
+
 
 
 def test_slot_remove_first():
     queue_in = QueueController()
-    data = ["1", "2"]
+    data = [1,2]
     queue_in.add_list(data)
     queue_in.remove_first()
 
-    assert queue_in.get() == deque(["2"])
+    assert queue_in.get_deque() == deque([2])
 
 def test_slot_remove_id():
     queue_in = QueueController()
-    data = ["1", "2", "3"]
+    data = [1,2,3]
     queue_in.add_list(data)
-    queue_in.remove("2")
+    queue_in.remove(2)
 
-    assert queue_in.get() == deque(["1", "3"])
+    assert queue_in.get_deque() == deque([1,3])

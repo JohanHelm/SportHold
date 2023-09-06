@@ -8,12 +8,14 @@ class SlotBase(BaseModel):
     start_date: date
     start_time: time
     timedelta: timedelta
-    user_id_deque: str
+    user_id_deque: List[int]
 
     model_config = ConfigDict(from_attributes=True)
 
+
 class SlotCreate(SlotBase):
     ...
+
 
 class SlotGet(SlotBase):
     id: int
