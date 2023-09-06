@@ -13,7 +13,6 @@ class ScheduleBase(BaseModel):
     min_book_time: timedelta = None
     max_book_time: timedelta = None
     time_step: timedelta = None
-    slots: List[SlotBase] = None
 
     model_config = ConfigDict(from_attributes=True)
 

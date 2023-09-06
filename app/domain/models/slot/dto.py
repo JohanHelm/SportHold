@@ -1,10 +1,10 @@
 from pydantic import BaseModel, ConfigDict
 from datetime import date, time, timedelta
-from typing import Deque, Optional, List
+from typing import Optional, List
 
 
 class SlotBase(BaseModel):
-    schedule_id: int
+    schedule_id: Optional[int] = None
     start_date: date
     start_time: time
     timedelta: timedelta

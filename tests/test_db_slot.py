@@ -18,7 +18,6 @@ async def test_slot_create(async_db_session):
     data = queue_in.add_list(users_id_list).to_list()
 
     test_slot_pydantic = SlotCreate(
-        schedule_id=123,
         start_date=date(
             year=2023,
             month=10,

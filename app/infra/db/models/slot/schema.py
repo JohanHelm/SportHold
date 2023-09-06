@@ -14,4 +14,4 @@ class Slot(Base):
     start_time: Mapped[time] = mapped_column(Time)
     timedelta: Mapped[timedelta] = mapped_column(Interval)
     user_id_deque: Mapped[str] = mapped_column(ARRAY(Integer))
-    schedule_id: Mapped[int] = mapped_column(Integer, ForeignKey("schedule.id"))
+    schedule_id: Mapped[int] = mapped_column(Integer, ForeignKey("schedule.id"), nullable=True)
