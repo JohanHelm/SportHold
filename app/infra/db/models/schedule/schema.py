@@ -21,3 +21,4 @@ class Schedule(Base):
     min_book_time: Mapped[timedelta] = mapped_column(Interval)
     max_book_time: Mapped[timedelta] = mapped_column(Interval)
     time_step: Mapped[timedelta] = mapped_column(Interval)
+    slot: Mapped[List["Slot"]] = relationship(back_populates="schedule")
