@@ -15,11 +15,13 @@ target_metadata = None
 import app.infra.db.models.user.schema as user
 import app.infra.db.models.slot.schema as slot
 import app.infra.db.models.object.schema as app_object
+import app.infra.db.models.schedule.schema as schedule
 
 target_metadata = [
     user.Base.metadata,
     slot.Base.metadata,
-    app_object.Base.metadata
+    app_object.Base.metadata,
+    schedule.Base.metadata
 ]
 
 def run_migrations_offline() -> None:
