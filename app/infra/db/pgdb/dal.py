@@ -18,7 +18,7 @@ class Builder:
         )
 
         self.session = async_sessionmaker(
-          self.engine, expire_on_commit=False, class_=AsyncSession
+          self.engine, expire_on_commit=False, class_=AsyncSession, autoflush=False, autocommit=False
         )
         return self.session
 
