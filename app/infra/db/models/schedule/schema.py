@@ -1,9 +1,9 @@
 from datetime import time, timedelta
 from typing import List
 
-from sqlalchemy import Integer, String, Time, ARRAY, Column
+from sqlalchemy import Integer, String, Time, ARRAY
 from sqlalchemy.types import Interval
-from sqlalchemy.orm import Mapped, declarative_base, relationship
+from sqlalchemy.orm import Mapped, relationship
 from sqlalchemy.orm import mapped_column
 
 from ...models import Base

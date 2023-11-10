@@ -1,5 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 from typing import Optional
+# from ... import CustomLogger as logger
 
 
 class UserBase(BaseModel):
@@ -20,3 +21,6 @@ class UserCreate(UserBase):
 
 class UserGet(UserBase):
     id: int
+
+
+# logger.info("data")

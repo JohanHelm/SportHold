@@ -1,0 +1,4 @@
+# this is default config file
+
+PRODUCTION:
+  test: "var"
