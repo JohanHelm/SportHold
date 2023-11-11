@@ -2,4 +2,4 @@ from utils.cli import cli
 
 
 if __name__ == "__main__":
-    cli.take_options()
+    cli.get_cli_options()

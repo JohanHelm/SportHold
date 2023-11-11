@@ -1,7 +1,7 @@
 from pathlib import Path
 import click
+import os
 
-ENVS = ["prod","dev", "test"]
 
 @click.command()
 # если параметр не передан напрямую взять его из переменных среды (envvar)
@@ -9,51 +9,56 @@ ENVS = ["prod","dev", "test"]
 @click.option(
     "-s",
     "--settings_file_path",
-    default="./conf/config.yaml", 
-    help="Path to config file.",
-    type=Path,
+    type=click.Path(exists=True),
+    default="./conf/config.yaml",
     show_default=True,
+    help="Path to config file.",
 )
 # тут же делать проверку https://click.palletsprojects.com/en/8.1.x/options/#choice-options
 # если параметр не передан напрямую взять его из переменных среды (envvar)
 @click.option(
     "-e",
     "--env",
-    type=str,
-    default="production",
+    type=click.Choice(("prod", "dev", "test"), case_sensitive=False),
+    default="prod",
     show_default=True,
-    help="Choose one of next options: production, test, development",
+    help="Choose one of environment variables: prod, test, dev",
 )
-
-# @cick.option(-ll --loglevel уровень логирования -- DEBUG, INFO ...)
-# @cick.option(-lf --logfile путь к файлу для логировани -- Path)
-# @cick.option(-lm --logfilemaxsize ограничение на рамер лог файла по исчерпанию которого файл ротируется -- Path)
-
-# def get_options(settings: str, env: str):
-def get_cli_options(settings_file_path: Path, 
-                    env: ENVS,
-                    loglevel,
-                    logfile,
-                    logfilemaxsize): # ENVS - проверить TypeHints
+@click.option(   #  уровень логирования -- DEBUG, INFO ...
+    '-ll',
+    '--loglevel',
+    type=click.Choice(('DEBUG', 'INFO', 'WARNING'), case_sensitive=False),
+    default='INFO',
+    show_default=True,
+    help="Choose logging level"
+)
+@click.option(   #  путь к файлу для логировани -- Path
+    '-lf',
+    '--logfile',
+    type=click.Path(exists=True),
+    default="./logs/logfile.log",
+    show_default=True,
+    help="Path to log file.",
+)
+@click.option(   #  ограничение на рамер лог файла по исчерпанию которого файл ротируется -- Path
+    '-lm',
+    '--logfilemaxsize',
+    type=int,  # ore str, 10M for example
+    default=10,
+    show_default=True,
+    help="Max size of log file before rotation.",
+)
+def get_cli_options(settings_file_path: Path, env: str, loglevel: str, logfile: str, logfilemaxsize: int): # ENVS - проверить TypeHints
     
-    # return 
+    click.echo(settings_file_path)
+    click.echo(os.getenv(env.upper()))  # Можно доставать переменную среды библеотеками os, environs, dotenv
+    click.echo(loglevel)
+    click.echo(logfile)
+    click.echo(logfilemaxsize)
+
 
     # тут будем передавать данные в Dynaconf
-    # options = []
-    # if Path(settings).exists():
-    #     options.append(settings)
-    #     click.echo(f"Config file {settings} really exists!")
-    # else:
-    #     click.echo(f"Config file {settings} not found!")
 
-    # if env in ("production", "test", "development"):
-    #     options.append(env)
-    #     click.echo(f'Choosen environmet "{env}" can be applied!')
-    # else:
-    #     click.echo(f"You have to choose one of: production, test, development!")
-
-    # if len(options) == 2:
-    #     cli_builder(options)
 
 
 # 1. Путь к конфиг файлу. -s --settings
