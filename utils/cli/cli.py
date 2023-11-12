@@ -9,7 +9,12 @@ import os
 @click.option(
     "-s",
     "--settings_file_path",
-    type=click.Path(exists=True),
+    type=click.Path(
+        exists=True,
+        readable=True,
+        resolve_path=False,
+        path_type=Path,
+    ),
     default="./conf/config.yaml",
     show_default=True,
     help="Path to config file.",
@@ -35,7 +40,12 @@ import os
 @click.option(   #  путь к файлу для логировани -- Path
     '-lf',
     '--logfile',
-    type=click.Path(exists=True),
+    type=click.Path(
+        exists=True,
+        writable=True,
+        resolve_path=False,
+        path_type=Path,
+    ),
     default="./logs/logfile.log",
     show_default=True,
     help="Path to log file.",
@@ -43,10 +53,10 @@ import os
 @click.option(   #  ограничение на рамер лог файла по исчерпанию которого файл ротируется -- Path
     '-lm',
     '--logfilemaxsize',
-    type=int,  # ore str, 10M for example
+    type=click.INT,  # ore click.STR, 10M for example
     default=10,
     show_default=True,
-    help="Max size of log file before rotation.",
+    help="Max size of log file before rotation in megabytes.",
 )
 def get_cli_options(settings_file_path: Path, env: str, loglevel: str, logfile: str, logfilemaxsize: int): # ENVS - проверить TypeHints
     
