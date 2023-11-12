@@ -76,4 +76,4 @@ def get_cli_options(
 
 
 def cli_builder(options):
-    print("build cli application")
+    return get_cli_options
