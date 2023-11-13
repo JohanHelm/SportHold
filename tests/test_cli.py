@@ -33,3 +33,21 @@ def test_cli_custom_options(cli_runner):
         ],
     )
     assert result.exit_code == 0
+
+def test_cli_bad_custom_options(cli_runner):
+    result = cli_runner.invoke(
+        get_cli_options,
+        [
+            "--settings_file_path",
+            "./conf/config.yaml",
+            "--env",
+            "DEV", # error option
+            "-ll",
+            "INFO",
+            "-lf",
+            "./logs/dev_log.log",
+            "-lm",
+            "10",
+        ],
+    )
+    assert result.exit_code == 2

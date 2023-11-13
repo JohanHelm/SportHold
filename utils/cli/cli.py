@@ -27,7 +27,7 @@ from loguru import logger
     type=click.Choice(("PRODUCTION", "DEVELOPMENT", "TEST"), case_sensitive=False),
     default="TEST",
     show_default=True,
-    help="Choose one of environment variables: prod, test, dev",
+    help='Choose one of environment variables: "PRODUCTION", "DEVELOPMENT", "TEST"',
     envvar="ENV",
 )
 @click.option(  #  уровень логирования -- DEBUG, INFO ...
