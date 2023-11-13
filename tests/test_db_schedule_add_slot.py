@@ -3,6 +3,7 @@ from datetime import time, timedelta, date
 import pytest
 from sqlalchemy import select
 from sqlalchemy.orm import noload
+from sqlalchemy.orm import selectinload
 
 from app.domain.models.schedule.dto import ScheduleGet, ScheduleCreate
 from app.domain.models.slot.controller import QueueController
@@ -16,9 +17,8 @@ pytest_plugins = ('pytest_asyncio',)
 
 
 @pytest.mark.asyncio
-async def test_schedule_add(async_db_session):
-    session = await async_db_session
-    schedule_dao = ScheduleDAO(session)
+async def test_schedule_add(session):
+    schedule_dao = ScheduleDAO()
     test_schedule_pydantic = ScheduleCreate(
         name="Test schedule",
         desc="Description",
@@ -29,10 +29,10 @@ async def test_schedule_add(async_db_session):
         max_book_time=timedelta(minutes=30),
         time_step=timedelta(minutes=15)
     )
-    created_schedule: ScheduleGet = await schedule_dao.create(test_schedule_pydantic)
+    created_schedule: ScheduleGet = await schedule_dao.create(session, test_schedule_pydantic)
     pytest.test_schedule_id = created_schedule.id
 
-    slot_dao = SlotDAO(session)
+    slot_dao = SlotDAO()
     queue_in = QueueController()
     users_id_list = [1, 2]
     data = queue_in.add_list(users_id_list).to_list()
@@ -47,13 +47,13 @@ async def test_schedule_add(async_db_session):
         timedelta=timedelta(minutes=30),
         user_id_deque=data
     )
-    created_slot: SlotGet = await slot_dao.create(test_slot_pydantic)
+    created_slot: SlotGet = await slot_dao.create(session, test_slot_pydantic)
     async with session() as session:
-        # optons(noload() - хак для исключения ошибок тестирования
-        sa_scehdule = await session.execute(select(Schedule).where(Schedule.id == created_schedule.id).options(noload(Schedule.slot)))
+        # optons(selectinload() - https://stackoverflow.com/questions/70104873/how-to-access-relationships-with-async-sqlalchemy
+        sa_scehdule = await session.execute(select(Schedule).where(Schedule.id == created_schedule.id).options(selectinload(Schedule.slot)))
         sa_scehdule_ = sa_scehdule.scalars().first()
 
-        sa_slot = await session.execute(select(Slot).where(Slot.id == created_slot.id).options(noload(Slot.schedule)))
+        sa_slot = await session.execute(select(Slot).where(Slot.id == created_slot.id).options(selectinload(Slot.schedule)))
         sa_slot_ = sa_slot.scalars().first()
         sa_scehdule_.slot.append(sa_slot_)
         session.add(sa_scehdule_)

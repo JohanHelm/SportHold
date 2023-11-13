@@ -9,9 +9,8 @@ pytest_plugins = ('pytest_asyncio',)
 
 
 @pytest.mark.asyncio
-async def test_slot_create(async_db_session):
-    session = await async_db_session
-    slot_dao = SlotDAO(session)
+async def test_slot_create(session):
+    slot_dao = SlotDAO()
     queue_in = QueueController()
     queue_out = QueueController()
     users_id_list = [1, 2]
@@ -27,7 +26,7 @@ async def test_slot_create(async_db_session):
         timedelta=timedelta(minutes=30),
         user_id_deque=data
     )
-    created_slot: SlotGet = await slot_dao.create(test_slot_pydantic)
+    created_slot: SlotGet = await slot_dao.create(session, test_slot_pydantic)
     returned_deque_from_db = created_slot.user_id_deque
     assert queue_in.get_deque() == queue_out.from_list(returned_deque_from_db).get_deque()
 
