@@ -82,9 +82,9 @@ def cli_runner():
     return runner
 
 
-@pytest.fixture(scope="function", autouse=True)
+@pytest.fixture(scope="function")
 def set_env():
-    os.environ["ENV"] = "DEV"
+    os.environ["ENV"] = "DEVELOPMENT"
     os.environ["LOGLEVEL"] = "DEBUG"
     os.environ["LOGFILE"] = "./logs/logfile.log"
     os.environ["SETTING_FILE_PATH"] = "./conf/config.yaml"
