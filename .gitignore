@@ -1,7 +1,4 @@
 .idea/
 __pycache__
-.secrets
-/conf/settings.toml
-/conf/.secrets.toml
 .pytest_cache
 logs
