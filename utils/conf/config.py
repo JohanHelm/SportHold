@@ -1,5 +1,6 @@
 from dynaconf import Dynaconf
 from loguru import logger
+from dynaconf import Dynaconf
 
 
 def load_config(path_settings: str, current_env: str) -> Dynaconf:

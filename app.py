@@ -1,6 +1,8 @@
 from utils.cli import cli
 from utils.conf.config import load_config
 from utils.logging.logs import init_logger, configure_logger
+from utils.conf.config import load_config
+from utils.logging.logs import init_logger
 
 if __name__ == "__main__":
     logger = init_logger()
