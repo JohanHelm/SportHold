@@ -11,7 +11,7 @@ class SettingsLoader:
             settings_files=[path_settings], environments=True, env=current_env
         )
         logger.debug(
-            f"get settings from file: {path_settings} with ENV = {current_env}"
+            f"Loading: settings from file: {path_settings} with ENV={current_env}"
         )
         cls.settings = settings
 

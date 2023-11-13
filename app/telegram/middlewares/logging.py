@@ -10,7 +10,6 @@ class LoggingMiddleware(BaseMiddleware):
         event: TelegramObject,
         data: Dict[str, Any]
     ) -> Any:
-        logger.debug(f"Before handler {event.message.from_user.id}") # записывать, от какого пользователя какое сообщение пришло
-        result = await handler(event, data)
-        logger.debug("After handler") 
+        logger.debug(f"Handler: logging {event.message.from_user.id}") # записывать, от какого пользователя какое сообщение пришло
+        result = await handler(event, data) 
         return result

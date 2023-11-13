@@ -10,7 +10,7 @@ router: Router = Router()
 @router.message(CommandStart())
 async def process_start_command(message: Message, db_session, bot: Bot):
     logger.debug(
-        f"get message from: {message.from_user.username}, user_id: {message.from_user.id} message: {message.text}"
+        f"Bot: message from: {message.from_user.username}, user_id: {message.from_user.id} message: {message.text}"
     )
     user_dao = UsedDAO() # TODO: сделать методы класса статическими
     user = await user_dao.get_by_id(db_session, id=1)

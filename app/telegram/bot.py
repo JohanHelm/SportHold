@@ -9,7 +9,7 @@ from utils.conf.config import SettingsLoader
 
 async def start_bot():
     settings = SettingsLoader.settings
-    logger.debug("Bot online")
+    logger.debug(f"Configure: bot {settings.BOT_URL}")
     storage = MemoryStorage()
     bot: Bot = Bot(
         token=settings.BOT_TOKEN,

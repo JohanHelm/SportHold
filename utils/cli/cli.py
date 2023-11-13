@@ -66,7 +66,7 @@ def get_cli_options(
     *args, **kwargs
 ):  # ENVS - проверить TypeHints
     # print(settings_file_path, env, loglevel, logfile, logfilemaxsize)
-    logger.debug("get CLI kwargs")
+    logger.debug("Loading: cli params")
     return kwargs
 
 
