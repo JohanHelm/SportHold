@@ -31,8 +31,10 @@ async def start_bot():
     logger.debug("-> Bot online")
 
     # -> Config
-    config: Dynaconf = load_config("confconf/settings.toml",
-                                   "confconf/.secrets.toml", )
+    config: Dynaconf = load_config(
+        "confconf/settings.toml",
+        "confconf/.secrets.toml",
+    )
 
     # -> Storage
     storage = MemoryStorage()
@@ -48,9 +50,21 @@ async def start_bot():
             "en": ("en-US",),
         },
         [
-            FluentTranslator("ru", translator=FluentBundle.from_files("ru", ["locales/ru.ftl"], )),
-            FluentTranslator("en", translator=FluentBundle.from_files("en", ["locales/en.ftl"], ))
-        ]
+            FluentTranslator(
+                "ru",
+                translator=FluentBundle.from_files(
+                    "ru",
+                    ["locales/ru.ftl"],
+                ),
+            ),
+            FluentTranslator(
+                "en",
+                translator=FluentBundle.from_files(
+                    "en",
+                    ["locales/en.ftl"],
+                ),
+            ),
+        ],
     )
 
     # -> Bot
@@ -70,8 +84,10 @@ async def start_bot():
     # -> Start
     try:
         await bot.delete_webhook(drop_pending_updates=True)
-        await dp.start_polling(bot,
-                               _translator_hub=translator_hub,
-                               allowed_updates=dp.resolve_used_update_types())
+        await dp.start_polling(
+            bot,
+            _translator_hub=translator_hub,
+            allowed_updates=dp.resolve_used_update_types(),
+        )
     finally:
         await bot.session.close()

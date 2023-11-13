@@ -1,4 +1,9 @@
 # this is default config file
-
+DEFAULT:
+  conf_env: "default env"
 PRODUCTION:
-  test: "var"
+  conf_env: "prod nev"
+TEST:
+  conf_env: "test env"
+  DB:
+    URI: "postgresql+asyncpg://postgres:qwerty123@127.0.0.1:5432/dev"

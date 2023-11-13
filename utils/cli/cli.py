@@ -1,7 +1,6 @@
 from pathlib import Path
 import click
-import os
-
+from loguru import logger
 
 @click.command()
 # если параметр не передан напрямую взять его из переменных среды (envvar)
@@ -25,8 +24,8 @@ import os
 @click.option(
     "-e",
     "--env",
-    type=click.Choice(("prod", "dev", "test"), case_sensitive=False),
-    default="prod",
+    type=click.Choice(("PRODUCTION", "DEVELOPMENT", "TEST"), case_sensitive=False),
+    default="TEST",
     show_default=True,
     help="Choose one of environment variables: prod, test, dev",
     envvar="ENV",
@@ -64,15 +63,11 @@ import os
     envvar="LOGFILEMAXSIZE",
 )
 def get_cli_options(
-    settings_file_path: Path, env: str, loglevel: str, logfile: str, logfilemaxsize: int
+    *args, **kwargs
 ):  # ENVS - проверить TypeHints
-    print(
-        settings_file_path,
-        env,
-        loglevel,
-        logfile,
-        logfilemaxsize
-        )
+    # print(settings_file_path, env, loglevel, logfile, logfilemaxsize)
+    logger.debug("get CLI kwargs")
+    return kwargs
 
 
 def cli_builder(options):

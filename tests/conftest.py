@@ -1,4 +1,5 @@
 import asyncio
+import os
 import pytest
 import pytest_asyncio
 from app.infra.db.pgdb.dal import Builder
@@ -26,3 +27,11 @@ def event_loop():
 def cli_runner():
     runner = CliRunner()
     return runner
+
+@pytest.fixture(scope="function", autouse=True)
+def set_env():
+    os.environ["ENV"] = "DEV"
+    os.environ["LOGLEVEL"] = "DEBUG"
+    os.environ["LOGFILE"] = "./logs/logfile.log"
+    os.environ["SETTING_FILE_PATH"] = "./conf/config.yaml"
+    
