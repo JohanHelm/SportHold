@@ -1,5 +1,5 @@
 from datetime import time, timedelta
-from typing import List
+from typing import TYPE_CHECKING, List
 
 from sqlalchemy import Integer, String, Time, ARRAY
 from sqlalchemy.types import Interval
@@ -7,6 +7,9 @@ from sqlalchemy.orm import Mapped, relationship
 from sqlalchemy.orm import mapped_column
 
 from ...models import Base
+
+if TYPE_CHECKING:
+    from app.infra.db.models.slot.schema import Slot
 
 
 class Schedule(Base):
