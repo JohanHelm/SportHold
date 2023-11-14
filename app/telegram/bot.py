@@ -17,7 +17,7 @@ async def start_bot():
     dp: Dispatcher = Dispatcher(storage=storage)  # сторейдж заменить на редиску
     dp.include_router(commands.router)  # подумать, как регистрировать сразу все роутеры
     dp.update.middleware(LoggingMiddleware()) # подумать, как регистрировать сразу все сидлвари
-    dp.update.middleware(DbSessionMiddleware(uri=settings.DB.URI, echo=True))
+    dp.update.middleware(DbSessionMiddleware(uri=settings.DB.URI, echo=False))
 
 
     try:
