@@ -1,5 +1,9 @@
+from datetime import date, datetime
+import json
+from os import name
 from typing import List, Tuple
 from sqlalchemy import (
+    DateTime,
     Row,
     Select,
     create_engine,
@@ -8,116 +12,126 @@ from sqlalchemy import (
     ForeignKey,
     select,
     delete,
+    true,
 )
+
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.orm import Mapped, declarative_base
 from sqlalchemy.orm import mapped_column
+from sqlalchemy.types import JSON
 
 Base = declarative_base()
-engine = create_engine("sqlite:///example.db", echo=True)
+engine = create_engine("sqlite:///example.db")
 Session = sessionmaker(bind=engine)
 session = Session()
 
 
-class BaseObject(Base):
-    __tablename__ = "objects"
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    name: Mapped[str] = mapped_column(String)
-    schedules: Mapped[List["Schedule"]] = relationship(back_populates="object")
-
-
 class User(Base):
     __tablename__ = "users"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    tg_id: Mapped[int] = mapped_column(String)
+    username: Mapped[str] = mapped_column(String)
+    records: Mapped[List["Record"]] = relationship()
+
+    def __str__(self):
+        return f"SQLA User, id: {self.id}, TG id: {self.tg_id}, username: {self.username}, active records count: {len(self.records)}"
+
+
+class Rental(Base):
+    __tablename__ = "rentals"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    type: Mapped[str] = mapped_column(String)
     name: Mapped[str] = mapped_column(String)
-    queues: Mapped[List["Queue"]] = relationship(back_populates="user")
+    description: Mapped[str] = mapped_column(String)
+    schedules: Mapped[List["Schedule"]] = relationship()
+
+    def __str__(self):
+        return f"SQLA Rental, id: {self.id}, type: {self.type}, name: {self.name}, description: {self.description}, schedules count: {len(self.schedules)}"
 
 
 class Schedule(Base):
     __tablename__ = "schedules"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    name: Mapped[str] = mapped_column(String)
-    object_id: Mapped[int] = mapped_column(Integer, ForeignKey("objects.id"))
-    object: Mapped["BaseObject"] = relationship(back_populates="schedules")
-    slots: Mapped[List["Slot"]] = relationship(back_populates="schedule")
-    queues: Mapped[List["Queue"]] = relationship(back_populates="schedule")
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    description: Mapped[str] = mapped_column(String)
+    status: Mapped[str] = mapped_column(String)
+    conditions: Mapped[JSON] = mapped_column(
+        JSON, nullable=True
+    )  # TODO: описание условий для генерации слотов, необходимо продумать схему
+    rental_id: Mapped[int] = mapped_column(ForeignKey("rentals.id"))
+    rental: Mapped[Rental] = relationship(back_populates="schedules")
+    slots: Mapped[List["Slot"]] = relationship()
+
+    def __str__(self):
+        return f"SQLA Schedule, id: {self.id}, description: {self.description}, rental: {self.rental.id}, slots count: {len(self.slots)}, status: {self.status}, conditions: {self.conditions}"
 
 
 class Slot(Base):
     __tablename__ = "slots"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    name: Mapped[str] = mapped_column(String)
-    schedule_id: Mapped[int] = mapped_column(Integer, ForeignKey("schedules.id"))
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    started_at: Mapped[DateTime] = mapped_column(DateTime)
+    duration: Mapped[int] = mapped_column(Integer)
+    status: Mapped[str] = mapped_column(String)
+    schedule_id: Mapped[int] = mapped_column(ForeignKey("schedules.id"))
+    record: Mapped["Record"] = relationship()
     schedule: Mapped["Schedule"] = relationship(back_populates="slots")
-    queues: Mapped[List["Queue"]] = relationship(back_populates="slot")
+
+    def __str__(self):
+        return f"SQLA Slot, id: {self.id}, schedule: {self.schedule.id}, record: {self.record}, start at: {self.started_at}, duration: {self.duration}, status: {self.status}"
 
 
-# Модель очереди на слот
-class Queue(Base):
-    __tablename__ = "queues"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    user_id: Mapped[User] = mapped_column(Integer, ForeignKey("users.id"), unique=False)
-    slot_id: Mapped[Slot] = mapped_column(Integer, ForeignKey("slots.id"), unique=False)
-    schedule_id: Mapped[Schedule] = mapped_column(
-        Integer, ForeignKey("schedules.id"), unique=False
-    )
-    user: Mapped["User"] = relationship(back_populates="queues")
-    slot: Mapped["Slot"] = relationship(back_populates="queues")
-    schedule: Mapped["Schedule"] = relationship(back_populates="queues")
+class Record(Base):
+    __tablename__ = "records"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), unique=False)
+    slot_id: Mapped[int] = mapped_column(ForeignKey("slots.id"), unique=False)
+    user: Mapped[User] = relationship(back_populates="records")
+    slot: Mapped[Slot] = relationship(back_populates="record")
+
+    def __str__(self):
+        return f"SQLA Record, id: {self.id}, user: {self.user.id}, slot: {self.slot.id}"
 
 
 Base.metadata.drop_all(engine)
 Base.metadata.create_all(engine)
 
-user1 = User(name="user1")
-user2 = User(name="user2")
-obj1 = BaseObject(name="obj1")
-
-session.add(user1)
-session.add(user2)
-session.add(obj1)
-
-session.commit()
-
-curr_obj = session.get(BaseObject, 1)
-
-sch1 = Schedule(name="schedule 1")
-curr_obj.schedules.append(sch1)
-
-session.commit()
-slot1 = Slot(name="slot 1")
-
-curr_sch = session.get(Schedule, 1)
-
-curr_sch.slots.append(slot1)
-session.commit()
-
-q1 = Queue(schedule=curr_sch, slot=slot1, user=user1)
-q2 = Queue(schedule=curr_sch, slot=slot1, user=user2)
-
-session.add(q1)
-session.add(q2)
-
-session.commit()
-
-stmt: Select[Tuple[Queue]] = (
-    select(Queue).where(Queue.user == user1).where(Queue.slot == slot1)
+user = User(tg_id=103273, username="@telegram_test_user")
+rental = Rental(
+    name="Ping-pong table", description="Free-to-play ping-pong table on 2nd floor", type = "SPORT"
 )
-res: Row[Tuple[Queue]] | None = session.execute(stmt).fetchone()
-if not res is None:
-    for row in res:
-        print(row.user.name)
 
-# удаление пользователя их очереди
-stmt: Select[Tuple[Queue]] = (
-    delete(Queue).where(Queue.slot == slot1).where(Queue.user == user1)
+session.add_all([user, rental])
+session.commit()
+print(user, rental, sep="\n")
+
+schedule = Schedule(
+    description="Basic schedule for pin-pong table",
+    status="ACTIVE",
+    conditions={"key": "value"},
 )
-res: Row[Tuple[Queue]] | None = session.execute(stmt)
+schedule.rental = rental
+session.add_all([schedule])
+session.commit()
+print(schedule)
 
-stmt: Select[Tuple[Queue]] = select(Queue).where(Queue.slot == slot1)
-res: Row[Tuple[Queue]] | None = session.execute(stmt).fetchone()
-print(res[0].user.name)
 
+slot = Slot(started_at=datetime(2023, 12, 1, 12, 12), duration=30, status="PLANNED")
+schedule.slots.append(slot)
 
 session.commit()
+print(slot)
+
+record = Record()
+record.slot = slot
+record.user = user
+
+session.add(record)
+session.commit()
+
+print(record)
+print(slot)
