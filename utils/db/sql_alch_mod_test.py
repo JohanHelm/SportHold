@@ -6,6 +6,7 @@ from sqlalchemy import (
     DateTime,
     Row,
     Select,
+    UniqueConstraint,
     create_engine,
     Integer,
     String,
@@ -22,7 +23,7 @@ from sqlalchemy.orm import mapped_column
 from sqlalchemy.types import JSON
 
 Base = declarative_base()
-engine = create_engine("sqlite:///example.db")
+engine = create_engine("sqlite:///example.db", echo=False)
 Session = sessionmaker(bind=engine)
 session = Session()
 
@@ -77,11 +78,11 @@ class Slot(Base):
     duration: Mapped[int] = mapped_column(Integer)
     status: Mapped[str] = mapped_column(String)
     schedule_id: Mapped[int] = mapped_column(ForeignKey("schedules.id"))
-    record: Mapped["Record"] = relationship()
+    record: Mapped[List["Record"]] = relationship()
     schedule: Mapped["Schedule"] = relationship(back_populates="slots")
 
     def __str__(self):
-        return f"SQLA Slot, id: {self.id}, schedule: {self.schedule.id}, record: {self.record}, start at: {self.started_at}, duration: {self.duration}, status: {self.status}"
+        return f"SQLA Slot, id: {self.id}, schedule: {self.schedule.id}, records: {[str(x) for x in self.record]}, start at: {self.started_at}, duration: {self.duration}, status: {self.status}"
 
 
 class Record(Base):
@@ -93,6 +94,8 @@ class Record(Base):
     user: Mapped[User] = relationship(back_populates="records")
     slot: Mapped[Slot] = relationship(back_populates="record")
 
+    __table_args__ = (UniqueConstraint("user_id", "slot_id"),)
+
     def __str__(self):
         return f"SQLA Record, id: {self.id}, user: {self.user.id}, slot: {self.slot.id}"
 
@@ -101,11 +104,14 @@ Base.metadata.drop_all(engine)
 Base.metadata.create_all(engine)
 
 user = User(tg_id=103273, username="@telegram_test_user")
+user_2 = User(tg_id=103272, username="@telegram_test_user_2")
 rental = Rental(
-    name="Ping-pong table", description="Free-to-play ping-pong table on 2nd floor", type = "SPORT"
+    name="Ping-pong table",
+    description="Free-to-play ping-pong table on 2nd floor",
+    type="SPORT",
 )
 
-session.add_all([user, rental])
+session.add_all([user, rental, user_2])
 session.commit()
 print(user, rental, sep="\n")
 
@@ -129,9 +135,16 @@ print(slot)
 record = Record()
 record.slot = slot
 record.user = user
-
 session.add(record)
 session.commit()
 
 print(record)
+print(slot)
+
+existing_slot = session.get(Slot, 1)
+record_2 = Record(slot_id=existing_slot.id)
+record_2.user = user_2
+session.add(record_2)
+session.commit()
+
 print(slot)
