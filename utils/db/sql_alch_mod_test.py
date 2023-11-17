@@ -1,19 +1,13 @@
 from datetime import date, datetime
-import json
-from os import name
-from typing import List, Tuple
+from enum import Enum
+from typing import List
 from sqlalchemy import (
     DateTime,
-    Row,
-    Select,
     UniqueConstraint,
     create_engine,
     Integer,
     String,
-    ForeignKey,
-    select,
-    delete,
-    true,
+    ForeignKey
 )
 
 from sqlalchemy.ext.declarative import declarative_base
@@ -21,6 +15,49 @@ from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.orm import Mapped, declarative_base
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.types import JSON
+from pydantic import BaseModel
+
+
+class WorkDays(str, Enum):
+    monday = "MONDAY"
+    tuesday = "TUESDAY"
+    wednesday = "WEDNESDAY"
+    thursday = "THURSDAY"
+    friday = "FRIDAY"
+    saturday = "SATURDAY"
+    sunday = "SUNDAY"
+
+
+class ExeptionType(str, Enum):
+    access = "ACCESS"
+    forbidden = "FORBIDDEN"
+
+
+class ConditionType(str, Enum):
+    flex_slot = "FLEX_SLOT"
+    solid_slot = "SOLID_SLOT"
+    manual_slot = "MANUAL_SLOT"
+
+
+class ConditionExeption(BaseModel):
+    type: ExeptionType
+    day: date
+    start_hour: int
+    end_hour: int
+
+
+class Conditions(BaseModel):
+    type: ConditionType
+    start_at: datetime
+    end_at: datetime
+    work_days: List[WorkDays]
+    exceptions: List[ConditionExeption]
+    start_hour: int
+    end_hour: int
+    min_time: int
+    max_time: int
+    book_range_hours: int
+
 
 Base = declarative_base()
 engine = create_engine("sqlite:///example.db", echo=False)
@@ -58,7 +95,9 @@ class Schedule(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     description: Mapped[str] = mapped_column(String)
-    status: Mapped[str] = mapped_column(String)
+    status: Mapped[str] = mapped_column(
+        String
+    )  # TODO: вынести статусы в отдельный перечень
     conditions: Mapped[JSON] = mapped_column(
         JSON, nullable=True
     )  # TODO: описание условий для генерации слотов, необходимо продумать схему
@@ -76,7 +115,9 @@ class Slot(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     started_at: Mapped[DateTime] = mapped_column(DateTime)
     duration: Mapped[int] = mapped_column(Integer)
-    status: Mapped[str] = mapped_column(String)
+    status: Mapped[str] = mapped_column(
+        String
+    )  # TODO: вынести статусы в отдельный перечень
     schedule_id: Mapped[int] = mapped_column(ForeignKey("schedules.id"))
     record: Mapped[List["Record"]] = relationship()
     schedule: Mapped["Schedule"] = relationship(back_populates="slots")
