@@ -1,19 +1,33 @@
-from typing import Optional
+from typing import List, TYPE_CHECKING
 
 from sqlalchemy import Integer, String
-from sqlalchemy.orm import Mapped, declarative_base
-from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import Mapped,  mapped_column
+from sqlalchemy.orm import relationship
 
-from ...models import Base
+# from ..record.schema import Record
+
+# from ...models import Base
+from sqlalchemy.orm import DeclarativeBase
+
+class Base(DeclarativeBase):
+    pass
+
+
+# if TYPE_CHECKING:
+#     from ..record.schema import Record
+
 
 class User(Base):
-    __tablename__ = "user"
+    __tablename__ = "users"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     tg_id: Mapped[int] = mapped_column(Integer)
-    first_name: Mapped[str] = mapped_column(String(30))
-    last_name: Mapped[Optional[str]]
-    username: Mapped[Optional[str]]
-    language_code: Mapped[Optional[str]]
-    is_premium: Mapped[Optional[bool]]
-    is_bot: Mapped[Optional[bool]]
+    username: Mapped[str] = mapped_column(String)
+    records: Mapped[List["Record"]] = relationship()
+
+    def __str__(self):
+        return f"SQLA User," \
+               f" id: {self.id}," \
+               f" TG id: {self.tg_id}," \
+               f" username: {self.username}," \
+               f" active records count: {len(self.records)}"

@@ -5,8 +5,8 @@ from click.testing import CliRunner
 import pytest
 import pytest_asyncio
 from app.infra.db.pgdb.dal import Builder
-from app.domain.models.object.dto import ObjectCreate
-from app.infra.db.models.object.dao import ObjectDAO
+from app.domain.models.rental.dto import RentalCreate
+# from app.infra.db.models.rental.dao import RentalDAO
 from app.domain.models.schedule.dto import ScheduleCreate
 from app.domain.models.user.dto import UserCreate, UserGet
 
@@ -28,8 +28,8 @@ async def session():
 
 
 @pytest.fixture(scope="function")
-def test_object() -> ObjectCreate:
-    return ObjectCreate(name="test", desc="test")
+def test_rental() -> RentalCreate:
+    return RentalCreate(name="test", desc="test")
 
 
 @pytest.fixture(scope="function")
@@ -57,12 +57,13 @@ def test_user() -> UserCreate:
         language_code="ru",
         is_premium=True,
         is_bot=False,
+        # records=["Record"]
     )
     return test_user_pydantic
 
 
 @pytest.fixture(scope="function")
-def test_user_get() -> UserCreate:
+def test_user_get() -> UserGet:
     test_user_pydantic = UserGet(
         id=1,
         tg_id=123,
