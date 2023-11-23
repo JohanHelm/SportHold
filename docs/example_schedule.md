@@ -8,55 +8,61 @@
 
 ```python
 schedules = {
-  "work_days": { # расписание для рабочих дней с 9 до 18 - генерирует хард слоты
+  "schedule": { # расписание для рабочих дней с 9 до 18 - генерирует хард слоты
+    "name": "name it!"
+    "description": "any description here"
     "status": "active",
     "start_date": "2022-02-11",
     "end_date": "2022-02-22",
-    "days": [ # с понедельника по пятницу
+    "days_mask": [ # с понедельника по пятницу
       1,
       2,
       3,
       4,
       5
     ],
-    "weeks": null,
-    "months": null,
-    "quartals": null,
-    "index_days_month": null,
+    "weeks_mask": null,
+    "months_mask": null,
+    "quartal_masks": null,
+    "index_days_month_mask": null,
     "nth_weekday_month_weekday": null,
     "nth_weekday_month_nth": null,
     "day_in_year": null,
     "merge_policy": "hard",
-    "recommendation_policy": null,
+    "suggest_policy": null,
     "start_hour": 9,
     "end_hour": 18,
     "slot_type": "hard", # разрешающий тип слота - хард
     "min_time": 30,
     "max_time": 60
   },
-  "rest_time": { # расписание для рабочих дней с 13 до 14 - генерирует занятые слоты - обед!
-    "days": [ # с понедельника по пятницу
+  "schedule": { # расписание для рабочих дней с 13 до 14 - генерирует обед)
+    "name": "name it!"
+    "description": "any description here"
+    "status": "active",
+    "start_date": "2022-02-11",
+    "end_date": "2022-02-22",
+    "days_mask": [ # с понедельника по пятницу
       1,
       2,
       3,
       4,
       5
     ],
-    "weeks": null,
-    "months": null,
-    "quartals": null,
-    "index_days_month": null,
+    "weeks_mask": null,
+    "months_mask": null,
+    "quartal_masks": null,
+    "index_days_month_mask": null,
     "nth_weekday_month_weekday": null,
     "nth_weekday_month_nth": null,
-    "day_in_month": null,
     "day_in_year": null,
-    "merge_policy": null,
-    "recommendation_policy": null,
+    "merge_policy": "hard",
+    "suggest_policy": null,
     "start_hour": 13,
     "end_hour": 14,
-    "slot_type": "forbidden", # запрещающий тип слота
-    "min_time": null,
-    "max_time": null
-}
+    "slot_type": "restrict", # запрещающий тип слота - рестрикт
+    "min_time": 30,
+    "max_time": 60
+  }
 }
 ```
