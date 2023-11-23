@@ -1,4 +1,4 @@
-from typing import List
+from typing import TYPE_CHECKING, List
 
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import Mapped, relationship
@@ -6,6 +6,10 @@ from sqlalchemy.orm import mapped_column
 from sqlalchemy.types import JSON
 
 from ...models import Base
+
+if TYPE_CHECKING:
+    from rental.schema import Rental
+    from slot.schema import Slot
 
 
 class Schedule(Base):
@@ -24,10 +28,12 @@ class Schedule(Base):
     slots: Mapped[List["Slot"]] = relationship()
 
     def __str__(self):
-        return f"SQLA Schedule," \
-               f" id: {self.id}," \
-               f" description: {self.description}," \
-               f" rental: {self.rental.id}," \
-               f" slots count: {len(self.slots)}," \
-               f" status: {self.status}," \
-               f" conditions: {self.conditions}"
+        return (
+            f"SQLA Schedule,"
+            f" id: {self.id},"
+            f" description: {self.description},"
+            f" rental: {self.rental.id},"
+            f" slots count: {len(self.slots)},"
+            f" status: {self.status},"
+            f" conditions: {self.conditions}"
+        )
