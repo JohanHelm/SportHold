@@ -1,6 +1,6 @@
 from typing import List
 from sqlalchemy import Integer, String
-from sqlalchemy.orm import Mapped,  mapped_column
+from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm import relationship
 
 from ...models import Base
@@ -15,8 +15,10 @@ class User(Base):
     records: Mapped[List["Record"]] = relationship()
 
     def __str__(self):
-        return f"SQLA User," \
-               f" id: {self.id}," \
-               f" TG id: {self.tg_id}," \
-               f" username: {self.username}," \
-               f" active records count: {len(self.records)}"
+        return (
+            f"SQLA User,"
+            f" id: {self.id},"
+            f" TG id: {self.tg_id},"
+            f" username: {self.username},"
+            f" active records count: {len(self.records)}"
+        )
