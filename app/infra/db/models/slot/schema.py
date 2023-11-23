@@ -1,43 +1,16 @@
-from datetime import datetime
-from typing import TYPE_CHECKING, List
+from typing import List
 from sqlalchemy import Integer, ForeignKey, DateTime, String
 from sqlalchemy.orm import Mapped, relationship
 from sqlalchemy.orm import mapped_column
 
-# from ..record.schema import Record
-# from ..schedule.schema import Schedule
-
-# from ...models import Base
-from sqlalchemy.orm import DeclarativeBase
-
-class Base(DeclarativeBase):
-    pass
-
-# if TYPE_CHECKING:
-#     from ..record.schema import Record
-#     from ..schedule.schema import Schedule
-
-
-# class Slot(Base):
-#     __tablename__ = "slot"
-#
-#     id: Mapped[int] = mapped_column(primary_key=True)
-#     start_date: Mapped[date] = mapped_column(Date)
-#     start_time: Mapped[time] = mapped_column(Time)
-#     timedelta: Mapped[timedelta] = mapped_column(Interval)
-#     user_id_deque: Mapped[str] = mapped_column(ARRAY(Integer))
-#     schedule_id: Mapped[int] = mapped_column(
-#         Integer, ForeignKey("schedule.id"), nullable=True
-#     )
-#     schedule: Mapped["Schedule"] = relationship(back_populates="slot")
+from ...models import Base
 
 
 class Slot(Base):
     __tablename__ = "slots"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    started_at: Mapped[datetime] = mapped_column(datetime)
-    # started_at: Mapped[DateTime] = mapped_column(DateTime)
+    started_at: Mapped[DateTime] = mapped_column(DateTime)
     duration: Mapped[int] = mapped_column(Integer)
     status: Mapped[str] = mapped_column(
         String

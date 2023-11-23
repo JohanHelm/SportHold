@@ -1,22 +1,25 @@
+import asyncio
 from datetime import date, datetime
 from enum import Enum
 from typing import List
 from sqlalchemy import (
     DateTime,
     UniqueConstraint,
-    create_engine,
     Integer,
     String,
     ForeignKey
 )
 
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import relationship, DeclarativeBase
 from sqlalchemy.orm import Mapped, declarative_base
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.types import JSON
 from pydantic import BaseModel
 
+
+class Base(DeclarativeBase):
+    pass
 
 class WorkDays(str, Enum):
     monday = "MONDAY"
@@ -59,17 +62,11 @@ class Conditions(BaseModel):
     book_range_hours: int
 
 
-Base = declarative_base()
-engine = create_engine("sqlite:///example.db", echo=False)
-Session = sessionmaker(bind=engine)
-session = Session()
-
-
 class User(Base):
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    tg_id: Mapped[int] = mapped_column(String)
+    tg_id: Mapped[int] = mapped_column(Integer)
     username: Mapped[str] = mapped_column(String)
     records: Mapped[List["Record"]] = relationship()
 
@@ -81,13 +78,13 @@ class Rental(Base):
     __tablename__ = "rentals"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    type: Mapped[str] = mapped_column(String)
+    category: Mapped[str] = mapped_column(String)
     name: Mapped[str] = mapped_column(String)
     description: Mapped[str] = mapped_column(String)
     schedules: Mapped[List["Schedule"]] = relationship()
 
     def __str__(self):
-        return f"SQLA Rental, id: {self.id}, type: {self.type}, name: {self.name}, description: {self.description}, schedules count: {len(self.schedules)}"
+        return f"SQLA Rental, id: {self.id}, category: {self.category}, name: {self.name}, description: {self.description}, schedules count: {len(self.schedules)}"
 
 
 class Schedule(Base):
@@ -102,7 +99,7 @@ class Schedule(Base):
         JSON, nullable=True
     )  # TODO: описание условий для генерации слотов, необходимо продумать схему
     rental_id: Mapped[int] = mapped_column(ForeignKey("rentals.id"))
-    rental: Mapped[Rental] = relationship(back_populates="schedules")
+    rental: Mapped["Rental"] = relationship(back_populates="schedules")
     slots: Mapped[List["Slot"]] = relationship()
 
     def __str__(self):
@@ -132,8 +129,8 @@ class Record(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), unique=False)
     slot_id: Mapped[int] = mapped_column(ForeignKey("slots.id"), unique=False)
-    user: Mapped[User] = relationship(back_populates="records")
-    slot: Mapped[Slot] = relationship(back_populates="record")
+    user: Mapped["User"] = relationship(back_populates="records")
+    slot: Mapped["Slot"] = relationship(back_populates="record")
 
     __table_args__ = (UniqueConstraint("user_id", "slot_id"),)
 
@@ -141,51 +138,46 @@ class Record(Base):
         return f"SQLA Record, id: {self.id}, user: {self.user.id}, slot: {self.slot.id}"
 
 
-Base.metadata.drop_all(engine)
-Base.metadata.create_all(engine)
-
-user = User(tg_id=103273, username="@telegram_test_user")
-user_2 = User(tg_id=103272, username="@telegram_test_user_2")
-rental = Rental(
-    name="Ping-pong table",
-    description="Free-to-play ping-pong table on 2nd floor",
-    type="SPORT",
-)
-
-session.add_all([user, rental, user_2])
-session.commit()
-print(user, rental, sep="\n")
-
-schedule = Schedule(
-    description="Basic schedule for pin-pong table",
-    status="ACTIVE",
-    conditions={"key": "value"},
-)
-schedule.rental = rental
-session.add_all([schedule])
-session.commit()
-print(schedule)
+uri = "postgresql+asyncpg://postgres:qwerty123@127.0.0.1:5432/dev"
+engine = create_async_engine(uri, echo=False)
 
 
-slot = Slot(started_at=datetime(2023, 12, 1, 12, 12), duration=30, status="PLANNED")
-schedule.slots.append(slot)
+async def create_tables():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(Base.metadata.create_all)
 
-session.commit()
-print(slot)
+async def add_test_data():
+    async with AsyncSession(engine) as session:
+        user = User(tg_id=103273, username="@telegram_test_user")
+        user_2 = User(tg_id=103272, username="@telegram_test_user_2")
+        rental = Rental(
+            name="Ping-pong table",
+            description="Free-to-play ping-pong table on 2nd floor",
+            category="SPORT",
+        )
+        schedule = Schedule(
+            description="Basic schedule for pin-pong table",
+            status="ACTIVE",
+            conditions={"key": "value"},
+        )
+        schedule.rental = rental
+        slot = Slot(started_at=datetime(2023, 12, 1, 12, 12), duration=30, status="PLANNED")
+        schedule.slots.append(slot)
+        record = Record()
+        record.slot = slot
+        record.user = user
+        record_2 = Record(slot_id=1)
+        record_2.user = user_2
+        session.add_all((user, rental, user_2, schedule, record, record_2))
 
-record = Record()
-record.slot = slot
-record.user = user
-session.add(record)
-session.commit()
+        await session.commit()
 
-print(record)
-print(slot)
 
-existing_slot = session.get(Slot, 1)
-record_2 = Record(slot_id=existing_slot.id)
-record_2.user = user_2
-session.add(record_2)
-session.commit()
 
-print(slot)
+async def main():
+    await create_tables()
+    await add_test_data()
+
+
+asyncio.run(main())

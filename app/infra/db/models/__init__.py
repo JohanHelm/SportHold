@@ -1,8 +1,19 @@
-from sqlalchemy.orm import declarative_base
+from sqlalchemy.orm import DeclarativeBase
 
-Base = declarative_base()
+
+class Base(DeclarativeBase):
+    pass
+
 
 from .user.schema import User
 from .schedule.schema import Schedule
 from .slot.schema import Slot
-from .object.schema import Object
+from .rental.schema import Rental
+from .record.schema import Record
+
+# from app.infra.db.models.schema import User
+# from .schedule.schema import Schedule
+# from .slot.schema import Slot
+# from .rental.schema import Rental
+# from .record.schema import Record
+

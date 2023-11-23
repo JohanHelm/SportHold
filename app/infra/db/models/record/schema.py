@@ -1,21 +1,9 @@
-from typing import TYPE_CHECKING
 from sqlalchemy import UniqueConstraint, ForeignKey
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
-# from ..user.schema import User
-# from ..slot.schema import Slot
-
-# from ...models import Base
-from sqlalchemy.orm import DeclarativeBase
-
-class Base(DeclarativeBase):
-    pass
-
-# if TYPE_CHECKING:
-#     ..user.schema import User
-#     ..slot.schema import Slot
+from ...models import Base
 
 
 class Record(Base):

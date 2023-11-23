@@ -29,7 +29,7 @@ async def session():
 
 @pytest.fixture(scope="function")
 def test_rental() -> RentalCreate:
-    return RentalCreate(name="test", desc="test")
+    return RentalCreate(category='test', name="test", description="test")
 
 
 @pytest.fixture(scope="function")

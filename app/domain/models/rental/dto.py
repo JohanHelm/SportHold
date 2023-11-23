@@ -2,9 +2,9 @@ from pydantic import BaseModel, ConfigDict
 
 
 class RentalBase(BaseModel):
-    category: str = None
-    name: str = None
-    description: str = None
+    category: str
+    name: str
+    description: str
 
     model_config = ConfigDict(from_attributes=True)
 
