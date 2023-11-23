@@ -1,3 +1,4 @@
+from typing import TYPE_CHECKING
 from sqlalchemy import UniqueConstraint, ForeignKey
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
@@ -5,6 +6,9 @@ from sqlalchemy.orm import relationship
 
 from ...models import Base
 
+if TYPE_CHECKING:
+    from user.schema import User
+    from slot.schema import Slot
 
 class Record(Base):
     __tablename__ = "records"
