@@ -1,10 +1,12 @@
-from typing import List
+from typing import TYPE_CHECKING, List
 from sqlalchemy import Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm import relationship
 
 from ...models import Base
 
+if TYPE_CHECKING:
+    from record.schema import Record
 
 class User(Base):
     __tablename__ = "users"
