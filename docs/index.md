@@ -7,12 +7,6 @@
 - категоризировать этот день - обычный, сокращенный, и т.д.
 - по аналогии с реальностью реализовывать расписание типа пн-пт 9-18, обед 13-14, сб 10-16, обед 13-14 вс выходной. Каждый первый понедельник месяца - санитарный день. Каждый 3-й четверг - бесплатное посещение.
 - реализация шаблонов расписаний
-- https://www.visme.co/ru/sozdat-raspisanie-online/
-- https://cyberleninka.ru/article/n/razrabotka-modeli-interaktivnoy-sistemy-sostavleniya-raspisaniya-v-vuze-s-ispolzovaniem-polzovatelskogo-opyta-na-primere-kazanskogo/viewer
-- https://moluch.ru/archive/400/88230/
-- https://cyberleninka.ru/article/n/matematicheskoe-modelirovanie-zadachi-sostavleniya-raspisaniya-zanyatiyvuza/viewer
-- https://pro.arcgis.com/ru/pro-app/latest/help/analysis/networks/transit-data-model.htm
-- https://gibkij.ru/ekonomte-svoe-vremya-s-pomoshhyu-idealnoj-modeli-raspisaniya-dostignite-balansa-mezhdu-rabotoj-i-lichnoj-zhiznyu/?doing_wp_cron=1700381837.9604570865631103515625
 
 ### Расписания
 
@@ -23,14 +17,53 @@
     - обязано иметь статус, который отражает возможность его использования
     - обязано даты начала, конца или срок действия, который в т.ч. может быть неограничен
     - имеет логику его применения к определенным годам, кварталам, месяцам, неделям, дням
-    - иметь информацию о рабочих и нерабочих днях, праздниках
-    - может иметь логику типа "repeat"
-    - имеет внутри себя все данные, необходимые для генерации тайм-слотов на день, условные `conditions`
-    - если расписание запрещающее - генерирует один тайм слот, который потом удаляет 
 
 ### Данные для генерации тайм-слотов
 
 - генерирует последовательно, в рамках суток, тайм-слоты
-- 
 
-### Тайм-слоты
+### Атрибуты сущностей
+
+#### Атрибуты категории дня:
+- Номер дня в неделе: 1 2 3 4 5 6 7 (пн-вс)
+- 1,2,3,4 номер дня (пн-вс) в месяце
+- Номер недели (чет\нечет) - 1 - 52
+- Номер дня в месяце - 1 - 31
+- Номер дня в году - 1-365
+
+#### Атрибуты дня:
+- Категория
+- Час начала аренды
+- Час окончания аренды
+- Множество перерывов
+- Тип слота
+- Политика разрешения конфликтов
+
+
+#### Тип слота:
+- Свободный
+- Жесткий
+- Мягкий
+
+#### Политика разрешения конфликтов генерируемых слотов с уже имеющимися:
+- Жесткая: удаление конфликтных слотов
+- Абсолютное Заполнение: создается слот при обнаружении промежутка
+- Только минимальное заполнение: создается слот, если промежуток не менее минимального времени, при его отсутствии - максимального времени
+- Абсолютное Растяжение: предыдущий слот растягивается на весь промежуток
+- Ратсяжение до минимума: предыдущий слот растягивается на весь минимальное время
+
+#### Атрибуты мягкого слота:
+- Минимальное время аренды
+- Максимальное время аренды
+
+#### Атрибуты жесткого слот:
+- Время аренды
+
+## Доп инфо
+
+- https://www.visme.co/ru/sozdat-raspisanie-online/
+- https://cyberleninka.ru/article/n/razrabotka-modeli-interaktivnoy-sistemy-sostavleniya-raspisaniya-v-vuze-s-ispolzovaniem-polzovatelskogo-opyta-na-primere-kazanskogo/viewer
+- https://moluch.ru/archive/400/88230/
+- https://cyberleninka.ru/article/n/matematicheskoe-modelirovanie-zadachi-sostavleniya-raspisaniya-zanyatiyvuza/viewer
+- https://pro.arcgis.com/ru/pro-app/latest/help/analysis/networks/transit-data-model.htm
+- https://gibkij.ru/ekonomte-svoe-vremya-s-pomoshhyu-idealnoj-modeli-raspisaniya-dostignite-balansa-mezhdu-rabotoj-i-lichnoj-zhiznyu/?doing_wp_cron=1700381837.9604570865631103515625
