@@ -14,13 +14,7 @@ schedules = {
     "status": "active",
     "start_date": "2022-02-11",
     "end_date": "2022-02-22",
-    "days_mask": [ # с понедельника по пятницу
-      1,
-      2,
-      3,
-      4,
-      5
-    ],
+    "days_mask": 31, # с понедельника по пятницу, 
     "weeks_mask": null,
     "months_mask": null,
     "quartal_masks": null,
@@ -42,13 +36,7 @@ schedules = {
     "status": "active",
     "start_date": "2022-02-11",
     "end_date": "2022-02-22",
-    "days_mask": [ # с понедельника по пятницу
-      1,
-      2,
-      3,
-      4,
-      5
-    ],
+    "days_mask": 31, # с понедельника по пятницу 
     "weeks_mask": null,
     "months_mask": null,
     "quartal_masks": null,
