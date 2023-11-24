@@ -1,7 +1,7 @@
 from enum import Enum, auto
 from pydantic import BaseModel, ConfigDict, Field
 from typing import Optional
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 from app.helpers.maskers.weekdays import DaysOfWeek
 from app.helpers.maskers.weeks import WeeksInYear
 from app.helpers.maskers.quartals import Quartals
