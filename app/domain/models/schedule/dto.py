@@ -1,6 +1,7 @@
 from pydantic import BaseModel, ConfigDict
 from typing import Optional
 from datetime import date
+from app.helpers.maskers.weekdays import DaysOfWeek
 
 class ScheduleBase(BaseModel):
     name: Optional[str]
@@ -8,7 +9,7 @@ class ScheduleBase(BaseModel):
     status: str
     valid_from: date
     valid_to: date
-    mask_weekdays:
+    mask_weekdays: DaysOfWeek.ALL
     mask_weeks:
     mask_quratals:
     mask_days_month:
