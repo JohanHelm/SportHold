@@ -21,7 +21,7 @@ schedules = {
     "mask_days_month": null,
     "nth_weekday": null,
     "nth_index": null,
-    "mask_days_year": null,
+    # "mask_days_year": null, отказался, маска слишком жирная
     "policy_merge": "hard",
     "policy_suggest": null,
     "hour_start": 9,
@@ -44,7 +44,7 @@ schedules = {
     "mask_days_month": null,
     "nth_weekday": null,
     "nth_index": null,
-    "mask_days_year": null,
+    # "mask_days_year": null,
     "policy_merge": "hard",
     "policy_suggest": null,
     "hour_start": 13,

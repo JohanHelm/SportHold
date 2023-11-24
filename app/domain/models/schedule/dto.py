@@ -16,17 +16,16 @@ class ScheduleBase(BaseModel):
     mask_weeks: WeeksInYear
     mask_quratals: Quartals
     mask_days_month: DaysInMonth
-    mask_days_year:
     nth_weekday: DaysOfWeek
     nth_index: int
-    slot_type:
+    slot_type: str
     slot_min_time: int
     slot_max_time: int
     slot_step_time: int
     hour_start: int
     hour_end: int
-    policy_merge:
-    policy_suggest:
+    policy_merge: str
+    policy_suggest: str
     
     rental_id: int
 
