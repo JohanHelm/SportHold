@@ -12,45 +12,47 @@ schedules = {
     "name": "name it!"
     "description": "any description here"
     "status": "active",
-    "start_date": "2022-02-11",
-    "end_date": "2022-02-22",
-    "days_mask": 31, # с понедельника по пятницу, 
-    "weeks_mask": null,
-    "months_mask": null,
+    "valid_from": "2022-02-11",
+    "valid_to": "2022-02-22",
+    "mask_weekdays": 31, # с понедельника по пятницу, 
+    "mask_weeks": null,
+    "mask_quratals": null,
     "quartal_masks": null,
-    "index_days_month_mask": null,
-    "nth_weekday_month_weekday": null,
-    "nth_weekday_month_nth": null,
-    "day_in_year": null,
-    "merge_policy": "hard",
-    "suggest_policy": null,
-    "start_hour": 9,
-    "end_hour": 18,
+    "mask_days_month": null,
+    "nth_weekday": null,
+    "nth_index": null,
+    "mask_days_year": null,
+    "policy_merge": "hard",
+    "policy_suggest": null,
+    "hour_start": 9,
+    "hour_end": 18,
     "slot_type": "hard", # разрешающий тип слота - хард
-    "min_time": 30,
-    "max_time": 60
+    "slot_min_time": 30,
+    "slot_max_time": 60,
+    "slot_step_time": 5
   },
-  "schedule": { # расписание для рабочих дней с 13 до 14 - генерирует обед)
+  "schedule": { # расписание для рабочих дней с 13 до 14 - 
     "name": "name it!"
     "description": "any description here"
     "status": "active",
-    "start_date": "2022-02-11",
-    "end_date": "2022-02-22",
-    "days_mask": 31, # с понедельника по пятницу 
-    "weeks_mask": null,
-    "months_mask": null,
+    "valid_from": "2022-02-11",
+    "valid_to": "2022-02-22",
+    "mask_weekdays": 31, # с понедельника по пятницу, 
+    "mask_weeks": null,
+    "mask_quratals": null,
     "quartal_masks": null,
-    "index_days_month_mask": null,
-    "nth_weekday_month_weekday": null,
-    "nth_weekday_month_nth": null,
-    "day_in_year": null,
-    "merge_policy": "hard",
-    "suggest_policy": null,
-    "start_hour": 13,
-    "end_hour": 14,
-    "slot_type": "restrict", # запрещающий тип слота - рестрикт
-    "min_time": 30,
-    "max_time": 60
+    "mask_days_month": null,
+    "nth_weekday": null,
+    "nth_index": null,
+    "mask_days_year": null,
+    "policy_merge": "hard",
+    "policy_suggest": null,
+    "hour_start": 13,
+    "hour_end": 14,
+    "slot_type": "restrict", # запрещающий тип слота - хард
+    "slot_min_time": 30,
+    "slot_max_time": 60,
+    "slot_step_time": 5
   }
 }
 ```
