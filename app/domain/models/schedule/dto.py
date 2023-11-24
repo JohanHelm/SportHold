@@ -3,6 +3,8 @@ from typing import Optional
 from datetime import date
 from app.helpers.maskers.weekdays import DaysOfWeek
 from app.helpers.maskers.weeks import WeeksInYear
+from app.helpers.maskers.quartals import Quartals
+from app.helpers.maskers.daysmonth import DaysInMonth
 
 class ScheduleBase(BaseModel):
     name: Optional[str]
@@ -10,12 +12,12 @@ class ScheduleBase(BaseModel):
     status: str
     valid_from: date
     valid_to: date
-    mask_weekdays: DaysOfWeek.ALL
-    mask_weeks: WeeksInYear.ALL
-    mask_quratals:
-    mask_days_month:
+    mask_weekdays: DaysOfWeek
+    mask_weeks: WeeksInYear
+    mask_quratals: Quartals
+    mask_days_month: DaysInMonth
     mask_days_year:
-    nth_weekday:
+    nth_weekday: DaysOfWeek
     nth_index: int
     slot_type:
     slot_min_time: int
