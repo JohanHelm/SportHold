@@ -32,6 +32,7 @@ class DaysInMonth(IntFlag):
     DAY29 = 268435456
     DAY30 = 536870912
     DAY31 = 1073741824
+    NONE = 0
 
 def encode_days(days):
     encoded_value = 0
