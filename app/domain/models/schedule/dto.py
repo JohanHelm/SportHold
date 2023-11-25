@@ -29,7 +29,7 @@ class ScheduleBase(BaseModel):
     # TODO: truthy BASE
     name: Optional[str] = Field(default=None)
     description: Optional[str] = Field(default=None)
-    status: Optional[ScheduleStatus] = Field(default=ScheduleStatus.NOT_ACTIVE.name)
+    status: Optional[ScheduleStatus] = Field(default=ScheduleStatus.NOT_ACTIVE)
     # TODO: change for another data struct? 
     valid_from: Optional[date] = Field(default=date.today())
     # Здесь нужно не valid_to а valid_for в количестве дней, либо месяцев, либо часов!!!
