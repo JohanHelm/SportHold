@@ -1,6 +1,11 @@
+from enum import Enum, auto
 from pydantic import BaseModel, ConfigDict
 from sqlalchemy import DateTime
 
+
+class SlotType(Enum):
+    ACCESSIBLE = auto()
+    RESTRICTED = auto()
 
 class SlotBase(BaseModel):
     started_at: DateTime

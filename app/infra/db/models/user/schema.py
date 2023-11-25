@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship
 from ...models import Base
 
 if TYPE_CHECKING:
-    from record.schema import Record
+    from ..record.schema import Record
 
 class User(Base):
     __tablename__ = "users"

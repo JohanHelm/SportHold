@@ -7,8 +7,8 @@ from sqlalchemy.orm import relationship
 from ...models import Base
 
 if TYPE_CHECKING:
-    from user.schema import User
-    from slot.schema import Slot
+    from ..user.schema import User
+    from ..slot.schema import Slot
 
 class Record(Base):
     __tablename__ = "records"

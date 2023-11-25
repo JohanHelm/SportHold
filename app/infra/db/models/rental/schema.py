@@ -7,7 +7,7 @@ from sqlalchemy.orm import relationship
 from ...models import Base
 
 if TYPE_CHECKING:
-    from schedule.schema import Schedule
+    from ..schedule.schema import Schedule
 
 
 class Rental(Base):

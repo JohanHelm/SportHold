@@ -6,8 +6,8 @@ from sqlalchemy.orm import mapped_column
 from ...models import Base
 
 if TYPE_CHECKING:
-    from record.schema import Record
-    from schedule.schema import Schedule
+    from ..record.schema import Record
+    from ..schedule.schema import Schedule
 
 
 class Slot(Base):

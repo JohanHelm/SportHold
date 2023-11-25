@@ -1,65 +1,22 @@
 import asyncio
 from datetime import date, datetime
-from enum import Enum
 from typing import List
+
 from sqlalchemy import (
     DateTime,
     UniqueConstraint,
     Integer,
     String,
-    ForeignKey
+    ForeignKey,
+    BIGINT
 )
-
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm import relationship, DeclarativeBase
-from sqlalchemy.orm import Mapped, declarative_base
-from sqlalchemy.orm import mapped_column
-from sqlalchemy.types import JSON
-from pydantic import BaseModel
 
 
 class Base(DeclarativeBase):
     pass
-
-class WorkDays(str, Enum):
-    monday = "MONDAY"
-    tuesday = "TUESDAY"
-    wednesday = "WEDNESDAY"
-    thursday = "THURSDAY"
-    friday = "FRIDAY"
-    saturday = "SATURDAY"
-    sunday = "SUNDAY"
-
-
-class ExeptionType(str, Enum):
-    access = "ACCESS"
-    forbidden = "FORBIDDEN"
-
-
-class ConditionType(str, Enum):
-    flex_slot = "FLEX_SLOT"
-    solid_slot = "SOLID_SLOT"
-    manual_slot = "MANUAL_SLOT"
-
-
-class ConditionExeption(BaseModel):
-    type: ExeptionType
-    day: date
-    start_hour: int
-    end_hour: int
-
-
-class Conditions(BaseModel):
-    type: ConditionType
-    start_at: datetime
-    end_at: datetime
-    work_days: List[WorkDays]
-    exceptions: List[ConditionExeption]
-    start_hour: int
-    end_hour: int
-    min_time: int
-    max_time: int
-    book_range_hours: int
 
 
 class User(Base):
@@ -91,19 +48,40 @@ class Schedule(Base):
     __tablename__ = "schedules"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    description: Mapped[str] = mapped_column(String)
-    status: Mapped[str] = mapped_column(
-        String
-    )  # TODO: вынести статусы в отдельный перечень
-    conditions: Mapped[JSON] = mapped_column(
-        JSON, nullable=True
-    )  # TODO: описание условий для генерации слотов, необходимо продумать схему
+    name: Mapped[str] = mapped_column(String, nullable=True)
+    description: Mapped[str] = mapped_column(String, nullable=True)
+    status: Mapped[int] = mapped_column(Integer, default=2)
+    valid_from: Mapped[DateTime] = mapped_column(DateTime, default=date.today())
+    valid_for_days: Mapped[int] = mapped_column(Integer, default=30)
+    mask_weekdays: Mapped[int] = mapped_column(Integer, default=127)
+    mask_weeks: Mapped[int] = mapped_column(BIGINT, default=4503599627370495)
+    mask_quartals: Mapped[int] = mapped_column(Integer, default=15)
+    mask_days_month: Mapped[int] = mapped_column(Integer, nullable=True)
+    nth_weekday: Mapped[int] = mapped_column(Integer, nullable=True)
+    nth_index: Mapped[int] = mapped_column(Integer, nullable=True)
+    slot_type: Mapped[int] = mapped_column(Integer, default=1)
+    slot_min_time: Mapped[int] = mapped_column(Integer, nullable=True)
+    slot_max_time: Mapped[int] = mapped_column(Integer, nullable=True)
+    slot_step_time: Mapped[int] = mapped_column(Integer, nullable=True)
+    hour_start: Mapped[int] = mapped_column(Integer, nullable=True)
+    hour_end: Mapped[int] = mapped_column(Integer, nullable=True)
+    policy_merge: Mapped[int] = mapped_column(Integer, default=1)
+    policy_suggest: Mapped[int] = mapped_column(Integer, default=1)
     rental_id: Mapped[int] = mapped_column(ForeignKey("rentals.id"))
     rental: Mapped["Rental"] = relationship(back_populates="schedules")
     slots: Mapped[List["Slot"]] = relationship()
 
     def __str__(self):
-        return f"SQLA Schedule, id: {self.id}, description: {self.description}, rental: {self.rental.id}, slots count: {len(self.slots)}, status: {self.status}, conditions: {self.conditions}"
+        return (
+            f"SQLA Schedule,"
+            f" id: {self.id},"
+            f" name: {self.name},"
+            f" description: {self.description},"
+            f" status: {self.status},"
+            f" "
+            f" rental: {self.rental.id},"
+            f" slots count: {len(self.slots)},"
+        )
 
 
 class Slot(Base):
@@ -147,6 +125,7 @@ async def create_tables():
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
 
+
 async def add_test_data():
     async with AsyncSession(engine) as session:
         user = User(tg_id=103273, username="@telegram_test_user")
@@ -156,11 +135,9 @@ async def add_test_data():
             description="Free-to-play ping-pong table on 2nd floor",
             category="SPORT",
         )
-        schedule = Schedule(
-            description="Basic schedule for pin-pong table",
-            status="ACTIVE",
-            conditions={"key": "value"},
-        )
+        schedule = Schedule(name="Basic",
+                            description="Basic schedule for pin-pong table",
+                            )
         schedule.rental = rental
         slot = Slot(started_at=datetime(2023, 12, 1, 12, 12), duration=30, status="PLANNED")
         schedule.slots.append(slot)
@@ -172,7 +149,6 @@ async def add_test_data():
         session.add_all((user, rental, user_2, schedule, record, record_2))
 
         await session.commit()
-
 
 
 async def main():

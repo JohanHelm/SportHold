@@ -1,23 +1,24 @@
 from enum import Enum, auto
 from pydantic import BaseModel, ConfigDict, Field
 from typing import Optional
-from datetime import date, timedelta
+from datetime import date
+
 from app.helpers.maskers.weekdays import DaysOfWeek
 from app.helpers.maskers.weeks import WeeksInYear
 from app.helpers.maskers.quartals import Quartals
 from app.helpers.maskers.daysmonth import DaysInMonth
 
+from app.domain.models.slot.dto import SlotType
+
+
 class ScheduleStatus(Enum):
     ACTIVE = auto()
     NOT_ACTIVE = auto()
 
-# TODO: move to slot dto and then import 
-class SlotType(Enum):
-    ACCESSEBLE = auto()
-    RESTRICTED = auto()
 
 class MergePolicy(Enum):
     REGULAR = auto()
+
 
 class SuggestPolicy(Enum):
     REGULAR = auto()
@@ -28,20 +29,21 @@ class ScheduleBase(BaseModel):
     # TODO: truthy BASE
     name: Optional[str] = Field(default=None)
     description: Optional[str] = Field(default=None)
-    status: Optional[ScheduleStatus] = Field(default=ScheduleStatus.NOT_ACTIVE)
+    status: Optional[ScheduleStatus] = Field(default=ScheduleStatus.NOT_ACTIVE.name)
     # TODO: change for another data struct? 
     valid_from: Optional[date] = Field(default=date.today())
-    valid_to: Optional[str] = Field(default=date.today() + timedelta(days=30))
+    # Здесь нужно не valid_to а valid_for в количестве дней, либо месяцев, либо часов!!!
+    valid_for_days: Optional[int] = Field(default=30)
     # TODO: array of masks?
-    mask_weekdays: Optional[DaysOfWeek] = Field(default=DaysOfWeek.ALL) 
+    mask_weekdays: Optional[DaysOfWeek] = Field(default=DaysOfWeek.ALL)
     mask_weeks: Optional[WeeksInYear] = Field(default=WeeksInYear.ALL)
-    mask_quratals: Optional[Quartals] = Field(default=Quartals.ALL)
+    mask_quartals: Optional[Quartals] = Field(default=Quartals.ALL)
     mask_days_month: Optional[DaysInMonth] = Field(default=None)
     # TODO: array of nth weekdays index?
-    nth_weekday: Optional[DaysOfWeek] = Field(default=None)
+    nth_weekday: Optional[DaysOfWeek] = Field(default=0)
     nth_index: Optional[int] = Field(None, ge=1, le=31)
     # TODO: change for another data struct? 
-    slot_type: Optional[SlotType] = Field(default=SlotType.ACCESSEBLE)
+    slot_type: Optional[SlotType] = Field(default=SlotType.ACCESSIBLE)
     slot_min_time: Optional[int] = Field(None, ge=1, le=1440)
     slot_max_time: Optional[int] = Field(None, ge=1, le=1440)
     slot_step_time: Optional[int] = Field(None, ge=1, le=1440)

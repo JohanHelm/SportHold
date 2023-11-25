@@ -5,5 +5,5 @@ class Quartals(IntFlag): # маска bit'ов, но в int чтобы удоб�
     Second = auto() # 2
     Thrid = auto() # 4
     Fourth = auto() # 8
-    ALL = 14
+    ALL = 15
     NONE = 0
