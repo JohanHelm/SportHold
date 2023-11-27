@@ -39,11 +39,11 @@ def is_day_in_schedule(schedule: ScheduleBase, date: datetime.date) -> Boolean:
         return False
     if WeeksInYear(2 ** today.isocalendar().week) not in schedule.mask_weeks:
         return False
-    # if Quartals(2**((today.month-1)//3 + 1)) not in schedule.mask_quartals:
-    #     return False
+    if Quartals(2**((today.month-1)//3 + 1)) not in schedule.mask_quartals:
+        return False
     if DaysInMonth(2 ** (today.day)) not in schedule.mask_days_month:
         return False
-    if schedule.nth_weekday and schedule.nth_weekday:
+    if schedule.nth_weekday and schedule.nth_index:
         if today != find_nth_weekday_in_month(
             today.year, today.month, schedule.nth_weekday, schedule.nth_index
         ):
