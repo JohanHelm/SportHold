@@ -1,6 +1,5 @@
-import datetime
+from datetime import datetime, timedelta
 from typing import List
-from xmlrpc.client import Boolean
 from .dto import ScheduleBase, ScheduleStatus
 from app.domain.models.record.dto import RecordBase
 from app.helpers.maskers.weekdays import DaysOfWeek
@@ -26,7 +25,7 @@ def find_nth_weekday_in_month(year, month, weekday, n):
     return d
 
 
-def is_day_in_schedule(schedule: ScheduleBase, date: datetime) -> Boolean:
+def is_day_in_schedule(schedule: ScheduleBase, date: datetime) -> bool:
     if schedule.status == ScheduleStatus.NOT_ACTIVE:
         return False
     if schedule.valid_from > date.date():
@@ -64,21 +63,21 @@ def generate_time_slots(schedule: ScheduleBase, date):
     end = schedule.hour_end
     policy = schedule.policy_merge
 
-    date = datetime.date(year=2023, month=11, day=27)
+    current_date = date
 
-    s = datetime.datetime(
-        year=date.year, month=date.month, day=date.day, hour=start, minute=0
-    )
-    # e = datetime.datetime(date.year, date.month, date.day, hour=end)
-    # time_slots = []
-    # while s + datetime.timedelta(minutes=smax) <= end:
-    #     duration = smax
-    #     if current_time + datetime.timedelta(minutes=duration) <= end:
-    #         time_slots.append(
-    #             (
-    #                 current_time,
-    #                 current_time + datetime.timedelta(minutes=duration),
-    #             )
-    #         )
-    #     current_time += datetime.timedelta(minutes=smax)
-    # return time_slots
+    s = datetime(current_date.year, current_date.month, current_date.day, start, 0)
+    e = datetime(current_date.year, current_date.month, current_date.day, end, 0)
+    time_slots = []
+    while s + timedelta(minutes=smax) <= e:
+        duration = smax
+        if s + timedelta(minutes=duration) <= e:
+            time_slots.append(
+                (
+                    s,
+                    s + timedelta(minutes=duration),
+                )
+            )
+        s += timedelta(minutes=smax)
+    return time_slots
+
+
