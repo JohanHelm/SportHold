@@ -59,7 +59,7 @@ class ScheduleManager:
         return True
 
     def is_day_in_schedules(self, date: datetime) -> bool:
-        return all(
+        return any(
             [self.check_schedule_date(schedule, date) for schedule in self.schedules]
         )
     def generate_time_slots(self, schedule, date):
