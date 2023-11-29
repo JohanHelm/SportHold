@@ -33,3 +33,12 @@
     Потребители услуг группы Providers. Платят деньги провайдерам. 
     Имеют доступ к ботам с расписаниями и к боту-каталогу.
     
+
+class UserRole(IntFlag):
+    REGULAR = 1 - Consumers
+    PARTNER = 2
+    ADMIN = 4
+    MANAGER = 8
+    EMPLOYEE = 16
+    OWNER = 32
+    WORKER = 64
