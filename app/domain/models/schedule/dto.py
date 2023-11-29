@@ -58,6 +58,9 @@ class ScheduleBase(BaseModel):
 
     model_config = ConfigDict(from_attributes=True, arbitrary_types_allowed=True)
 
+    def __hash__(self) -> int:
+        return self.name.__hash__() # or self.id.__hash__()
+
 
 class ScheduleCreate(ScheduleBase):
     ...

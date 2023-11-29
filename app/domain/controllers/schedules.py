@@ -1,6 +1,8 @@
+from typing import List, Set
 from datetime import datetime, timedelta
 
-from app.domain.models.schedule.dto import ScheduleStatus
+from app.domain.models.schedule.dto import ScheduleBase, ScheduleStatus
+from app.domain.models.slot.dto import SlotType
 from app.helpers.maskers.daysmonth import DaysInMonth
 from app.helpers.maskers.quartals import Quartals
 from app.helpers.maskers.weekdays import DaysOfWeek
@@ -8,14 +10,10 @@ from app.helpers.maskers.weeks import WeeksInYear
 
 
 class ScheduleManager:
-    def __init__(self) -> None:
-        self.schedules = []
-
-    def add_schedule(self, schedule):
-        self.schedules.append(schedule)
-
-    def clear(self):
-        self.schedules = []
+    """
+    Обрабатывает связку - лист расписаний и день - Выдает кортеж подходящих расписаний на день
+    Обрабатывает кортеж расписаний на день - выдает список слотов на день
+    """
 
     def find_nth_weekday_in_month(year, month, weekday, n):
         d = datetime(year, month, 1)
@@ -58,23 +56,22 @@ class ScheduleManager:
                 return False
         return True
 
-    def is_day_in_schedules(self, date: datetime) -> bool:
-        return any(
-            [self.check_schedule_date(schedule, date) for schedule in self.schedules]
+    def day_in_schedule(self, schedules, date: datetime) -> Set[ScheduleBase]:
+        res = set(
+            schedule
+            for schedule in schedules
+            if self.check_schedule_date(schedule, date)
         )
-    def generate_time_slots(self, schedule, date):
-        step = schedule.slot_step_time
+        return res
+
+    def slots_from_schedule(self, schedule, date):
         smax = schedule.slot_max_time
-        smin = schedule.slot_min_time
         start = schedule.hour_start
         end = schedule.hour_end
-        policy = schedule.policy_merge
-
         current_date = date
-
+        time_slots = []
         s = datetime(current_date.year, current_date.month, current_date.day, start, 0)
         e = datetime(current_date.year, current_date.month, current_date.day, end, 0)
-        time_slots = []
         while s + timedelta(minutes=smax) <= e:
             duration = smax
             if s + timedelta(minutes=duration) <= e:
@@ -86,3 +83,40 @@ class ScheduleManager:
                 )
             s += timedelta(minutes=smax)
         return time_slots
+    def remove_overlapping_slots(self,allowed_slots, forbidden_slots):
+        cleaned_slots = []
+        for slot in allowed_slots:
+            overlap = False
+            for forbidden_slot in forbidden_slots:
+                if slot[0] < forbidden_slot[1] and slot[1] > forbidden_slot[0]:
+                    overlap = True
+                    break
+            if not overlap:
+                cleaned_slots.append(slot)
+        return cleaned_slots
+    
+    def generate_time_slots(self, schedules, date):
+        access_schedule = [
+            schedule
+            for schedule in schedules
+            if schedule.slot_type == SlotType.ACCESSIBLE
+        ]
+        restrict_schedule = [
+            schedule
+            for schedule in schedules
+            if schedule.slot_type == SlotType.RESTRICTED
+        ]
+        cleaned_slots = []
+        allowed_slots = []
+        forbidden_slots = []
+        for schedule in access_schedule:
+            schedule_slots = self.slots_from_schedule(schedule, date)
+            allowed_slots.extend(schedule_slots)
+
+        for schedule in restrict_schedule:
+            schedule_slots = self.slots_from_schedule(schedule, date)
+            forbidden_slots.extend(schedule_slots)
+
+        cleaned_slots = self.remove_overlapping_slots(allowed_slots, forbidden_slots)
+        return cleaned_slots
+            
