@@ -1,4 +1,4 @@
-from typing import List, Set
+from typing import Set
 from datetime import datetime, timedelta
 
 from app.domain.models.schedule.dto import ScheduleBase, ScheduleStatus
@@ -24,7 +24,7 @@ class ScheduleManager:
 
         return d
 
-    def check_schedule_date(self, schedule, date):
+    def is_date_in_schedule(self, schedule, date):
         if schedule.status == ScheduleStatus.NOT_ACTIVE:
             return False
         if schedule.valid_from > date.date():
@@ -56,15 +56,15 @@ class ScheduleManager:
                 return False
         return True
 
-    def day_in_schedule(self, schedules, date: datetime) -> Set[ScheduleBase]:
+    def is_day_in_schedules(self, schedules, date: datetime) -> Set[ScheduleBase]:
         res = set(
             schedule
             for schedule in schedules
-            if self.check_schedule_date(schedule, date)
+            if self.is_date_in_schedule(schedule, date)
         )
         return res
 
-    def slots_from_schedule(self, schedule, date):
+    def get_time_intervals_from_schedule(self, schedule, date):
         smax = schedule.slot_max_time
         start = schedule.hour_start
         end = schedule.hour_end
@@ -83,7 +83,8 @@ class ScheduleManager:
                 )
             s += timedelta(minutes=smax)
         return time_slots
-    def remove_overlapping_slots(self,allowed_slots, forbidden_slots):
+
+    def remove_overlapping_time_intervals(self, allowed_slots, forbidden_slots):
         cleaned_slots = []
         for slot in allowed_slots:
             overlap = False
@@ -94,8 +95,8 @@ class ScheduleManager:
             if not overlap:
                 cleaned_slots.append(slot)
         return cleaned_slots
-    
-    def generate_time_slots(self, schedules, date):
+
+    def generate_time_intervals(self, schedules, date):
         access_schedule = [
             schedule
             for schedule in schedules
@@ -110,13 +111,14 @@ class ScheduleManager:
         allowed_slots = []
         forbidden_slots = []
         for schedule in access_schedule:
-            schedule_slots = self.slots_from_schedule(schedule, date)
+            schedule_slots = self.get_time_intervals_from_schedule(schedule, date)
             allowed_slots.extend(schedule_slots)
 
         for schedule in restrict_schedule:
-            schedule_slots = self.slots_from_schedule(schedule, date)
+            schedule_slots = self.get_time_intervals_from_schedule(schedule, date)
             forbidden_slots.extend(schedule_slots)
 
-        cleaned_slots = self.remove_overlapping_slots(allowed_slots, forbidden_slots)
+        cleaned_slots = self.remove_overlapping_time_intervals(
+            allowed_slots, forbidden_slots
+        )
         return cleaned_slots
-            

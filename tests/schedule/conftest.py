@@ -50,7 +50,7 @@ def day_siesta_schedule():
     none_days_schedule.status = ScheduleStatus.ACTIVE
     none_days_schedule.mask_weeks = WeeksInYear.ALL
     none_days_schedule.mask_weekdays = DaysOfWeek.ALL
-    none_days_schedule.mask_quartals = Quartals.NONE
+    none_days_schedule.mask_quartals = Quartals.ALL
     none_days_schedule.mask_days_month = DaysInMonth.ALL
     none_days_schedule.hour_start = 16
     none_days_schedule.hour_end = 17
