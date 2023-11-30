@@ -1,7 +1,10 @@
+from ast import List
 from datetime import date
 from enum import IntFlag, IntEnum
 from typing import Optional
 from pydantic import BaseModel, ConfigDict, Field
+
+from app.domain.models.rental.dto import RentalBase
 
 
 class UserRole(IntFlag):
@@ -26,6 +29,7 @@ class UserBase(BaseModel):
     subscription_type: Optional[SubscrptionType] = Field(default=None)
     subscription_valid_for: Optional[date] = Field(default=None)
     wallet_balance: int = Field(default=0)
+    rentals: List[RentalBase]
     
     model_config = ConfigDict(from_attributes=True)
 
