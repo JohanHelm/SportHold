@@ -25,6 +25,8 @@ class UserBase(BaseModel):
     roles: UserRole
     subscription_type: Optional[SubscrptionType] = Field(default=None)
     subscription_valid_for: Optional[date] = Field(default=None)
+    wallet_balance: int = Field(default=0)
+    
     model_config = ConfigDict(from_attributes=True)
 
 
