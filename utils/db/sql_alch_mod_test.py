@@ -154,6 +154,27 @@ class Tarif(Base):
         )
 
 
+class Promo(Base):
+    __tablename__ = "promos"
+
+    promo_code: Mapped[str] = mapped_column(primary_key=True)
+    active: Mapped[int] = mapped_column(Integer, default=1)
+    promo_money: Mapped[int] = mapped_column(Integer)
+    used_times: Mapped[int] = mapped_column(Integer, default=0)
+    expires_at: Mapped[DateTime] = mapped_column(DateTime, nullable=True)
+    times_to_use: Mapped[int] = mapped_column(Integer, nullable=True)
+
+    def __str__(self):
+        return (
+            f"SQLA Promo,"
+            f" promo_code: {self.promo_code},"
+            f" active: {self.active},"
+            f" promo_money: {self.promo_money},"
+            f" used_times: {self.used_times},"
+            f" expires_at: {self.expires_at},"
+            f" times_to_use: {self.times_to_use}"
+        )
+
 uri = "postgresql+asyncpg://postgres:qwerty123@127.0.0.1:5432/dev"
 engine = create_async_engine(uri, echo=False)
 
@@ -185,7 +206,8 @@ async def add_test_data():
         record_2 = Record(slot_id=1)
         record_2.user = user_2
         tarif1 = Tarif(rentals_amount=1, one_month=150, three_month=400, six_month=750, one_year=1500, two_years=2500, three_years=3500)
-        session.add_all((user, rental, user_2, schedule, record, record_2, tarif1))
+        promo_test = Promo(promo_code='TEST_PROMO', promo_money=100, times_to_use=5)
+        session.add_all((user, rental, user_2, schedule, record, record_2, tarif1, promo_test))
 
         await session.commit()
 
