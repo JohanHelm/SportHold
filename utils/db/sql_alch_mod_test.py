@@ -28,7 +28,11 @@ class User(Base):
     records: Mapped[List["Record"]] = relationship()
 
     def __str__(self):
-        return f"SQLA User, id: {self.id}, TG id: {self.tg_id}, username: {self.username}, active records count: {len(self.records)}"
+        return f"SQLA User, " \
+               f"id: {self.id}, " \
+               f"TG id: {self.tg_id}, " \
+               f"username: {self.username}, " \
+               f"active records count: {len(self.records)}"
 
 
 class Rental(Base):
@@ -41,7 +45,12 @@ class Rental(Base):
     schedules: Mapped[List["Schedule"]] = relationship()
 
     def __str__(self):
-        return f"SQLA Rental, id: {self.id}, category: {self.category}, name: {self.name}, description: {self.description}, schedules count: {len(self.schedules)}"
+        return f"SQLA Rental, " \
+               f"id: {self.id}, " \
+               f"category: {self.category}, " \
+               f"name: {self.name}, " \
+               f"description: {self.description}, " \
+               f"schedules count: {len(self.schedules)}"
 
 
 class Schedule(Base):
@@ -98,7 +107,13 @@ class Slot(Base):
     schedule: Mapped["Schedule"] = relationship(back_populates="slots")
 
     def __str__(self):
-        return f"SQLA Slot, id: {self.id}, schedule: {self.schedule.id}, records: {[str(x) for x in self.record]}, start at: {self.started_at}, duration: {self.duration}, status: {self.status}"
+        return f"SQLA Slot, " \
+               f"id: {self.id}, " \
+               f"schedule: {self.schedule.id}, " \
+               f"records: {[str(x) for x in self.record]}, " \
+               f"start at: {self.started_at}, " \
+               f"duration: {self.duration}, " \
+               f"status: {self.status}"
 
 
 class Record(Base):
@@ -114,6 +129,29 @@ class Record(Base):
 
     def __str__(self):
         return f"SQLA Record, id: {self.id}, user: {self.user.id}, slot: {self.slot.id}"
+
+
+class Tarif(Base):
+    __tablename__ = "tarifs"
+
+    rentals_amount: Mapped[int] = mapped_column(primary_key=True)
+    one_month: Mapped[int] = mapped_column(Integer)
+    three_month: Mapped[int] = mapped_column(Integer)
+    six_month: Mapped[int] = mapped_column(Integer)
+    one_year: Mapped[int] = mapped_column(Integer)
+    two_years: Mapped[int] = mapped_column(Integer)
+    three_years: Mapped[int] = mapped_column(Integer)
+
+    def __str__(self):
+        return (
+            f"SQLA Tarif,"
+            f" tarif: {self.rentals_amount},"
+            f" one_month: {self.one_month},"
+            f" six_month: {self.six_month},"
+            f" one_year: {self.one_year},"
+            f" two_years: {self.two_years},"
+            f" three_years: {self.three_years}"
+        )
 
 
 uri = "postgresql+asyncpg://postgres:qwerty123@127.0.0.1:5432/dev"
@@ -146,7 +184,8 @@ async def add_test_data():
         record.user = user
         record_2 = Record(slot_id=1)
         record_2.user = user_2
-        session.add_all((user, rental, user_2, schedule, record, record_2))
+        tarif1 = Tarif(rentals_amount=1, one_month=150, three_month=400, six_month=750, one_year=1500, two_years=2500, three_years=3500)
+        session.add_all((user, rental, user_2, schedule, record, record_2, tarif1))
 
         await session.commit()
 
