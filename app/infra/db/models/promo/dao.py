@@ -10,5 +10,3 @@ class PromoDAO:
             await session.commit()
         get_promo_pydantic = PromoGet.model_validate(sa_promo_add)
         return get_promo_pydantic
-
-

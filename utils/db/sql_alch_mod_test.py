@@ -205,7 +205,13 @@ async def add_test_data():
         record.user = user
         record_2 = Record(slot_id=1)
         record_2.user = user_2
-        tarif1 = Tarif(rentals_amount=1, one_month=150, three_month=400, six_month=750, one_year=1500, two_years=2500, three_years=3500)
+        tarif1 = Tarif(rentals_amount=1,
+                       one_month=150,
+                       three_month=400,
+                       six_month=750,
+                       one_year=1500,
+                       two_years=2500,
+                       three_years=3500)
         promo_test = Promo(promo_code='TEST_PROMO', promo_money=100, times_to_use=5)
         session.add_all((user, rental, user_2, schedule, record, record_2, tarif1, promo_test))
 

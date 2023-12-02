@@ -14,6 +14,7 @@ class RentalBase(BaseModel):
     description: str
     rental_type: RentalType
     user_id: Optional[UserBase]
+
     model_config = ConfigDict(from_attributes=True)
 
 
