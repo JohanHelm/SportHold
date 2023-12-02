@@ -24,6 +24,10 @@ class User(Base):
 
     user_id: Mapped[int] = mapped_column(Integer, primary_key=True)
     username: Mapped[str] = mapped_column(String)
+    fullname: Mapped[str] = mapped_column(String)
+    lang_code: Mapped[str] = mapped_column(String)
+    registration_date: Mapped[DateTime] = mapped_column(DateTime)
+    active: Mapped[int] = mapped_column(Integer, default=1)
     records: Mapped[List["Record"]] = relationship()
 
     def __str__(self):
@@ -232,8 +236,10 @@ async def create_tables():
 
 async def add_test_data():
     async with AsyncSession(engine) as session:
-        user = User(user_id=103273, username="@telegram_test_user")
-        user_2 = User(user_id=103272, username="@telegram_test_user_2")
+        user = User(user_id=103273, username="@telegram_test_user", fullname="Rocky Balboa", lang_code="ru",
+                    registration_date=datetime.now())
+        user_2 = User(user_id=103272, username="@telegram_test_user_2", fullname="Ivan Drago", lang_code="ru",
+                    registration_date=datetime.now())
         rental = Rental(
             name="Ping-pong table",
             description="Free-to-play ping-pong table on 2nd floor",
