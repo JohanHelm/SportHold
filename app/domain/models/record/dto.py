@@ -13,4 +13,4 @@ class RecordCreate(RecordBase):
 
 
 class RecordGet(RecordBase):
-    id: int
+    record_id: int

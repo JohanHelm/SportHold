@@ -23,4 +23,4 @@ class RentalCreate(RentalBase):
 
 
 class RentalGet(RentalBase):
-    id: int
+    rental_id: int

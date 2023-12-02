@@ -24,5 +24,5 @@ class SlotCreate(SlotBase):
 
 
 class SlotGet(SlotBase):
-    id: int
+    slot_id: int
     schedule_id: int

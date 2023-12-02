@@ -23,7 +23,7 @@ if TYPE_CHECKING:
 class Schedule(Base):
     __tablename__ = "schedules"
 
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    schedule_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String, nullable=True)
     description: Mapped[str] = mapped_column(String, nullable=True)
     status: Mapped[int] = mapped_column(Integer, default=2)
@@ -43,14 +43,14 @@ class Schedule(Base):
     hour_end: Mapped[int] = mapped_column(Integer, nullable=True)
     policy_merge: Mapped[int] = mapped_column(Integer, default=1)
     policy_suggest: Mapped[int] = mapped_column(Integer, default=1)
-    rental_id: Mapped[int] = mapped_column(ForeignKey("rentals.id"))
+    rental_id: Mapped[int] = mapped_column(ForeignKey("rentals.rental_id"))
     rental: Mapped["Rental"] = relationship(back_populates="schedules")
     slots: Mapped[List["Slot"]] = relationship()
 
     def __str__(self):
         return (
             f"SQLA Schedule,"
-            f" id: {self.id},"
+            f" id: {self.schedule_id},"
             f" name: {self.name},"
             f" description: {self.description},"
             f" status: {self.status},"
@@ -70,6 +70,6 @@ class Schedule(Base):
             f" hour_end: {self.hour_end},"
             f" policy_merge: {MergePolicy(self.policy_merge)},"
             f" policy_suggest: {SuggestPolicy(self.policy_suggest)},"
-            f" rental: {self.rental.id},"
+            f" rental: {self.rental.rental_id},"
             f" slots count: {len(self.slots)},"
         )

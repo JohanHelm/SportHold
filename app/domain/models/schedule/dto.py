@@ -67,4 +67,4 @@ class ScheduleCreate(ScheduleBase):
 
 
 class ScheduleGet(ScheduleBase):
-    id: int
+    schedule_id: int

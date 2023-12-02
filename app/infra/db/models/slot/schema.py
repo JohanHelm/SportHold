@@ -13,21 +13,21 @@ if TYPE_CHECKING:
 class Slot(Base):
     __tablename__ = "slots"
 
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    slot_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     started_at: Mapped[DateTime] = mapped_column(DateTime)
     duration: Mapped[int] = mapped_column(Integer)
     status: Mapped[str] = mapped_column(
         String
     )  # TODO: вынести статусы в отдельный перечень
-    schedule_id: Mapped[int] = mapped_column(ForeignKey("schedules.id"))
+    schedule_id: Mapped[int] = mapped_column(ForeignKey("schedules.schedule_id"))
     record: Mapped[List["Record"]] = relationship()
     schedule: Mapped["Schedule"] = relationship(back_populates="slots")
 
     def __str__(self):
         return (
             f"SQLA Slot, "
-            f"id: {self.id},"
-            f" schedule: {self.schedule.id},"
+            f"id: {self.slot_id},"
+            f" schedule: {self.schedule.schedule_id},"
             f" records: {[str(x) for x in self.record]},"
             f" start at: {self.started_at},"
             f" duration: {self.duration},"

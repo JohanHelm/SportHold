@@ -13,13 +13,13 @@ if TYPE_CHECKING:
 class Record(Base):
     __tablename__ = "records"
 
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), unique=False)
-    slot_id: Mapped[int] = mapped_column(ForeignKey("slots.id"), unique=False)
+    record_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"), unique=False)
+    slot_id: Mapped[int] = mapped_column(ForeignKey("slots.slot_id"), unique=False)
     user: Mapped["User"] = relationship(back_populates="records")
     slot: Mapped["Slot"] = relationship(back_populates="record")
 
     __table_args__ = (UniqueConstraint("user_id", "slot_id"),)
 
     def __str__(self):
-        return f"SQLA Record, id: {self.id}, user: {self.user.id}, slot: {self.slot.id}"
+        return f"SQLA Record, id: {self.record_id}, user: {self.user.user_id}, slot: {self.slot.slot_id}"
