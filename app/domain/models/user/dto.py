@@ -1,7 +1,7 @@
-from ast import List
+# from ast import List
 from datetime import date
 from enum import IntFlag, IntEnum
-from typing import Optional
+from typing import Optional, List
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.domain.models.rental.dto import RentalBase
@@ -23,13 +23,13 @@ class SubscrptionType(IntEnum):
 
 
 class UserBase(BaseModel):
-    tg_id: int
+    user_id: int  # telegram account id here!!
     username: str
-    roles: UserRole
-    subscription_type: Optional[SubscrptionType] = Field(default=None)
-    subscription_valid_for: Optional[date] = Field(default=None)
-    wallet_balance: int = Field(default=0)
-    rentals: List[RentalBase]
+    # roles: List[UserRole]
+    # subscription_type: Optional[SubscrptionType] = Field(default=None)
+    # subscription_valid_for: Optional[date] = Field(default=None)
+    # wallet_balance: int = Field(default=0)
+    # rentals: List[RentalBase]
     
     model_config = ConfigDict(from_attributes=True)
 
@@ -39,4 +39,4 @@ class UserCreate(UserBase):
 
 
 class UserGet(UserBase):
-    id: int
+    ...

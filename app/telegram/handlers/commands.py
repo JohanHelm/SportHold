@@ -4,18 +4,21 @@ from aiogram.types import Message
 from loguru import logger
 from app.infra.db.models.user.dao import UsedDAO
 from app.domain.models.user.dto import UserCreate, UserGet
+from app.telegram.messages.text_messages import hello_new_user, hello_old_user, help_message
 
 router: Router = Router()
 
 
 @router.message(CommandStart())
-async def process_start_command(message: Message, db_session, bot: Bot):
-    logger.debug(
-        f"Bot: message from: {message.from_user.username}, user_id: {message.from_user.id} message: {message.text}"
-    )
-    user1 = UserCreate(tg_id=message.from_user.id, username=message.from_user.username)
-    user_dao = UsedDAO() # TODO: сделать методы класса статическими
-    await user_dao.create(db_session, user1)
+async def process_start_command(message: Message, db_session):
+    user_dao = UsedDAO()  # TODO: сделать методы класса статическими
 
-    user = await user_dao.get_by_tg_id(db_session, message.from_user.id)
-    await message.answer(user.model_dump_json())
+    if await user_dao.user_exists(db_session, message.from_user.id):
+        await message.answer(hello_old_user(message.from_user.username))
+    else:
+        await user_dao.create(db_session, UserCreate(user_id=message.from_user.id, username=message.from_user.username))
+        logger.info(
+            f"Bot: We've got new user here. His name: {message.from_user.username}, user_id: {message.from_user.id}")
+        # TODO Написать приветствие нового пользователя
+        await message.answer(hello_new_user(message.from_user.username))
+

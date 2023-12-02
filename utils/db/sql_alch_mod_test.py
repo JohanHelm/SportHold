@@ -22,15 +22,13 @@ class Base(DeclarativeBase):
 class User(Base):
     __tablename__ = "users"
 
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    tg_id: Mapped[int] = mapped_column(Integer)
+    user_id: Mapped[int] = mapped_column(Integer, primary_key=True)
     username: Mapped[str] = mapped_column(String)
     records: Mapped[List["Record"]] = relationship()
 
     def __str__(self):
         return f"SQLA User, " \
-               f"id: {self.id}, " \
-               f"TG id: {self.tg_id}, " \
+               f"id: {self.user_id}, " \
                f"username: {self.username}, " \
                f"active records count: {len(self.records)}"
 
@@ -120,7 +118,7 @@ class Record(Base):
     __tablename__ = "records"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), unique=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"), unique=False)
     slot_id: Mapped[int] = mapped_column(ForeignKey("slots.id"), unique=False)
     user: Mapped["User"] = relationship(back_populates="records")
     slot: Mapped["Slot"] = relationship(back_populates="record")
@@ -128,7 +126,7 @@ class Record(Base):
     __table_args__ = (UniqueConstraint("user_id", "slot_id"),)
 
     def __str__(self):
-        return f"SQLA Record, id: {self.id}, user: {self.user.id}, slot: {self.slot.id}"
+        return f"SQLA Record, id: {self.id}, user: {self.user.user_id}, slot: {self.slot.slot_id}"
 
 
 class Tarif(Base):
@@ -234,8 +232,8 @@ async def create_tables():
 
 async def add_test_data():
     async with AsyncSession(engine) as session:
-        user = User(tg_id=103273, username="@telegram_test_user")
-        user_2 = User(tg_id=103272, username="@telegram_test_user_2")
+        user = User(user_id=103273, username="@telegram_test_user")
+        user_2 = User(user_id=103272, username="@telegram_test_user_2")
         rental = Rental(
             name="Ping-pong table",
             description="Free-to-play ping-pong table on 2nd floor",

@@ -11,16 +11,14 @@ if TYPE_CHECKING:
 class User(Base):
     __tablename__ = "users"
 
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    tg_id: Mapped[int] = mapped_column(Integer)
+    user_id: Mapped[int] = mapped_column(Integer, primary_key=True)
     username: Mapped[str] = mapped_column(String)
     records: Mapped[List["Record"]] = relationship()
 
     def __str__(self):
         return (
             f"SQLA User,"
-            f" id: {self.id},"
-            f" TG id: {self.tg_id},"
+            f" user_id: {self.user_id},"
             f" username: {self.username},"
             f" active records count: {len(self.records)}"
         )
