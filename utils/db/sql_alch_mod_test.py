@@ -1,5 +1,5 @@
 import asyncio
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from typing import List
 
 from sqlalchemy import (
@@ -175,6 +175,53 @@ class Promo(Base):
             f" times_to_use: {self.times_to_use}"
         )
 
+
+class Income(Base):
+    __tablename__ = "incomes"
+
+    income_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    customer_id: Mapped[int] = mapped_column(Integer)  # TODO реализовать завсимость от столбца с первичным ключом в таблице users
+    full_name: Mapped[str] = mapped_column(String)
+    summ: Mapped[int] = mapped_column(Integer)
+    date_time: Mapped[DateTime] = mapped_column(DateTime)
+    method: Mapped[int] = mapped_column(Integer)
+
+    def __str__(self):
+        return (
+            f"SQLA Income,"
+            f" customer_id: {self.customer_id},"
+            f" full_name: {self.full_name},"
+            f" summ: {self.summ},"
+            f" date_time: {self.date_time},"
+        )
+
+class Order(Base):
+    __tablename__ = "orders"
+
+    order_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    customer_id: Mapped[int] = mapped_column(Integer)   # TODO реализовать завсимость от столбца с первичным ключом в таблице users
+    full_name: Mapped[str] = mapped_column(String)
+    tarif: Mapped[int] = mapped_column(Integer)  # TODO реализовать зависимость от таблицы с тарифами
+    date_time: Mapped[DateTime] = mapped_column(DateTime)
+    expires_at: Mapped[DateTime] = mapped_column(DateTime)
+    duration: Mapped[int] = mapped_column(Integer)
+    active: Mapped[int] = mapped_column(Integer, default=1)
+    prolong: Mapped[int] = mapped_column(Integer, default=1)
+
+    def __str__(self):
+        return (
+            f"SQLA Order,"
+            f" order_id: {self.order_id},"
+            f" customer_id: {self.customer_id},"
+            f" full_name: {self.full_name},"
+            f" tarif: {self.tarif},"
+            f" date_time: {self.date_time},"
+            f" expires_at: {self.expires_at},"
+            f" duration: {self.duration},"
+            f" active: {self.active},"
+            f" prolong: {self.prolong}"
+        )
+
 uri = "postgresql+asyncpg://postgres:qwerty123@127.0.0.1:5432/dev"
 engine = create_async_engine(uri, echo=False)
 
@@ -213,7 +260,10 @@ async def add_test_data():
                        two_years=2500,
                        three_years=3500)
         promo_test = Promo(promo_code='TEST_PROMO', promo_money=100, times_to_use=5)
-        session.add_all((user, rental, user_2, schedule, record, record_2, tarif1, promo_test))
+        income1 = Income(customer_id=103272, full_name="John Doe", summ=100, date_time=datetime.now(), method=1)
+        order1 = Order(customer_id=103272, full_name="John Doe", tarif=1, date_time=datetime.now(),
+                       expires_at=datetime.now()+timedelta(days=30), duration=1, active=1, prolong=1)
+        session.add_all((user, rental, user_2, schedule, record, record_2, tarif1, promo_test, income1, order1))
 
         await session.commit()
 
