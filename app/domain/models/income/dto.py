@@ -26,4 +26,4 @@ class IncomeCreate(IncomeBase):
 
 
 class IncomeGet(IncomeBase):
-    id: int
+    income_id: int
