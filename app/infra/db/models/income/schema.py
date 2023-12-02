@@ -9,7 +9,8 @@ from app.domain.models.income.dto import PaymentMethod
 class Income(Base):
     __tablename__ = "incomes"
 
-    customer_id: int
+    income_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    customer_id: Mapped[int] = mapped_column(Integer)  # TODO реализовать завсимость от столбца с первичным ключом в таблице users
     full_name: Mapped[str] = mapped_column(String)
     summ: Mapped[int] = mapped_column(Integer)
     date_time: Mapped[DateTime] = mapped_column(DateTime)
