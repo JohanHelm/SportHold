@@ -11,9 +11,9 @@ class UsedDAO:
         get_user_pydantic = UserGet.model_validate(sa_user_add)
         return get_user_pydantic
 
-    async def get_by_id(self, session, id):
+    async def get_by_user_id(self, session, user_id):
         async with session() as session:
-            user = await session.get(User, id)
+            user = await session.get(User, user_id)
         get_user_pydantic = UserGet.model_validate(user)
         return get_user_pydantic
 
@@ -27,11 +27,7 @@ class UsedDAO:
         get_user_pydantic = UserGet.model_validate(user)
         return get_user_pydantic
 
-    async def get_by_tg_id(self, session, tg_user_id):
+    async def user_exists(self, session, user_id):
         async with session() as session:
-            result = await session.execute(User.__table__.select().where(User.user_id == tg_user_id))
-            user = result.all()
-        return user
-
-    async def user_exists(self, session, tg_user_id):
-        return bool(await UsedDAO.get_by_tg_id(self, session, tg_user_id))
+            user = await session.get(User, user_id)
+        return isinstance(user, User)

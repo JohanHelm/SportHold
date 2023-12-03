@@ -26,3 +26,4 @@ async def process_start_command(message: Message, db_session):
             f"Bot: We've got new user here. His name: {message.from_user.username}, user_id: {message.from_user.id}")
         # TODO Написать приветствие нового пользователя
         await message.answer(hello_new_user(message.from_user.username))
+    await message.answer(str(await user_dao.get_by_user_id(db_session, message.from_user.id)))

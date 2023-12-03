@@ -1,14 +1,15 @@
 import asyncio
 from datetime import date, datetime, timedelta
 from typing import List
-
+from enum import IntFlag, IntEnum
 from sqlalchemy import (
     DateTime,
     UniqueConstraint,
     Integer,
     String,
     ForeignKey,
-    BIGINT
+    BIGINT,
+    ARRAY
 )
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import Mapped, mapped_column
@@ -18,6 +19,15 @@ from sqlalchemy.orm import relationship, DeclarativeBase
 class Base(DeclarativeBase):
     pass
 
+class UserRole(IntFlag):
+    REGULAR = 1
+    PARTNER = 2
+    ADMIN = 4
+    MANAGER = 8
+    EMPLOYEE = 16
+    OWNER = 32
+    WORKER = 64
+    PAID = 128
 
 class User(Base):
     __tablename__ = "users"
@@ -28,6 +38,7 @@ class User(Base):
     lang_code: Mapped[str] = mapped_column(String)
     registration_date: Mapped[DateTime] = mapped_column(DateTime)
     active: Mapped[int] = mapped_column(Integer, default=1)
+    roles: Mapped[List["UserRole"]] = mapped_column(ARRAY(Integer), default=[1])
     records: Mapped[List["Record"]] = relationship()
 
     def __str__(self):
