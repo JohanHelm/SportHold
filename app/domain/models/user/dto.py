@@ -45,4 +45,4 @@ class UserCreate(UserBase):
 
 
 class UserGet(UserBase):
-    ...
+    user_id: int

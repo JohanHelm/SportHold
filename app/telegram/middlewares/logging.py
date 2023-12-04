@@ -10,9 +10,10 @@ class LoggingMiddleware(BaseMiddleware):
         event: TelegramObject,
         data: Dict[str, Any]
     ) -> Any:
-        logger.info(
-            f"Bot: message from: {event.message.from_user.username},"
-            f" user_id: {event.message.from_user.id},"
-            f" message: {event.message.text}")
+        if event.message: # Если пользователь останавливает бота, event.message == None, тогда логгер упадет с ошибкой
+            logger.info(
+                f"Bot: message from: {event.message.from_user.username},"
+                f" user_id: {event.message.from_user.id},"
+                f" message: {event.message.text}")
         result = await handler(event, data)
         return result

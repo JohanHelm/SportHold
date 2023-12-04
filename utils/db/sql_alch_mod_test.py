@@ -248,7 +248,7 @@ async def create_tables():
 async def add_test_data():
     async with AsyncSession(engine) as session:
         user = User(user_id=103273, username="@telegram_test_user", fullname="Rocky Balboa", lang_code="ru",
-                    registration_date=datetime.now())
+                    registration_date=datetime.now(), active=0)
         user_2 = User(user_id=103272, username="@telegram_test_user_2", fullname="Ivan Drago", lang_code="ru",
                     registration_date=datetime.now())
         rental = Rental(
@@ -278,6 +278,7 @@ async def add_test_data():
         income1 = Income(customer_id=103272, full_name="John Doe", summ=100, date_time=datetime.now(), method=1)
         order1 = Order(customer_id=103272, full_name="John Doe", tarif=1, date_time=datetime.now(),
                        expires_at=datetime.now()+timedelta(days=30), duration=1, active=1, prolong=1)
+        setattr(user, 'active', 1)
         session.add_all((user, rental, user_2, schedule, record, record_2, tarif1, promo_test, income1, order1))
 
         await session.commit()

@@ -19,7 +19,7 @@ class UsedDAO:
 
     async def update(self, session, updated_user: UserGet):
         async with session() as session:
-            user = await session.get(User, updated_user.id)
+            user = await session.get(User, updated_user.user_id)
             kv = updated_user.model_dump()
             for key, value in kv.items():
                 setattr(user, key, value)
