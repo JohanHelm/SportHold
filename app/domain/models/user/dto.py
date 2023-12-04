@@ -30,7 +30,7 @@ class UserBase(BaseModel):
     registration_date: datetime
     active: int = Field(default=1)
     # TODO Разобраться с ролями, ренталами
-    # roles: List[int] #= Field(default=[UserRole.REGULAR])
+    roles: UserRole = Field(default=UserRole.REGULAR)
     # subscription_type: Optional[SubscrptionType] = Field(default=None)
     # subscription_valid_for: Optional[date] = Field(default=None)
     # wallet_balance: int = Field(default=0)

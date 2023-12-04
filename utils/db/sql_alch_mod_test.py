@@ -38,7 +38,7 @@ class User(Base):
     lang_code: Mapped[str] = mapped_column(String)
     registration_date: Mapped[DateTime] = mapped_column(DateTime)
     active: Mapped[int] = mapped_column(Integer, default=1)
-    roles: Mapped[List["UserRole"]] = mapped_column(ARRAY(Integer), default=[1])
+    roles: Mapped["UserRole"] = mapped_column(Integer, default=1)
     records: Mapped[List["Record"]] = relationship()
 
     def __str__(self):
