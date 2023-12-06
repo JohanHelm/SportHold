@@ -12,7 +12,6 @@ class Order(Base):
     full_name: Mapped[str] = mapped_column(String)
     tarif: Mapped[int] = mapped_column(Integer)  # TODO реализовать зависимость от таблицы с тарифами
     date_time: Mapped[DateTime] = mapped_column(DateTime)
-    expires_at: Mapped[DateTime] = mapped_column(DateTime)
     duration: Mapped[int] = mapped_column(Integer)
     active: Mapped[int] = mapped_column(Integer, default=1)
     prolong: Mapped[int] = mapped_column(Integer, default=1)
@@ -25,7 +24,6 @@ class Order(Base):
             f" full_name: {self.full_name},"
             f" tarif: {self.tarif},"
             f" date_time: {self.date_time},"
-            f" expires_at: {self.expires_at},"
             f" duration: {self.duration},"
             f" active: {self.active},"
             f" prolong: {self.prolong}"

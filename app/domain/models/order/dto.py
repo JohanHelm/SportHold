@@ -8,7 +8,6 @@ class OrderBase(BaseModel):
     full_name: str
     tarif: int
     date_time: DateTime
-    expires_at: DateTime
     duration: int
     active: int = Field(default=1)
     prolong: int = Field(default=1)

@@ -216,7 +216,6 @@ class Order(Base):
     full_name: Mapped[str] = mapped_column(String)
     tarif: Mapped[int] = mapped_column(Integer)  # TODO реализовать зависимость от таблицы с тарифами
     date_time: Mapped[DateTime] = mapped_column(DateTime)
-    expires_at: Mapped[DateTime] = mapped_column(DateTime)
     duration: Mapped[int] = mapped_column(Integer)
     active: Mapped[int] = mapped_column(Integer, default=1)
     prolong: Mapped[int] = mapped_column(Integer, default=1)
@@ -276,8 +275,7 @@ async def add_test_data():
                        three_years=3500)
         promo_test = Promo(promo_code='TEST_PROMO', promo_money=100, times_to_use=5)
         income1 = Income(customer_id=103272, full_name="John Doe", summ=100, date_time=datetime.now(), method=1)
-        order1 = Order(customer_id=103272, full_name="John Doe", tarif=1, date_time=datetime.now(),
-                       expires_at=datetime.now()+timedelta(days=30), duration=1, active=1, prolong=1)
+        order1 = Order(customer_id=103272, full_name="John Doe", tarif=1, date_time=datetime.now(), duration=1, active=1, prolong=1)
         setattr(user, 'active', 1)
         session.add_all((user, rental, user_2, schedule, record, record_2, tarif1, promo_test, income1, order1))
 

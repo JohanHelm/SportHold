@@ -40,13 +40,12 @@ async def process_help_command(message: Message):
 @router.my_chat_member(ChatMemberUpdatedFilter(member_status_changed=KICKED))
 async def user_blocked_bot(event: ChatMemberUpdated, db_session):
     user_dao = UsedDAO()
-    await user_dao.update(db_session, UserGet(user_id=event.from_user.id,
-                                              active=0))
-    # TODO разобраться с UserGet, почему ля его создания нужны все атрибуты User а не достаточно только user_id
+    # await user_dao.update(db_session, UserGet(user_id=event.from_user.id, active=0)
+    # TODO разобраться с UserGet, почему для его создания нужны все атрибуты User а не достаточно только user_id
 
 
 @router.my_chat_member(ChatMemberUpdatedFilter(member_status_changed=MEMBER))
 async def user_unblocked_bot(event: ChatMemberUpdated, db_session):
     user_dao = UsedDAO()
-    await user_dao.update(db_session, UserGet(user_id=event.from_user.id,
-                                              active=1))
+    # await user_dao.update(db_session, UserGet(user_id=event.from_user.id,
+    #                                           active=1))

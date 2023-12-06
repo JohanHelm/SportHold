@@ -19,4 +19,4 @@ class PromoCreate(PromoBase):
 
 
 class PromoGet(PromoBase):
-    ...
+    promo_code: str

@@ -1,7 +1,5 @@
-# from ast import List
 from datetime import datetime
 from enum import IntFlag, IntEnum
-from typing import Optional, List
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.domain.models.rental.dto import RentalBase
