@@ -31,3 +31,12 @@ class UsedDAO:
         async with session() as session:
             user = await session.get(User, user_id)
         return isinstance(user, User)
+
+    async def update_by_user_id(self, session, user_id, **kwargs):
+        async with session() as session:
+            user = await session.get(User, user_id)
+            for key, value in kwargs.items():
+                setattr(user, key, value)
+            await session.commit()
+        get_user_pydantic = UserGet.model_validate(user)
+        return get_user_pydantic

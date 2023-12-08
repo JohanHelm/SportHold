@@ -32,6 +32,7 @@ async def process_start_command(message: Message, db_session):
         await message.answer(hello_new_user(message.from_user.username))
 
 
+
 @router.message(Command(commands='help'))
 async def process_help_command(message: Message):
     await message.answer(help_message)
@@ -40,12 +41,11 @@ async def process_help_command(message: Message):
 @router.my_chat_member(ChatMemberUpdatedFilter(member_status_changed=KICKED))
 async def user_blocked_bot(event: ChatMemberUpdated, db_session):
     user_dao = UsedDAO()
-    # await user_dao.update(db_session, UserGet(user_id=event.from_user.id, active=0)
+    await user_dao.update_by_user_id(db_session, user_id=event.from_user.id, active=0)
     # TODO разобраться с UserGet, почему для его создания нужны все атрибуты User а не достаточно только user_id
 
 
 @router.my_chat_member(ChatMemberUpdatedFilter(member_status_changed=MEMBER))
 async def user_unblocked_bot(event: ChatMemberUpdated, db_session):
     user_dao = UsedDAO()
-    # await user_dao.update(db_session, UserGet(user_id=event.from_user.id,
-    #                                           active=1))
+    await user_dao.update_by_user_id(db_session, user_id=event.from_user.id, active=1)
