@@ -51,7 +51,7 @@ class User(Base):
 class Rental(Base):
     __tablename__ = "rentals"
 
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    rental_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     category: Mapped[str] = mapped_column(String)
     name: Mapped[str] = mapped_column(String)
     description: Mapped[str] = mapped_column(String)
@@ -69,7 +69,7 @@ class Rental(Base):
 class Schedule(Base):
     __tablename__ = "schedules"
 
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    schedule_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String, nullable=True)
     description: Mapped[str] = mapped_column(String, nullable=True)
     status: Mapped[int] = mapped_column(Integer, default=2)
@@ -89,14 +89,14 @@ class Schedule(Base):
     hour_end: Mapped[int] = mapped_column(Integer, nullable=True)
     policy_merge: Mapped[int] = mapped_column(Integer, default=1)
     policy_suggest: Mapped[int] = mapped_column(Integer, default=1)
-    rental_id: Mapped[int] = mapped_column(ForeignKey("rentals.id"))
+    rental_id: Mapped[int] = mapped_column(ForeignKey("rentals.rental_id"))
     rental: Mapped["Rental"] = relationship(back_populates="schedules")
     slots: Mapped[List["Slot"]] = relationship()
 
     def __str__(self):
         return (
             f"SQLA Schedule,"
-            f" id: {self.id},"
+            f" id: {self.rental_id},"
             f" name: {self.name},"
             f" description: {self.description},"
             f" status: {self.status},"
@@ -109,13 +109,13 @@ class Schedule(Base):
 class Slot(Base):
     __tablename__ = "slots"
 
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    slot_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     started_at: Mapped[DateTime] = mapped_column(DateTime)
     duration: Mapped[int] = mapped_column(Integer)
     status: Mapped[str] = mapped_column(
         String
     )  # TODO: вынести статусы в отдельный перечень
-    schedule_id: Mapped[int] = mapped_column(ForeignKey("schedules.id"))
+    schedule_id: Mapped[int] = mapped_column(ForeignKey("schedules.schedule_id"))
     record: Mapped[List["Record"]] = relationship()
     schedule: Mapped["Schedule"] = relationship(back_populates="slots")
 
@@ -132,16 +132,16 @@ class Slot(Base):
 class Record(Base):
     __tablename__ = "records"
 
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    record_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"), unique=False)
-    slot_id: Mapped[int] = mapped_column(ForeignKey("slots.id"), unique=False)
+    slot_id: Mapped[int] = mapped_column(ForeignKey("slots.slot_id"), unique=False)
     user: Mapped["User"] = relationship(back_populates="records")
     slot: Mapped["Slot"] = relationship(back_populates="record")
 
     __table_args__ = (UniqueConstraint("user_id", "slot_id"),)
 
     def __str__(self):
-        return f"SQLA Record, id: {self.id}, user: {self.user.user_id}, slot: {self.slot.slot_id}"
+        return f"SQLA Record, id: {self.record_id}, user: {self.user.user_id}, slot: {self.slot.slot_id}"
 
 
 class Tarif(Base):
@@ -255,10 +255,29 @@ async def add_test_data():
             description="Free-to-play ping-pong table on 2nd floor",
             category="SPORT",
         )
+        rental1 = Rental(
+            name="Exercise bike",
+            description="New power generating facility, birn you fat and save couple of weals.",
+            category="SPORT",
+        )
+        rental2 = Rental(
+            name="Darts board",
+            description="Spend some time by throwing arrows",
+            category="SPORT",
+        )
+
         schedule = Schedule(name="Basic",
                             description="Basic schedule for pin-pong table",
                             )
         schedule.rental = rental
+        schedule1 = Schedule(name="Basic",
+                            description="Basic schedule for exercise bike",
+                            )
+        schedule1.rental = rental1
+        schedule2 = Schedule(name="Common",
+                             description="Common schedule for different rentals",
+                             )
+        schedule2.rental = rental2
         slot = Slot(started_at=datetime(2023, 12, 1, 12, 12), duration=30, status="PLANNED")
         schedule.slots.append(slot)
         record = Record()
@@ -277,7 +296,7 @@ async def add_test_data():
         income1 = Income(customer_id=103272, full_name="John Doe", summ=100, date_time=datetime.now(), method=1)
         order1 = Order(customer_id=103272, full_name="John Doe", tarif=1, date_time=datetime.now(), duration=1, active=1, prolong=1)
         setattr(user, 'active', 1)
-        session.add_all((user, rental, user_2, schedule, record, record_2, tarif1, promo_test, income1, order1))
+        session.add_all((user, rental, user_2, schedule, record, record_2, tarif1, promo_test, income1, order1, rental1, rental2))
 
         await session.commit()
 

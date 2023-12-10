@@ -22,9 +22,9 @@ class Rental(Base):
     def __str__(self):
         return (
             f"SQLA Rental,"
-            f" id: {self.rental_id},"
-            f" type: {self.category},"
-            f" name: {self.name},"
-            f" description: {self.description},"
-            f" schedules count: {len(self.schedules)}"
+            f" rental_id: {self.rental_id},\n"
+            f" category: {self.category},\n"
+            f" name: {self.name},\n"
+            f" description: {self.description},\n"
+            # f" schedules count: {len(self.schedules)}"
         )
