@@ -1,3 +1,7 @@
+def hello_regular_user(user_name):
+    return f"Привет, {user_name}!\n" \
+           f"Далее ты можешь ознакомиться со списком доступных объектов и записаться на свободное время."
+
 def hello_new_user(user_name):
     return f"Привет, новый пользователь {user_name}"
 
