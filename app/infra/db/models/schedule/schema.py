@@ -32,8 +32,8 @@ class Schedule(Base):
     mask_weekdays: Mapped[int] = mapped_column(Integer, default=127)
     mask_weeks: Mapped[int] = mapped_column(BIGINT, default=4503599627370495)
     mask_quartals: Mapped[int] = mapped_column(Integer, default=15)
-    mask_days_month: Mapped[int] = mapped_column(Integer, nullable=True)
-    nth_weekday: Mapped[int] = mapped_column(Integer, nullable=True)
+    mask_days_month: Mapped[int] = mapped_column(BIGINT, default=4294967295)   # nullable=True)
+    nth_weekday: Mapped[int] = mapped_column(Integer, default=0)
     nth_index: Mapped[int] = mapped_column(Integer, nullable=True)
     slot_type: Mapped[int] = mapped_column(Integer, default=1)
     slot_min_time: Mapped[int] = mapped_column(Integer, nullable=True)
@@ -47,6 +47,8 @@ class Schedule(Base):
     rental: Mapped["Rental"] = relationship(back_populates="schedules")
     slots: Mapped[List["Slot"]] = relationship()
 
+
+# TODO допилить текстовое представление экземпляра, сейчас падает с ошибкой на полях где есть None
     def __str__(self):
         return (
             f"SQLA Schedule,"

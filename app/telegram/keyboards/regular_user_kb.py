@@ -14,7 +14,7 @@ def create_pagination_keyboard(rental_number, total_rentals) -> InlineKeyboardMa
     backward_btn = InlineKeyboardButton(text='<<', callback_data='shift_show_rentals/-1')
     forward_btn = InlineKeyboardButton(text='>>', callback_data='shift_show_rentals/+1')
     rental_button = InlineKeyboardButton(text=f"{rental_number}/{total_rentals} Расписание",
-                                         callback_data=f"schedule {rental_number}/{total_rentals}")
+                                         callback_data=f"schedule {rental_number}")
     if rental_number == 1:
         kb_builder.row(rental_button, forward_btn)
     elif rental_number == total_rentals:
