@@ -4,7 +4,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 def create_first_keyboard() -> InlineKeyboardMarkup:
     kb_builder = InlineKeyboardBuilder()
-    show_rentals_btn = InlineKeyboardButton(text='Объекты!', callback_data='show_rentals/0')
+    show_rentals_btn = InlineKeyboardButton(text='Объекты!', callback_data='show_rentals')
     kb_builder.row(show_rentals_btn)
     return kb_builder.as_markup()
 
@@ -12,7 +12,7 @@ def create_first_keyboard() -> InlineKeyboardMarkup:
 def create_pagination_keyboard(rental_number, total_rentals) -> InlineKeyboardMarkup:
     kb_builder = InlineKeyboardBuilder()
     backward_btn = InlineKeyboardButton(text='<<', callback_data='shift_show_rentals/-1')
-    forward_btn = InlineKeyboardButton(text='>>', callback_data='some special callback data')
+    forward_btn = InlineKeyboardButton(text='>>', callback_data='shift_show_rentals/+1')
     rental_button = InlineKeyboardButton(text=f"{rental_number}/{total_rentals} Расписание",
                                          callback_data=f"schedule {rental_number}/{total_rentals}")
     if rental_number == 1:
