@@ -12,7 +12,6 @@ from app.telegram.messages.text_messages import help_message, hello_regular_user
 from app.telegram.keyboards.regular_user_kb import create_first_keyboard
 
 
-
 router: Router = Router()
 router.my_chat_member.filter(F.chat.type == "private")
 
@@ -31,20 +30,8 @@ async def process_start_command(message: Message, db_session):
     user = await user_dao.get_by_user_id(db_session, message.from_user.id)
 
     # TODO логика ветвления в зависимости от роли пользователя
-    if user.roles is UserRole.REGULAR:
+    if UserRole.REGULAR in user.roles:
         await message.answer(hello_regular_user(message.from_user.username), reply_markup=create_first_keyboard())
-
-
-    # rental = RentalDAO()
-    # rentals = await rental.show_rentals(db_session)
-    # page = 1
-    # # for one_rental in rentals:
-    # #     await message.answer(str(one_rental), reply_markup=create_pagination_keyboard(1, len(rentals)))
-    # await message.answer(str(rentals[page-1]), reply_markup=create_pagination_keyboard(page, len(rentals)))
-
-
-
-
 
 
 @router.message(Command(commands='help'))

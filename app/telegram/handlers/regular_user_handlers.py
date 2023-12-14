@@ -15,7 +15,6 @@ router: Router = Router()
 class ShowRental(StatesGroup):
     choosing_rental_number = State()
 
- #  TODO Прикрутить логгирование ко всем кнопкам
 
 @router.callback_query(F.data == 'show_rentals', StateFilter(None))
 async def show_rentals(callback: CallbackQuery, state: FSMContext, db_session):
@@ -36,6 +35,7 @@ async def shift_show_rentals(callback: CallbackQuery, state: FSMContext, db_sess
     rentals = await rental.show_rentals(db_session)
     await callback.message.edit_text(text=str(rentals[rental_number]),
                                      reply_markup=create_pagination_keyboard(rental_number + 1, len(rentals)))
+
 
 @router.callback_query(F.data.startswith('schedule '), ~StateFilter(None))
 async def show_rentals_schedule(callback: CallbackQuery, state: FSMContext, db_session):

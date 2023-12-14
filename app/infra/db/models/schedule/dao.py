@@ -15,6 +15,5 @@ class ScheduleDAO:
     async def show_rentals_schedule(self, session, rental_id):
         async with session() as session:
             result = await session.execute(select(Schedule).where(Schedule.rental_id == rental_id))
-            # schedule = result.scalar()
             schedule = result.scalars().all()
         return schedule
