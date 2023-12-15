@@ -8,7 +8,7 @@ from app.helpers.maskers.quartals import Quartals
 from app.helpers.maskers.weekdays import DaysOfWeek
 from app.helpers.maskers.weeks import WeeksInYear
 
-
+# TODO Создать класс Slot, чтобы ScheduleManager возвращал список объектов, а не кортежей с datetime.datetime
 class ScheduleManager:
     """
     Обрабатывает связку - лист расписаний и день - Выдает кортеж подходящих расписаний на день

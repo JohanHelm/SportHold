@@ -9,8 +9,10 @@ from aiogram.fsm.state import State, StatesGroup
 
 from app.infra.db.models.rental.dao import RentalDAO
 from app.infra.db.models.schedule.dao import ScheduleDAO
-from app.telegram.keyboards.regular_user_kb import create_pagination_keyboard
+from app.telegram.keyboards.regular_user_kb import create_rental_pagination_keyboard, create_slot_pagination_keyboard
 from app.domain.controllers.schedules import ScheduleManager
+from app.telegram.messages.text_messages import display_rental_info, display_rental_slots
+
 
 router: Router = Router()
 
@@ -26,8 +28,8 @@ async def show_rentals(callback: CallbackQuery, state: FSMContext, db_session):
     await state.update_data(choosing_rental_number=rental_number)
     rental = RentalDAO()
     rentals = await rental.show_rentals(db_session)
-    await callback.message.edit_text(text=str(rentals[rental_number]),
-                                     reply_markup=create_pagination_keyboard(rental_number + 1, len(rentals)))
+    await callback.message.edit_text(text=display_rental_info(rentals[rental_number]),
+                                     reply_markup=create_rental_pagination_keyboard(rental_number + 1, len(rentals)))
 
 
 @router.callback_query(F.data.startswith('shift_show_rentals'), ~StateFilter(None))
@@ -36,12 +38,12 @@ async def shift_show_rentals(callback: CallbackQuery, state: FSMContext, db_sess
     await state.update_data(choosing_rental_number=rental_number)
     rental = RentalDAO()
     rentals = await rental.show_rentals(db_session)
-    await callback.message.edit_text(text=str(rentals[rental_number]),
-                                     reply_markup=create_pagination_keyboard(rental_number + 1, len(rentals)))
+    await callback.message.edit_text(text=display_rental_info(rentals[rental_number]),
+                                     reply_markup=create_rental_pagination_keyboard(rental_number + 1, len(rentals)))
 
 
 @router.callback_query(F.data.startswith('schedule '), ~StateFilter(None))
-async def show_rentals_schedule(callback: CallbackQuery, state: FSMContext, db_session):
+async def show_rentals_slots(callback: CallbackQuery, state: FSMContext, db_session):
     rental_number = (await state.get_data())['choosing_rental_number']
     rental = RentalDAO()
     rentals = await rental.show_rentals(db_session)
@@ -52,7 +54,5 @@ async def show_rentals_schedule(callback: CallbackQuery, state: FSMContext, db_s
     date = datetime.today()
     manager = ScheduleManager()
     slots = manager.generate_time_intervals(rentals_schedules, date=date)
-
-    # await callback.message.edit_text(text=str(rentals[rental_number]),
-    #                                  reply_markup=create_pagination_keyboard(rental_number + 1, len(rentals)))
-    await callback.bot.send_message(chat_id=callback.message.chat.id, text=str(slots))
+    await callback.message.edit_text(text=display_rental_slots(slots[0]),
+                                     reply_markup=create_slot_pagination_keyboard(1, len(slots)))
