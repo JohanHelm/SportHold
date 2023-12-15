@@ -15,12 +15,12 @@ class ScheduleManager:
     Обрабатывает кортеж расписаний на день - выдает список слотов на день
     """
 
-    def find_nth_weekday_in_month(year, month, weekday, n):
+    def find_nth_weekday_in_month(self, year, month, weekday, n):
         d = datetime(year, month, 1)
         while d.weekday() != weekday:
-            d += datetime.timedelta(days=1)
+            d += timedelta(days=1)
 
-        d += datetime.timedelta(weeks=n - 1)
+        d += timedelta(weeks=n - 1)
 
         return d
 
@@ -100,14 +100,14 @@ class ScheduleManager:
         access_schedule = [
             schedule
             for schedule in schedules
-            if schedule.slot_type == SlotType.ACCESSIBLE
+            if SlotType(schedule.slot_type) == SlotType.ACCESSIBLE
         ]
         restrict_schedule = [
             schedule
             for schedule in schedules
-            if schedule.slot_type == SlotType.RESTRICTED
+            if SlotType(schedule.slot_type) == SlotType.RESTRICTED
         ]
-        cleaned_slots = []
+        # cleaned_slots = []
         allowed_slots = []
         forbidden_slots = []
         for schedule in access_schedule:

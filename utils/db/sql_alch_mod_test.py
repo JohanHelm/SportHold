@@ -1,7 +1,7 @@
 import asyncio
 from datetime import date, datetime, timedelta
 from typing import List
-from enum import IntFlag, IntEnum
+from enum import IntFlag, IntEnum, Enum, auto
 from sqlalchemy import (
     DateTime,
     UniqueConstraint,
@@ -18,6 +18,11 @@ from sqlalchemy.orm import relationship, DeclarativeBase
 
 class Base(DeclarativeBase):
     pass
+
+class SlotType(Enum):
+    ACCESSIBLE = auto()
+    RESTRICTED = auto()
+
 
 class UserRole(IntFlag):
     REGULAR = 1
@@ -83,10 +88,10 @@ class Schedule(Base):
     nth_index: Mapped[int] = mapped_column(Integer, nullable=True)
     slot_type: Mapped[int] = mapped_column(Integer, default=1)
     slot_min_time: Mapped[int] = mapped_column(Integer, nullable=True)
-    slot_max_time: Mapped[int] = mapped_column(Integer, nullable=True)
+    slot_max_time: Mapped[int] = mapped_column(Integer, default=30)
     slot_step_time: Mapped[int] = mapped_column(Integer, nullable=True)
-    hour_start: Mapped[int] = mapped_column(Integer, nullable=True)
-    hour_end: Mapped[int] = mapped_column(Integer, nullable=True)
+    hour_start: Mapped[int] = mapped_column(Integer, default=9)
+    hour_end: Mapped[int] = mapped_column(Integer, default=18)
     policy_merge: Mapped[int] = mapped_column(Integer, default=1)
     policy_suggest: Mapped[int] = mapped_column(Integer, default=1)
     rental_id: Mapped[int] = mapped_column(ForeignKey("rentals.rental_id"))
