@@ -5,6 +5,10 @@ def hello_regular_user(user_name: str) -> str:
     return f"Привет, {user_name}!\n" \
            f"Далее ты можешь ознакомиться со списком доступных объектов и записаться на свободное время."
 
+def hello_owner_user(user_name: str) -> str:
+    return f"Привет, {user_name}!\n" \
+           f"Здесь ты можешь создавать объекты и их распсания, просматривать записи клиентов, пополнять счёт и т.д."
+
 
 def display_rental_info(rental: Rental) -> str:
     return f"Наименование: {rental.name}\n" \

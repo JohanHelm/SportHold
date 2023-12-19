@@ -2,7 +2,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 
-def create_first_keyboard() -> InlineKeyboardMarkup:
+def create_first_regular_keyboard() -> InlineKeyboardMarkup:
     kb_builder = InlineKeyboardBuilder()
     show_rentals_btn = InlineKeyboardButton(text='Объекты!', callback_data='show_rentals')
     kb_builder.row(show_rentals_btn)

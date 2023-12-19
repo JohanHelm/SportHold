@@ -8,9 +8,9 @@ from loguru import logger
 
 from app.domain.models.user.dto import UserCreate, UserGet, UserRole
 from app.infra.db.models.user.dao import UsedDAO
-from app.telegram.messages.text_messages import help_message, hello_regular_user
-from app.telegram.keyboards.regular_user_kb import create_first_keyboard
-
+from app.telegram.messages.text_messages import help_message, hello_regular_user, hello_owner_user
+from app.telegram.keyboards.regular_user_kb import create_first_regular_keyboard
+from app.telegram.keyboards.owner_user_kb import create_first_owner_keyboard
 
 router: Router = Router()
 router.my_chat_member.filter(F.chat.type == "private")
@@ -31,7 +31,11 @@ async def process_start_command(message: Message, db_session):
 
     # TODO логика ветвления в зависимости от роли пользователя
     if UserRole.REGULAR in user.roles:
-        await message.answer(hello_regular_user(message.from_user.username), reply_markup=create_first_keyboard())
+        await message.answer(hello_regular_user(message.from_user.username),
+                             reply_markup=create_first_regular_keyboard())
+    elif UserRole.OWNER in user.roles:
+        await message.answer(hello_owner_user(message.from_user.username), reply_markup=create_first_owner_keyboard())
+
 
 
 @router.message(Command(commands='help'))
