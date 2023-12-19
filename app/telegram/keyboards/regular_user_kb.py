@@ -28,7 +28,7 @@ def create_slot_pagination_keyboard(slot_number, total_slots) -> InlineKeyboardM
     backward_btn = InlineKeyboardButton(text='<<', callback_data='shift_show_slots/-1')
     forward_btn = InlineKeyboardButton(text='>>', callback_data='shift_show_slots/+1')
     sign_up_button = InlineKeyboardButton(text=f"Записаться",
-                                         callback_data=f"sign_up_slot {slot_number}")
+                                         callback_data=f"sign_up_to_slot {slot_number}")
     if slot_number == 1:
         kb_builder.row(sign_up_button, forward_btn)
     elif slot_number == total_slots:

@@ -8,7 +8,14 @@ from app.helpers.maskers.quartals import Quartals
 from app.helpers.maskers.weekdays import DaysOfWeek
 from app.helpers.maskers.weeks import WeeksInYear
 
-# TODO Создать класс Slot, чтобы ScheduleManager возвращал список объектов, а не кортежей с datetime.datetime
+
+class TemporarySlot:
+    def __init__(self, start: datetime, end: datetime, schedule_id):
+        self.start = start
+        self.end = end
+        self.schedule_id = schedule_id
+
+
 class ScheduleManager:
     """
     Обрабатывает связку - лист расписаний и день - Выдает кортеж подходящих расписаний на день
@@ -75,12 +82,8 @@ class ScheduleManager:
         while s + timedelta(minutes=smax) <= e:
             duration = smax
             if s + timedelta(minutes=duration) <= e:
-                time_slots.append(
-                    (
-                        s,
-                        s + timedelta(minutes=duration),
-                    )
-                )
+                temporary_slot = TemporarySlot(s, s + timedelta(minutes=duration), schedule.schedule_id)
+                time_slots.append(temporary_slot)
             s += timedelta(minutes=smax)
         return time_slots
 
@@ -89,7 +92,7 @@ class ScheduleManager:
         for slot in allowed_slots:
             overlap = False
             for forbidden_slot in forbidden_slots:
-                if slot[0] < forbidden_slot[1] and slot[1] > forbidden_slot[0]:
+                if slot.start < forbidden_slot.end and slot.end > forbidden_slot.start:
                     overlap = True
                     break
             if not overlap:
