@@ -21,21 +21,15 @@ class SubscrptionType(IntEnum):
 
 
 class UserBase(BaseModel):
-    user_id: int  # telegram account id here!!
+    id: int  # telegram account id here!!
     username: str
     fullname: str
-    lang_code: str
-    registration_date: datetime
-    active: int = Field(default=1)
-    # TODO Разобраться с ролями, ренталами
+    created_at: datetime
+    IsAtive: bool = Field(default=1)
     roles: UserRole = Field(default=UserRole.REGULAR)
-    # subscription_type: Optional[SubscrptionType] = Field(default=None)
-    # subscription_valid_for: Optional[date] = Field(default=None)
-    # wallet_balance: int = Field(default=0)
-    # rentals: List[RentalBase]
-
 
     model_config = ConfigDict(from_attributes=True)
+    # TODO: records: List[Record] =
 
 
 class UserCreate(UserBase):
@@ -43,4 +37,4 @@ class UserCreate(UserBase):
 
 
 class UserGet(UserBase):
-    user_id: int
+    id: int
