@@ -24,17 +24,10 @@ class UserBase(BaseModel):
     id: int  # telegram account id here!!
     username: str
     fullname: str
-    created_at: datetime
-    IsAtive: bool = Field(default=1)
+    created_at: datetime = Field(default_factory=datetime.now)
+    is_active: bool = Field(default=False)
     roles: UserRole = Field(default=UserRole.REGULAR)
+    subsription_type: SubscrptionType = Field(default=SubscrptionType.REGULAR)
 
     model_config = ConfigDict(from_attributes=True)
     # TODO: records: List[Record] =
-
-
-class UserCreate(UserBase):
-    ...
-
-
-class UserGet(UserBase):
-    id: int

@@ -8,7 +8,6 @@ from app.infra.db.pgdb.dal import Builder
 from app.domain.models.rental.dto import RentalCreate
 # from app.infra.db.models.rental.dao import RentalDAO
 from app.domain.models.schedule.dto import ScheduleCreate
-from app.domain.models.user.dto import UserCreate, UserGet
 
 URI_ASYNC = "postgresql+asyncpg://postgres:qwerty123@127.0.0.1:5432/dev"
 
@@ -47,34 +46,34 @@ def test_schedule() -> ScheduleCreate:
     return test_schedule_pydantic
 
 
-@pytest.fixture(scope="function")
-def test_user() -> UserCreate:
-    test_user_pydantic = UserCreate(
-        tg_id=123,
-        first_name="anton",
-        last_name="bezkrovny",
-        username="@antonbezkrovnyy",
-        language_code="ru",
-        is_premium=True,
-        is_bot=False,
-        # records=["Record"]
-    )
-    return test_user_pydantic
+# @pytest.fixture(scope="function")
+# def test_user() -> UserCreate:
+#     test_user_pydantic = UserCreate(
+#         tg_id=123,
+#         first_name="anton",
+#         last_name="bezkrovny",
+#         username="@antonbezkrovnyy",
+#         language_code="ru",
+#         is_premium=True,
+#         is_bot=False,
+#         # records=["Record"]
+#     )
+#     return test_user_pydantic
 
 
-@pytest.fixture(scope="function")
-def test_user_get() -> UserGet:
-    test_user_pydantic = UserGet(
-        id=1,
-        tg_id=123,
-        first_name="anton",
-        last_name="bezkrovny",
-        username="@antonbezkrovnyy",
-        language_code="ru",
-        is_premium=True,
-        is_bot=False,
-    )
-    return test_user_pydantic
+# @pytest.fixture(scope="function")
+# def test_user_get() -> UserGet:
+#     test_user_pydantic = UserGet(
+#         id=1,
+#         tg_id=123,
+#         first_name="anton",
+#         last_name="bezkrovny",
+#         username="@antonbezkrovnyy",
+#         language_code="ru",
+#         is_premium=True,
+#         is_bot=False,
+#     )
+#     return test_user_pydantic
 
 
 @pytest.fixture(scope="session")
