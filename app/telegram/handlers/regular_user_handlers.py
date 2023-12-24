@@ -1,18 +1,19 @@
 from datetime import datetime
 
 from aiogram import Router, F
-from aiogram.types import CallbackQuery
-
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
+from aiogram.types import CallbackQuery
 
+from app.domain.controllers.schedules import ScheduleManager
 from app.infra.db.models.rental.dao import RentalDAO
 from app.infra.db.models.schedule.dao import ScheduleDAO
-from app.telegram.keyboards.regular_user_kb import create_rental_pagination_keyboard, create_slot_pagination_keyboard
-from app.domain.controllers.schedules import ScheduleManager
-from app.telegram.messages.text_messages import display_rental_info, display_rental_slots
-
+from app.telegram.keyboards.regular_user_kb import \
+    create_rental_pagination_keyboard, \
+    create_slot_pagination_keyboard, \
+    create_first_regular_keyboard
+from app.telegram.messages.text_messages import display_rental_info, display_rental_slots, hello_regular_user
 
 router: Router = Router()
 
@@ -21,21 +22,26 @@ class ShowRentalSlots(StatesGroup):
     choosing_rental_number = State()
     choosing_slot_number = State()
 
+
 # Возможно добавить опрос юзверя, типа напиши своё имя, номер телефона для связи, и т п
 class SignUpToSlot(StatesGroup):
     fill_name = State()
     fill_phone = State()
 
 
-
-@router.callback_query(F.data == 'show_rentals', StateFilter(None))
+@router.callback_query(F.data == 'show_rentals')  # , StateFilter(None))
 async def show_rentals(callback: CallbackQuery, state: FSMContext, db_session):
     await state.set_state(ShowRentalSlots.choosing_rental_number)
     rental_number = 0
     await state.update_data(choosing_rental_number=rental_number)
     rental = RentalDAO()
     rentals = await rental.show_rentals(db_session)
-    await callback.message.edit_text(text=display_rental_info(rentals[rental_number]),
+    rental_id = rentals[rental_number].rental_id
+    schedule = ScheduleDAO()
+    rentals_schedules = await schedule.show_rentals_schedule(db_session, rental_id)
+    # TODO rentals_schedules должен содержать не список всех расписаний объекта,
+    #  а активное на данный момент или на искомый день расписание.
+    await callback.message.edit_text(text=display_rental_info(rentals[rental_number], rentals_schedules[0]),
                                      reply_markup=create_rental_pagination_keyboard(rental_number + 1, len(rentals)))
 
 
@@ -45,7 +51,11 @@ async def shift_show_rentals(callback: CallbackQuery, state: FSMContext, db_sess
     await state.update_data(choosing_rental_number=rental_number)
     rental = RentalDAO()
     rentals = await rental.show_rentals(db_session)
-    await callback.message.edit_text(text=display_rental_info(rentals[rental_number]),
+    rental_id = rentals[rental_number].rental_id
+    schedule = ScheduleDAO()
+    rentals_schedules = await schedule.show_rentals_schedule(db_session, rental_id)
+
+    await callback.message.edit_text(text=display_rental_info(rentals[rental_number], rentals_schedules[0]),
                                      reply_markup=create_rental_pagination_keyboard(rental_number + 1, len(rentals)))
 
 
@@ -102,3 +112,27 @@ async def sign_up_to_slot(callback: CallbackQuery, state: FSMContext, db_session
     # Cоздать рекорд в базе
 
     await callback.message.edit_text(text=str(user_id))
+
+
+@router.callback_query(F.data.startswith('back_to_rentals'), StateFilter(ShowRentalSlots.choosing_slot_number))
+async def back_to_rentals(callback: CallbackQuery, state: FSMContext, db_session):
+    rental_number = (await state.get_data())['choosing_rental_number']
+    await state.set_state(ShowRentalSlots.choosing_rental_number)
+    rental = RentalDAO()
+    rentals = await rental.show_rentals(db_session)
+    rental_id = rentals[rental_number].rental_id
+    schedule = ScheduleDAO()
+    rentals_schedules = await schedule.show_rentals_schedule(db_session, rental_id)
+    await callback.message.edit_text(text=display_rental_info(rentals[rental_number], rentals_schedules[0]),
+                                     reply_markup=create_rental_pagination_keyboard(rental_number + 1, len(rentals)))
+
+
+@router.callback_query(F.data == 'to_main_menu')
+async def to_main_menu(callback: CallbackQuery, state: FSMContext, db_session):
+    await state.clear()
+    avalable_rentals: int = 2
+    total_rentals: int = 2
+    records_amount: int = 0
+    await callback.message.edit_text(
+        hello_regular_user(callback.from_user.username, avalable_rentals, total_rentals, records_amount),
+        reply_markup=create_first_regular_keyboard())
