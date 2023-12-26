@@ -1,7 +1,9 @@
 from typing import TYPE_CHECKING, List, Optional
-from sqlalchemy import Integer, ForeignKey, DateTime, String
+from sqlalchemy import Enum, Integer, ForeignKey, DateTime, String
 from sqlalchemy.orm import Mapped, relationship
 from sqlalchemy.orm import mapped_column
+
+from app.infra.db.models.utils.helpers import SlotStatus, SlotType
 
 from ...models import Base
 
@@ -21,8 +23,8 @@ class Slot(Base):
 
     started_at: Mapped[DateTime] = mapped_column(DateTime)
     ended_at: Mapped[DateTime] = mapped_column(DateTime)
-    status: Mapped[int] = mapped_column(default=0)
-    type: Mapped[int] = mapped_column(default=0)
+    status: Mapped[Enum] = mapped_column(SlotStatus, default=SlotStatus.ACTIVE)
+    type: Mapped[Enum] = mapped_column(SlotType, default=SlotType.ACCESSIBLE)
 
     records: Mapped[Optional[List["Record"]]] = relationship(back_populates="slot")
     schedule: Mapped["Schedule"] = relationship(back_populates="slots")

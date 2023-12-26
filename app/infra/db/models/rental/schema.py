@@ -25,6 +25,5 @@ class Rental(Base):
             f" rental_id: {self.rental_id},\n"
             f" category: {self.category},\n"
             f" name: {self.name},\n"
-            f" description: {self.description},\n"
-            # f" schedules count: {len(self.schedules)}"
+            f" description: {self.description}\n"
         )

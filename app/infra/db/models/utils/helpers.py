@@ -14,3 +14,15 @@ class UserRole(IntFlag):
 class UserStatus(Enum):
     INACTIVE = 0
     ACTIVE = 1
+
+class SlotStatus(Enum):
+    INACTIVE = 0
+    ACTIVE = 1
+
+class SlotType(Enum):
+    ACCESSIBLE = 0
+    RESTRICTED = 1
+
+class ScheduleStatus(Enum):
+    INACTIVE = 0
+    ACTIVE = 1
