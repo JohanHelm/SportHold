@@ -25,12 +25,12 @@ class Schedule(Base):
 
     name: Mapped[str] = mapped_column(String, nullable=True)
     description: Mapped[str] = mapped_column(String, nullable=True)
-    status: Mapped[Enum] = mapped_column(ScheduleStatus, default=ScheduleStatus.INACTIVE)
+    status: Mapped[Enum] = mapped_column(Enum(ScheduleStatus), default=ScheduleStatus.INACTIVE)
     started_at: Mapped[DateTime] = mapped_column(DateTime, default=date.today())
     ended_at: Mapped[DateTime] = mapped_column(
         Integer, default=date.today() + timedelta(days=30)
     )
-    slot_type: Mapped[Enum] = mapped_column(SlotType, default=SlotType.ACCESSIBLE)
+    slot_type: Mapped[Enum] = mapped_column(Enum(SlotType), default=SlotType.ACCESSIBLE)
     slot_time: Mapped[int] = mapped_column(Integer, default=30)
     hour_start: Mapped[int] = mapped_column(Integer, default=9)
     hour_end: Mapped[int] = mapped_column(Integer, default=18)

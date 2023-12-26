@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 class Rental(Base):
     __tablename__ = "rentals"
 
-    rental_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     category: Mapped[str] = mapped_column(String)
     name: Mapped[str] = mapped_column(String)
     description: Mapped[str] = mapped_column(String)
@@ -22,7 +22,7 @@ class Rental(Base):
     def __str__(self):
         return (
             f"SQLA Rental,"
-            f" rental_id: {self.rental_id},\n"
+            f" id: {self.id},\n"
             f" category: {self.category},\n"
             f" name: {self.name},\n"
             f" description: {self.description}\n"

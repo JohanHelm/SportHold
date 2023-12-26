@@ -23,8 +23,8 @@ class Slot(Base):
 
     started_at: Mapped[DateTime] = mapped_column(DateTime)
     ended_at: Mapped[DateTime] = mapped_column(DateTime)
-    status: Mapped[Enum] = mapped_column(SlotStatus, default=SlotStatus.ACTIVE)
-    type: Mapped[Enum] = mapped_column(SlotType, default=SlotType.ACCESSIBLE)
+    status: Mapped[Enum] = mapped_column(Enum(SlotStatus), default=SlotStatus.ACTIVE)
+    type: Mapped[Enum] = mapped_column(Enum(SlotType), default=SlotType.ACCESSIBLE)
 
     records: Mapped[Optional[List["Record"]]] = relationship(back_populates="slot")
     schedule: Mapped["Schedule"] = relationship(back_populates="slots")

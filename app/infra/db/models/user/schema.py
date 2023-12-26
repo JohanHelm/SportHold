@@ -21,7 +21,7 @@ class User(Base):
     username: Mapped[str] = mapped_column(String)
     fullname: Mapped[str] = mapped_column(String)
     created_at: Mapped[DateTime] = mapped_column(DateTime, default=date.today())
-    is_active: Mapped[Enum] = mapped_column(UserStatus, default=UserStatus.ACTIVE)
+    is_active: Mapped[Enum] = mapped_column(Enum(UserStatus), default=UserStatus.ACTIVE)
     # TODO: how to use IntFlag in SQLA?
     roles: Mapped[int] = mapped_column(Integer, default=UserRole.REGULAR)
 
