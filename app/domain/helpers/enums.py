@@ -1,7 +1,7 @@
 from enum import Enum, IntFlag
 
 
-class DaysOfWeek(IntFlag):  # маска bit'ов, но в int чтобы удобно хранить в бд
+class DaysOfWeek(IntFlag):
     Monday = 1
     Tuesday = 2
     Wednesday = 4

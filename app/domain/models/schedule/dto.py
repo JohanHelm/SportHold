@@ -1,8 +1,6 @@
 from pydantic import BaseModel, ConfigDict, Field
 from typing import Optional
 from datetime import date, datetime, timedelta
-
-
 from app.domain.helpers.enums import SlotType, DaysOfWeek, ScheduleStatus
 
 
