@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 
 class Rental(Base):
-    _tablename__ = "rentals"
+    __tablename__ = "rentals"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
 
