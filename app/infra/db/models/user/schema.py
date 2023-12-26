@@ -4,7 +4,7 @@ from sqlalchemy import Integer, String, DateTime
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm import relationship
 
-from app.infra.db.models.utils.helpers import UserRole, UserStatus
+from app.domain.helpers.enums import UserRole, UserStatus
 
 from ...models import Base
 

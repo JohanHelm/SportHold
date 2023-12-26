@@ -4,7 +4,7 @@ from sqlalchemy import Enum, Integer, ForeignKey, DateTime, String
 from sqlalchemy.orm import Mapped, relationship
 from sqlalchemy.orm import mapped_column
 
-from app.infra.db.models.utils.helpers import SlotStatus, SlotType
+from app.domain.helpers.enums import SlotStatus, SlotType
 
 from ...models import Base
 

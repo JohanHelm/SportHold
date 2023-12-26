@@ -5,7 +5,7 @@ from sqlalchemy.orm import Mapped, relationship
 from sqlalchemy.orm import mapped_column
 from datetime import date, datetime, timedelta
 
-from app.infra.db.models.utils.helpers import ScheduleStatus, SlotType, DaysOfWeek
+from app.domain.helpers.enums import ScheduleStatus, SlotType, DaysOfWeek
 
 from ...models import Base
 

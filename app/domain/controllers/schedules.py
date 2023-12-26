@@ -1,13 +1,12 @@
 from typing import Set
 from datetime import datetime, timedelta
 
-from app.domain.models.schedule.dto import ScheduleBase, ScheduleStatus
-from app.domain.models.slot.dto import SlotType
-from app.helpers.maskers.weekdays import DaysOfWeek
+from app.domain.models.schedule.dto import ScheduleModel
+from app.domain.helpers.enums import DaysOfWeek, ScheduleStatus, SlotStatus, SlotType
 
 
 
-class TemporarySlot:
+class SlotData:
     def __init__(self, start: datetime, end: datetime, schedule_id):
         self.start = start
         self.end = end
@@ -37,7 +36,6 @@ class ScheduleManager:
         if (schedule.valid_from + schedule.valid_for_days) < date.date():
             return False
         if DaysOfWeek(2 ** date.date().isoweekday()) not in schedule.mask_weekdays:
-            print(DaysOfWeek(2 ** date.date().isoweekday()))
             return False
         if WeeksInYear(2 ** date.date().isocalendar().week) not in schedule.mask_weeks:
             print(WeeksInYear(2 ** date.date().isocalendar().week))

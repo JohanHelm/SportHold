@@ -5,7 +5,7 @@ from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
-from app.infra.db.models.utils.helpers import RentalTypes
+from app.domain.helpers.enums import RentalTypes
 
 from ...models import Base
 
