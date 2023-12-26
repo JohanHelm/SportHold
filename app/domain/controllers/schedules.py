@@ -3,10 +3,8 @@ from datetime import datetime, timedelta
 
 from app.domain.models.schedule.dto import ScheduleBase, ScheduleStatus
 from app.domain.models.slot.dto import SlotType
-from app.helpers.maskers.daysmonth import DaysInMonth
-from app.helpers.maskers.quartals import Quartals
 from app.helpers.maskers.weekdays import DaysOfWeek
-from app.helpers.maskers.weeks import WeeksInYear
+
 
 
 class TemporarySlot:
