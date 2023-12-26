@@ -3,6 +3,9 @@ from typing import TYPE_CHECKING, List
 from sqlalchemy import Integer, String, DateTime
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm import relationship
+from sqlalchemy import Enum
+
+from app.infra.db.models.utils.helpers import UserRole, UserStatus
 
 from ...models import Base
 
@@ -18,8 +21,9 @@ class User(Base):
     username: Mapped[str] = mapped_column(String)
     fullname: Mapped[str] = mapped_column(String)
     created_at: Mapped[DateTime] = mapped_column(DateTime, default=date.today())
-    is_active: Mapped[int] = mapped_column(Integer, default=1)
-    roles: Mapped[int] = mapped_column(Integer, default=0)
+    is_active: Mapped[Enum] = mapped_column(UserStatus, default=UserStatus.ACTIVE)
+    # TODO: how to use IntFlag in SQLA?
+    roles: Mapped[int] = mapped_column(Integer, default=UserRole.REGULAR)
 
     records: Mapped[List["Record"]] = relationship(back_populates="user")
 
