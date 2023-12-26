@@ -45,3 +45,10 @@ class ScheduleStatus(Enum):
 
     def custom_print(self):
         return self.name
+
+class RentalTypes(Enum):
+    REGULAR = 0
+
+    def custom_print(self):
+        return self.name
+
