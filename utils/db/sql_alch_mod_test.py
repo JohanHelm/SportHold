@@ -116,7 +116,7 @@ class Slot(Base):
 
     slot_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     started_at: Mapped[DateTime] = mapped_column(DateTime)
-    duration: Mapped[int] = mapped_column(Integer)
+    ended_at: Mapped[DateTime] = mapped_column(DateTime)
     status: Mapped[str] = mapped_column(
         String
     )  # TODO: вынести статусы в отдельный перечень
@@ -283,7 +283,7 @@ async def add_test_data():
                              description="Common schedule for different rentals",
                              )
         schedule2.rental = rental2
-        slot = Slot(started_at=datetime(2023, 12, 1, 12, 12), duration=30, status="PLANNED")
+        slot = Slot(started_at=datetime(2023, 12, 1, 12, 0), ended_at=datetime(2023, 12, 1, 12, 30), status="PLANNED")
         schedule.slots.append(slot)
         record = Record()
         record.slot = slot

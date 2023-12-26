@@ -1,3 +1,4 @@
+from datetime import datetime
 from enum import Enum, auto
 from pydantic import BaseModel, ConfigDict
 from sqlalchemy import DateTime
@@ -11,8 +12,8 @@ class SlotStatus(Enum):
     GENERATED = auto()
     
 class SlotBase(BaseModel):
-    started_at: DateTime
-    duration: int
+    started_at: datetime
+    ended_at: datetime
     status: SlotStatus
     type: SlotType
     

@@ -26,13 +26,12 @@ def display_rental_info(rental: Rental, schedule: Schedule) -> str:
            f"Близжайший свободный слот ---?\n" \
            f"Мои записи на этом объекте"
 
+# TODO здесь выводить описание политики бронирования
+def display_booking_info(schedule: Schedule) -> str:
+    return f"Описание брониования: {schedule.description}"
 
-def display_rental_slots(slot: TemporarySlot) -> str:
-    slot_date = slot.start.strftime("%d.%m.%Y г.")
-    slot_start_time = slot.start.strftime("%H:%M")
-    slot_end_time = slot.end.strftime("%H:%M")
-    return f" Дата: {slot_date}\n" \
-           f" Время: {slot_start_time} - {slot_end_time}"
+
+
 
 help_message = f"Краткая инструкция по использованию ботом.\n" \
                f"Ссылка на канал с видеоинструкциями.\n" \

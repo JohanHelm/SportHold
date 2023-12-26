@@ -15,6 +15,10 @@ class TemporarySlot:
         self.end = end
         self.schedule_id = schedule_id
 
+    def __str__(self):
+        return f"{self.start}\n" \
+               f"{self.end}"
+
 
 class ScheduleManager:
     """
