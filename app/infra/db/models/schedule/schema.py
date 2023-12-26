@@ -1,18 +1,12 @@
 from typing import TYPE_CHECKING, List
 
-from sqlalchemy import DateTime, Integer, String, ForeignKey, BIGINT
+from sqlalchemy import DateTime, Integer, String, ForeignKey
 from sqlalchemy.orm import Mapped, relationship
 from sqlalchemy.orm import mapped_column
-from datetime import date
+from datetime import date, timedelta
 
 from ...models import Base
 
-from app.helpers.maskers.weekdays import DaysOfWeek
-from app.helpers.maskers.weeks import WeeksInYear
-from app.helpers.maskers.quartals import Quartals
-from app.helpers.maskers.daysmonth import DaysInMonth
-from app.domain.models.slot.dto import SlotType
-from app.domain.models.schedule.dto import SuggestPolicy, MergePolicy
 
 
 if TYPE_CHECKING:
@@ -23,55 +17,37 @@ if TYPE_CHECKING:
 class Schedule(Base):
     __tablename__ = "schedules"
 
-    schedule_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+
+    rental_id: Mapped[int] = mapped_column(ForeignKey("rentals.id"))
+
     name: Mapped[str] = mapped_column(String, nullable=True)
     description: Mapped[str] = mapped_column(String, nullable=True)
-    status: Mapped[int] = mapped_column(Integer, default=2)
-    valid_from: Mapped[DateTime] = mapped_column(DateTime, default=date.today())
-    valid_for_days: Mapped[int] = mapped_column(Integer, default=30)
-    mask_weekdays: Mapped[int] = mapped_column(Integer, default=127)
-    mask_weeks: Mapped[int] = mapped_column(BIGINT, default=4503599627370495)
-    mask_quartals: Mapped[int] = mapped_column(Integer, default=15)
-    mask_days_month: Mapped[int] = mapped_column(BIGINT, default=4294967295)
-    nth_weekday: Mapped[int] = mapped_column(Integer, default=0)
-    nth_index: Mapped[int] = mapped_column(Integer, nullable=True)
+    status: Mapped[int] = mapped_column(Integer, default=0)
+    started_at: Mapped[DateTime] = mapped_column(DateTime, default=date.today())
+    ended_at: Mapped[DateTime] = mapped_column(
+        Integer, default=date.today() + timedelta(days=30)
+    )
     slot_type: Mapped[int] = mapped_column(Integer, default=1)
-    slot_min_time: Mapped[int] = mapped_column(Integer, nullable=True)
-    slot_max_time: Mapped[int] = mapped_column(Integer, default=30)
-    slot_step_time: Mapped[int] = mapped_column(Integer, nullable=True)
+    slot_time: Mapped[int] = mapped_column(Integer, default=30)
     hour_start: Mapped[int] = mapped_column(Integer, default=9)
     hour_end: Mapped[int] = mapped_column(Integer, default=18)
-    policy_merge: Mapped[int] = mapped_column(Integer, default=1)
-    policy_suggest: Mapped[int] = mapped_column(Integer, default=1)
-    rental_id: Mapped[int] = mapped_column(ForeignKey("rentals.rental_id"))
+
     rental: Mapped["Rental"] = relationship(back_populates="schedules")
-    slots: Mapped[List["Slot"]] = relationship()
+    slots: Mapped[List["Slot"]] = relationship(back_populates="schedule")
 
-
-# TODO допилить текстовое представление экземпляра, сейчас падает с ошибкой на полях где есть None
+    # TODO допилить текстовое представление экземпляра, сейчас падает с ошибкой на полях где есть None
     def __str__(self):
         return (
             f"SQLA Schedule,"
-            f" id: {self.schedule_id},"
+            f" id: {self.id},"
             f" name: {self.name},"
             f" description: {self.description},"
             f" status: {self.status},"
-            f" valid_from: {self.valid_from},"
-            f" valid_for_days: {self.valid_for_days},"
-            f" mask_weekdays: {DaysOfWeek(self.mask_weekdays)},"
-            f" mask_weeks: {WeeksInYear(self.mask_weeks)},"
-            f" mask_quartals: {Quartals(self.mask_quartals)},"
-            f" mask_days_month: {DaysInMonth(self.mask_days_month)},"
-            f" nth_weekday: {DaysOfWeek(self.nth_weekday)},"
-            f" nth_index: {self.nth_index},"
-            f" slot_type: {SlotType(self.slot_type)},"
-            f" slot_min_time: {self.slot_min_time},"
-            f" slot_max_time: {self.slot_max_time},"
-            f" slot_step_time: {self.slot_step_time},"
+            f" started_at: {self.started_at},"
+            f" ended_at: {self.ended_at},"
+            f" slot_time: {self.slot_time},"
             f" hour_start: {self.hour_start},"
             f" hour_end: {self.hour_end},"
-            f" policy_merge: {MergePolicy(self.policy_merge)},"
-            f" policy_suggest: {SuggestPolicy(self.policy_suggest)},"
-            f" rental: {self.rental.rental_id},"
-            f" slots count: {len(self.slots)},"
+            f" rental_id: {self.rental.rental_id}"
         )
