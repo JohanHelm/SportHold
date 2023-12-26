@@ -21,10 +21,12 @@ class Slot(Base):
     rental_id: Mapped[int] = mapped_column(ForeignKey("rentals.id"))
     schedule_id: Mapped[int] = mapped_column(ForeignKey("schedules.id"))
 
-    started_at: Mapped[DateTime] = mapped_column(DateTime)
-    ended_at: Mapped[DateTime] = mapped_column(DateTime)
-    status: Mapped[Enum] = mapped_column(Enum(SlotStatus), default=SlotStatus.ACTIVE)
-    type: Mapped[Enum] = mapped_column(Enum(SlotType), default=SlotType.ACCESSIBLE)
+    created: Mapped[DateTime] = mapped_column(DateTime, default=datetime.now())
+
+    started: Mapped[DateTime] = mapped_column(DateTime)
+    ended: Mapped[DateTime] = mapped_column(DateTime)
+    status: Mapped[int] = mapped_column(Integer, default=SlotStatus.INACTIVE)
+    type: Mapped[int] = mapped_column(Integer, default=SlotType.ACCESSIBLE)
 
     records: Mapped[Optional[List["Record"]]] = relationship(back_populates="slot")
     schedule: Mapped["Schedule"] = relationship(back_populates="slots")
@@ -33,9 +35,11 @@ class Slot(Base):
     def __str__(self):
         return (
             f"SQLA Slot, "
-            f"id: {self.id},"
-            f" schedule: {self.schedule_id},"
-            f" started_at at: {self.started_at},"
-            f" ended_at: {self.ended_at},"
-            f" status: {self.status}"
+            f"id: {self.id}, "
+            f"status: {SlotStatus(self.status).custom_print()} "
+            f"type: {SlotType(self.type).custom_print()} "
+            f"created: {self.created}, "
+            f"schedule id: {self.schedule_id}, "
+            f"started: {self.started}, "
+            f"ended: {self.ended}"
         )

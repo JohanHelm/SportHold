@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import TYPE_CHECKING
 from sqlalchemy import DateTime, UniqueConstraint, ForeignKey
 from sqlalchemy.orm import Mapped
@@ -20,8 +21,7 @@ class Record(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), unique=False)
     slot_id: Mapped[int] = mapped_column(ForeignKey("slots.id"), unique=False)
     rental_id: Mapped[int] = mapped_column(ForeignKey("rentals.id"), unique=False)
-
-    created_at: Mapped[DateTime] = mapped_column(DateTime)
+    created: Mapped[DateTime] = mapped_column(DateTime, default=datetime.now())
 
     user: Mapped["User"] = relationship(back_populates="records")
     slot: Mapped["Slot"] = relationship(back_populates="records")
@@ -32,8 +32,9 @@ class Record(Base):
     def __str__(self):
         return (
             f"SQLA Record,"
-            f" id: {self.id},"
-            f" user_id: {self.user_id},"
-            f" slot_id: {self.slot_id},"
-            f" rental_id: {self.rental_id}"
+            f"id: {self.id},"
+            f"user_id: {self.user_id},"
+            f"slot_id: {self.slot_id},"
+            f"rental_id: {self.rental_id}, "
+            f"created: {self.created}"
         )

@@ -19,7 +19,7 @@ class User(Base):
 
     username: Mapped[str] = mapped_column(String)
     fullname: Mapped[str] = mapped_column(String)
-    created_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.now())
+    created: Mapped[DateTime] = mapped_column(DateTime, default=datetime.now())
     status: Mapped[int] = mapped_column(Integer, default=UserStatus.ACTIVE)
     roles: Mapped[int] = mapped_column(Integer, default=UserRole.REGULAR)
 
@@ -31,7 +31,7 @@ class User(Base):
             f"id: {self.id}, "
             f"username: {self.username}, "
             f"fullname: {self.fullname}, "
-            f"created_at: {self.created_at}, "
+            f"created: {self.created}, "
             f"status: {UserStatus(self.status).custom_print()}, "
             f"roles: {UserRole(self.roles).custom_print()}"
         )

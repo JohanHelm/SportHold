@@ -1,58 +1,50 @@
-from datetime import datetime
-from enum import IntFlag as IF, IntEnum as EN
+from enum import Enum
+from typing import TYPE_CHECKING, List
 
 from sqlalchemy import create_engine
-from sqlalchemy.orm import declarative_base, mapped_column
+from sqlalchemy.orm import DeclarativeBase, declarative_base, mapped_column, relationship
 from sqlalchemy.orm import Session, sessionmaker
-from sqlalchemy import Integer, String, DateTime
+from sqlalchemy import Integer, String
 
 from sqlalchemy.orm.base import Mapped
 
-Base = declarative_base()
-
-
-class UserRole(IF):
-    REGULAR = 1
-    PARTNER = 2
-    ADMIN = 4
-    MANAGER = 8
-    EMPLOYEE = 16
-    OWNER = 32
-    WORKER = 64
-    PAID = 128
-
-    def custom_print(self):
-        return "|".join(val.name for val in UserRole if self.value & val)
-
-
-class UserStatus(EN):
-    INACTIVE = 0
-    ACTIVE = 1
+class RentalTypes(Enum):
+    REGULAR = 0
 
     def custom_print(self):
         return self.name
 
+if TYPE_CHECKING:
+    from app.infra.db.models.schedule.schema import Schedule
+    from app.infra.db.models.slot.schema import Slot
+    from app.infra.db.models.record.schema import Record
 
-class User(Base):
-    __tablename__ = "users"
+Base: DeclarativeBase = declarative_base()
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
 
-    username: Mapped[str] = mapped_column(String)
-    fullname: Mapped[str] = mapped_column(String)
-    created_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.now())
-    status: Mapped[int] = mapped_column(Integer, default=UserStatus.ACTIVE)
-    roles: Mapped[int] = mapped_column(Integer, default=UserRole.REGULAR)
+class Rental(Base):
+    __tablename__ = "rentals"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+
+    name: Mapped[str] = mapped_column(String)
+    description: Mapped[str] = mapped_column(String)
+    type: Mapped[int] = mapped_column(Integer, default=RentalTypes.REGULAR)
+
+    # schedules: Mapped[List["Schedule"]] = relationship()
+    # slots: Mapped[List["Slot"]] = relationship()
+    # records: Mapped[List["Record"]] = relationship()
 
     def __str__(self):
         return (
-            f"SQLA User, "
+            f"SQLA Rental, "
             f"id: {self.id}, "
-            f"username: {self.username}, "
-            f"fullname: {self.fullname}, "
-            f"created_at: {self.created_at}, "
-            f"status: {UserStatus(self.status).custom_print()}, "
-            f"roles: {UserRole(self.roles).custom_print()}"
+            f"category: {RentalTypes(self.type).custom_print()}, "
+            f"name: {self.name}, "
+            f"description: {self.type} "
+            # f"schedules: {len(self.schedules)} "
+            # f"slots: {len(self.slots)} "
+            # f"records: {len(self.records)}"
         )
 
 
@@ -67,19 +59,13 @@ Base.metadata.create_all(bind=engine)
 def main():
     db: Session = SessionLocal()
 
-    user = User(
-        username="Test",
-        fullname="test user",
-        status=UserStatus.ACTIVE,
-        roles=UserRole.ADMIN | UserRole.EMPLOYEE,
+    rental: Rental = Rental(
+        name="test",
+        description = "test",
+        type = RentalTypes.REGULAR,
     )
 
-    db.add(user)
-    db.commit()
-
-    print(user)
-    print(f"UserRole.MANAGER in user.roles: {UserRole.MANAGER in UserRole(user.roles)}")
-    print(f"UserStatus.ACTIVE == user.status :{UserStatus.ACTIVE == user.status}")
+    print(rental)
 
 
 if __name__ == "__main__":

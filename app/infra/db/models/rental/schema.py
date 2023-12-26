@@ -1,5 +1,6 @@
+from datetime import datetime
 from typing import TYPE_CHECKING, List
-from sqlalchemy import Integer, String
+from sqlalchemy import DateTime, Integer, String
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
@@ -21,6 +22,7 @@ class Rental(Base):
 
     name: Mapped[str] = mapped_column(String)
     description: Mapped[str] = mapped_column(String)
+    created: Mapped[DateTime] = mapped_column(DateTime, default=datetime.now())
     type: Mapped[int] = mapped_column(Integer, default=RentalTypes.REGULAR)
 
     schedules: Mapped[List["Schedule"]] = relationship(back_populates="rental")
@@ -31,9 +33,10 @@ class Rental(Base):
         return (
             f"SQLA Rental, "
             f"id: {self.id}, "
-            f"category: {RentalTypes(self.type).custom_print()}, "
+            f"type: {RentalTypes(self.type).custom_print()}, "
             f"name: {self.name}, "
             f"description: {self.description} "
+            f"created: {self.created_at}, "
             f"schedules: {len(self.schedules)} "
             f"slots: {len(self.slots)} "
             f"records: {len(self.records)}"
