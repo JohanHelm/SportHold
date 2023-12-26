@@ -11,6 +11,7 @@ if TYPE_CHECKING:
     from ..slot.schema import Slot
     from ..rental.schema import Rental
 
+
 class Record(Base):
     __tablename__ = "records"
 
@@ -27,3 +28,12 @@ class Record(Base):
     rental: Mapped["Rental"] = relationship(back_populates="records")
 
     __table_args__ = (UniqueConstraint("user_id", "slot_id"),)
+
+    def __str__(self):
+        return (
+            f"SQLA Record,"
+            f" id: {self.id},"
+            f" user_id: {self.user_id},"
+            f" slot_id: {self.slot_id},"
+            f" rental_id: {self.rental_id}"
+        )
