@@ -1,5 +1,5 @@
 from app.infra.db.models.rental.schema import Rental
-from app.domain.controllers.slots import TemporarySlot
+from app.domain.controllers.slots import SlotData
 
 def hello_regular_user(user_name: str) -> str:
     return f"Привет, {user_name}!\n" \
@@ -16,7 +16,7 @@ def display_rental_info(rental: Rental) -> str:
            f"Описание: {rental.description}"
 
 
-def display_rental_slots(slot: TemporarySlot) -> str:
+def display_rental_slots(slot: SlotData) -> str:
     slot_date = slot.start.strftime("%d.%m.%Y г.")
     slot_start_time = slot.start.strftime("%H:%M")
     slot_end_time = slot.end.strftime("%H:%M")

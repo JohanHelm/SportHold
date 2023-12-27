@@ -23,6 +23,9 @@ class SlotType(Enum):
     ACCESSIBLE = auto()
     RESTRICTED = auto()
 
+class UserStatus(Enum):
+    INACTIVE = 0
+    ACTIVE = 1
 
 class UserRole(IntFlag):
     REGULAR = 1
@@ -37,20 +40,26 @@ class UserRole(IntFlag):
 class User(Base):
     __tablename__ = "users"
 
-    user_id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+
     username: Mapped[str] = mapped_column(String)
     fullname: Mapped[str] = mapped_column(String)
-    lang_code: Mapped[str] = mapped_column(String)
-    registration_date: Mapped[DateTime] = mapped_column(DateTime)
-    active: Mapped[int] = mapped_column(Integer, default=1)
-    roles: Mapped["UserRole"] = mapped_column(Integer, default=1)
-    records: Mapped[List["Record"]] = relationship()
+    created: Mapped[DateTime] = mapped_column(DateTime, default=datetime.now())
+    status: Mapped[int] = mapped_column(Integer, default=UserStatus.ACTIVE.value)
+    roles: Mapped[int] = mapped_column(Integer, default=UserRole.REGULAR)
+
+    records: Mapped[List["Record"]] = relationship(back_populates="user")
 
     def __str__(self):
-        return f"SQLA User, " \
-               f"id: {self.user_id}, " \
-               f"username: {self.username}, " \
-               f"active records count: {len(self.records)}"
+        return (
+            f"SQLA User, "
+            f"id: {self.id}, "
+            f"username: {self.username}, "
+            f"fullname: {self.fullname}, "
+            f"created: {self.created}, "
+            f"status: {UserStatus(self.status)}, "
+            f"roles: {UserRole(self.roles)}"
+        )
 
 
 class Rental(Base):
@@ -138,7 +147,7 @@ class Record(Base):
     __tablename__ = "records"
 
     record_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"), unique=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), unique=False)
     slot_id: Mapped[int] = mapped_column(ForeignKey("slots.slot_id"), unique=False)
     user: Mapped["User"] = relationship(back_populates="records")
     slot: Mapped["Slot"] = relationship(back_populates="record")
@@ -251,57 +260,56 @@ async def create_tables():
 
 async def add_test_data():
     async with AsyncSession(engine) as session:
-        user = User(user_id=103273, username="@telegram_test_user", fullname="Rocky Balboa", lang_code="ru",
-                    registration_date=datetime.now(), active=0)
-        user_2 = User(user_id=103272, username="@telegram_test_user_2", fullname="Ivan Drago", lang_code="ru",
-                    registration_date=datetime.now())
-        rental = Rental(
-            name="Ping-pong table",
-            description="Free-to-play ping-pong table on 2nd floor",
-            category="SPORT",
-        )
-        rental1 = Rental(
-            name="Exercise bike",
-            description="New power generating facility, birn you fat and save couple of weals.",
-            category="SPORT",
-        )
-        rental2 = Rental(
-            name="Darts board",
-            description="Spend some time by throwing arrows",
-            category="SPORT",
-        )
-
-        schedule = Schedule(name="Basic",
-                            description="Basic schedule for pin-pong table",
-                            )
-        schedule.rental = rental
-        schedule1 = Schedule(name="Basic",
-                            description="Basic schedule for exercise bike",
-                            )
-        schedule1.rental = rental1
-        schedule2 = Schedule(name="Common",
-                             description="Common schedule for different rentals",
-                             )
-        schedule2.rental = rental2
-        slot = Slot(started_at=datetime(2023, 12, 1, 12, 12), duration=30, status="PLANNED")
-        schedule.slots.append(slot)
-        record = Record()
-        record.slot = slot
-        record.user = user
-        record_2 = Record(slot_id=1)
-        record_2.user = user_2
-        tarif1 = Tarif(rentals_amount=1,
-                       one_month=150,
-                       three_month=400,
-                       six_month=750,
-                       one_year=1500,
-                       two_years=2500,
-                       three_years=3500)
-        promo_test = Promo(promo_code='TEST_PROMO', promo_money=100, times_to_use=5)
-        income1 = Income(customer_id=103272, full_name="John Doe", summ=100, date_time=datetime.now(), method=1)
-        order1 = Order(customer_id=103272, full_name="John Doe", tarif=1, date_time=datetime.now(), duration=1, active=1, prolong=1)
-        setattr(user, 'active', 1)
-        session.add_all((user, rental, user_2, schedule, record, record_2, tarif1, promo_test, income1, order1, rental1, rental2))
+        user = User(id=103273, username="@telegram_test_user", fullname="Rocky Balboa")
+        # user_2 = User(telegram_id=103272, username="@telegram_test_user_2", fullname="Ivan Drago", status=1, roles=1)
+        # rental = Rental(
+        #     name="Ping-pong table",
+        #     description="Free-to-play ping-pong table on 2nd floor",
+        #     category="SPORT",
+        # )
+        # rental1 = Rental(
+        #     name="Exercise bike",
+        #     description="New power generating facility, birn you fat and save couple of weals.",
+        #     category="SPORT",
+        # )
+        # rental2 = Rental(
+        #     name="Darts board",
+        #     description="Spend some time by throwing arrows",
+        #     category="SPORT",
+        # )
+        #
+        # schedule = Schedule(name="Basic",
+        #                     description="Basic schedule for pin-pong table",
+        #                     )
+        # schedule.rental = rental
+        # schedule1 = Schedule(name="Basic",
+        #                     description="Basic schedule for exercise bike",
+        #                     )
+        # schedule1.rental = rental1
+        # schedule2 = Schedule(name="Common",
+        #                      description="Common schedule for different rentals",
+        #                      )
+        # schedule2.rental = rental2
+        # slot = Slot(started_at=datetime(2023, 12, 1, 12, 12), duration=30, status="PLANNED")
+        # schedule.slots.append(slot)
+        # record = Record()
+        # record.slot = slot
+        # record.user = user
+        # record_2 = Record(slot_id=1)
+        # record_2.user = user_2
+        # tarif1 = Tarif(rentals_amount=1,
+        #                one_month=150,
+        #                three_month=400,
+        #                six_month=750,
+        #                one_year=1500,
+        #                two_years=2500,
+        #                three_years=3500)
+        # promo_test = Promo(promo_code='TEST_PROMO', promo_money=100, times_to_use=5)
+        # income1 = Income(customer_id=103272, full_name="John Doe", summ=100, date_time=datetime.now(), method=1)
+        # order1 = Order(customer_id=103272, full_name="John Doe", tarif=1, date_time=datetime.now(), duration=1, active=1, prolong=1)
+        #
+        session.add(user)
+        # session.add_all((user, user_2, rental, schedule, record, record_2, tarif1, promo_test, income1, order1, rental1, rental2))
 
         await session.commit()
 
@@ -312,3 +320,8 @@ async def main():
 
 
 asyncio.run(main())
+
+# print(UserStatus.ACTIVE)
+print(UserRole.REGULAR)
+# print(type(UserStatus.ACTIVE))
+print(type(UserRole.REGULAR))
