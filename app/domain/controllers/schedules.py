@@ -3,12 +3,7 @@ from datetime import date, datetime, timedelta
 
 from app.domain.models.schedule.dto import ScheduleModel
 from app.domain.helpers.enums import DaysOfWeek, ScheduleStatus, SlotStatus, SlotType
-
-
-class SlotData:
-    def __init__(self, start: datetime, end: datetime):
-        self.start = start
-        self.end = end
+from app.domain.models.slot.dto import SlotModel, SlotData
 
 
 class SlotManager:
@@ -46,7 +41,9 @@ class SlotManager:
         e = datetime(current_date.year, current_date.month, current_date.day, end, 0)
         while s + timedelta(minutes=slot_time) <= e:
             if s + timedelta(minutes=slot_time) <= e:
-                temporary_slot = SlotData(s, s + timedelta(minutes=slot_time))
+                temporary_slot = SlotModel(
+                    started=s, ended=s + timedelta(minutes=slot_time)
+                )
                 time_slots.append(temporary_slot)
             s += timedelta(minutes=slot_time)
         return time_slots
@@ -63,7 +60,7 @@ class SlotManager:
                 cleaned_slots.append(slot)
         return cleaned_slots
 
-    def generate_time_intervals(self, schedules, date):
+    def generate_time_intervals(self, schedules, date) -> SlotData:
         access_schedule = [
             schedule
             for schedule in schedules
@@ -87,4 +84,5 @@ class SlotManager:
         cleaned_slots = self.remove_overlapping_time_intervals(
             allowed_slots, forbidden_slots
         )
-        return cleaned_slots
+        slots_data = SlotData(slots=cleaned_slots)
+        return slots_data
