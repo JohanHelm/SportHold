@@ -5,20 +5,11 @@ from app.domain.helpers.enums import SlotType, DaysOfWeek, ScheduleStatus
 
 
 # вся киллер фича - тут
-class ScheduleModel(BaseModel):
-    name: Optional[str] = Field(default=None)
-    description: Optional[str] = Field(default=None)
-    mask_days: Optional[int] = Field(default=DaysOfWeek.ALL)
+class SlotModel(BaseModel):
     status: Optional[int] = Field(default=ScheduleStatus.INACTIVE)
     started: Optional[datetime] = Field(default=date.today())
     ended: Optional[datetime] = Field(default=date.today() + timedelta(days=30))
     created: Optional[datetime] = Field(default=date.today())
-    slot_type: Optional[int] = Field(default=SlotType.ACCESSIBLE)
-    slot_time: Optional[int] = Field(None, ge=1, le=1440)
-    hour_start: Optional[int] = Field(None, ge=0, le=24)
-    hour_end: Optional[int] = Field(None, ge=0, le=24)
+    type: Optional[int] = Field(default=SlotType.ACCESSIBLE)
 
     model_config = ConfigDict(from_attributes=True, arbitrary_types_allowed=True)
-
-    def __hash__(self) -> int:  # change to FROZEN pydantic
-        return self.name.__hash__()  # or self.id.__hash__()

@@ -1,86 +1,54 @@
 from typing import Set
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 
 from app.domain.models.schedule.dto import ScheduleModel
 from app.domain.helpers.enums import DaysOfWeek, ScheduleStatus, SlotStatus, SlotType
 
 
-
 class SlotData:
-    def __init__(self, start: datetime, end: datetime, schedule_id):
+    def __init__(self, start: datetime, end: datetime):
         self.start = start
         self.end = end
-        self.schedule_id = schedule_id
 
 
-class ScheduleManager:
+class SlotManager:
     """
     Обрабатывает связку - лист расписаний и день - Выдает кортеж подходящих расписаний на день
     Обрабатывает кортеж расписаний на день - выдает список слотов на день
     """
 
-    def find_nth_weekday_in_month(self, year, month, weekday, n):
-        d = datetime(year, month, 1)
-        while d.weekday() != weekday:
-            d += timedelta(days=1)
-
-        d += timedelta(weeks=n - 1)
-
-        return d
-
-    def is_date_in_schedule(self, schedule, date):
-        if schedule.status == ScheduleStatus.NOT_ACTIVE:
+    def is_date_in_schedule(self, schedule: ScheduleModel, date: date):
+        if schedule.status == ScheduleStatus.INACTIVE:
             return False
-        if schedule.valid_from > date.date():
+        if schedule.started > date.date():
             return False
-        if (schedule.valid_from + schedule.valid_for_days) < date.date():
+        if schedule.ended < date.date():
             return False
         if DaysOfWeek(2 ** date.date().isoweekday()) not in schedule.mask_weekdays:
             return False
-        if WeeksInYear(2 ** date.date().isocalendar().week) not in schedule.mask_weeks:
-            print(WeeksInYear(2 ** date.date().isocalendar().week))
-            return False
-        if (
-            Quartals(2 ** ((date.date().month - 1) // 3 + 1))
-            not in schedule.mask_quartals
-        ):
-            print(Quartals(2 ** ((date.date().month - 1) // 3 + 1)))
-            return False
-        if DaysInMonth(2 ** (date.date().day)) not in schedule.mask_days_month:
-            print(DaysInMonth(2 ** (date.date().day)))
-            return False
-        if schedule.nth_weekday and schedule.nth_index:
-            if date.date() != self.find_nth_weekday_in_month(
-                date.date().year,
-                date.date().month,
-                schedule.nth_weekday,
-                schedule.nth_index,
-            ):
-                return False
         return True
 
-    def is_day_in_schedules(self, schedules, date: datetime) -> Set[ScheduleBase]:
-        res = set(
+    def suitable_schedules(self, schedules, date: datetime) -> Set[ScheduleModel]:
+        suitable_schedules = set(
             schedule
             for schedule in schedules
             if self.is_date_in_schedule(schedule, date)
         )
-        return res
+        return suitable_schedules
 
-    def get_time_intervals_from_schedule(self, schedule, date):
-        smax = schedule.slot_max_time
+    def get_time_slots_from_schedule(self, schedule, date):
+        slot_time = schedule.slot_time
         start = schedule.hour_start
         end = schedule.hour_end
         current_date = date
         time_slots = []
         s = datetime(current_date.year, current_date.month, current_date.day, start, 0)
         e = datetime(current_date.year, current_date.month, current_date.day, end, 0)
-        while s + timedelta(minutes=smax) <= e:
-            duration = smax
-            if s + timedelta(minutes=duration) <= e:
-                temporary_slot = TemporarySlot(s, s + timedelta(minutes=duration), schedule.schedule_id)
+        while s + timedelta(minutes=slot_time) <= e:
+            if s + timedelta(minutes=slot_time) <= e:
+                temporary_slot = SlotData(s, s + timedelta(minutes=slot_time))
                 time_slots.append(temporary_slot)
-            s += timedelta(minutes=smax)
+            s += timedelta(minutes=slot_time)
         return time_slots
 
     def remove_overlapping_time_intervals(self, allowed_slots, forbidden_slots):
@@ -106,7 +74,6 @@ class ScheduleManager:
             for schedule in schedules
             if SlotType(schedule.slot_type) == SlotType.RESTRICTED
         ]
-        # cleaned_slots = []
         allowed_slots = []
         forbidden_slots = []
         for schedule in access_schedule:
