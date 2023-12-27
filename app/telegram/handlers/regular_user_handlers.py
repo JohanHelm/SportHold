@@ -10,7 +10,7 @@ from aiogram.fsm.state import State, StatesGroup
 from app.infra.db.models.rental.dao import RentalDAO
 from app.infra.db.models.schedule.dao import ScheduleDAO
 from app.telegram.keyboards.regular_user_kb import create_rental_pagination_keyboard, create_slot_pagination_keyboard
-from app.domain.controllers.schedules import ScheduleManager
+from app.domain.controllers.slots import ScheduleManager
 from app.telegram.messages.text_messages import display_rental_info, display_rental_slots
 
 

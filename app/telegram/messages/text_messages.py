@@ -1,5 +1,5 @@
 from app.infra.db.models.rental.schema import Rental
-from app.domain.controllers.schedules import TemporarySlot
+from app.domain.controllers.slots import TemporarySlot
 
 def hello_regular_user(user_name: str) -> str:
     return f"Привет, {user_name}!\n" \

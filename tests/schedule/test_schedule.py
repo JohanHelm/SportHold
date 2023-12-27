@@ -1,6 +1,6 @@
 from datetime import datetime
 import pytest
-from app.domain.controllers.schedules import ScheduleManager
+from app.domain.controllers.slots import ScheduleManager
 
 pytest_plugins = ("pytest_asyncio",)
 
