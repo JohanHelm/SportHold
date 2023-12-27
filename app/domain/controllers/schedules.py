@@ -29,7 +29,7 @@ class ScheduleManager:
         return d
 
     def is_date_in_schedule(self, schedule, date):
-        if schedule.status == ScheduleStatus.NOT_ACTIVE:
+        if schedule.status == ScheduleStatus.INACTIVE:
             return False
         if schedule.valid_from > date.date():
             return False
@@ -59,7 +59,7 @@ class ScheduleManager:
                 return False
         return True
 
-    def is_day_in_schedules(self, schedules, date: datetime) -> Set[ScheduleBase]:
+    def is_day_in_schedules(self, schedules, date: datetime) -> Set[ScheduleModel]:
         res = set(
             schedule
             for schedule in schedules

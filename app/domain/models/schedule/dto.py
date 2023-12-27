@@ -11,7 +11,7 @@ class ScheduleModel(BaseModel):
     name: Optional[str] = Field(default=None)
     description: Optional[str] = Field(default=None)
     mask_days: DaysOfWeek = Field(default=DaysOfWeek.ALL)
-    status: Optional[ScheduleStatus] = Field(default=ScheduleStatus.NOT_ACTIVE)
+    status: Optional[ScheduleStatus] = Field(default=ScheduleStatus.INACTIVE)
     started: Optional[datetime] = Field(default=date.today())
     ended: Optional[datetime] = Field(default=date.today() + timedelta(days=30))
     created: Optional[datetime] = Field(default=date.today())

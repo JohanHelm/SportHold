@@ -20,7 +20,8 @@ class User(Base):
     username: Mapped[str] = mapped_column(String)
     fullname: Mapped[str] = mapped_column(String)
     created: Mapped[DateTime] = mapped_column(DateTime, default=datetime.now())
-    status: Mapped[int] = mapped_column(Integer, default=UserStatus.ACTIVE)
+    # ?? Постгресс ругается, не даёт сохранить в базу обект Enum, только число
+    status: Mapped[int] = mapped_column(Integer, default=UserStatus.ACTIVE.value)
     roles: Mapped[int] = mapped_column(Integer, default=UserRole.REGULAR)
 
     records: Mapped[List["Record"]] = relationship(back_populates="user")
