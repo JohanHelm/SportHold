@@ -31,8 +31,12 @@ async def process_start_command(message: Message, db_session):
         await session.refresh(user)
     # TODO логика ветвления в зависимости от роли пользователя
     if UserRole.REGULAR in UserRole(user.roles):
-        await message.answer(hello_regular_user(message.from_user.username),
-                             reply_markup=create_first_regular_keyboard())
+        avalable_rentals: int = 2
+        total_rentals: int = 2
+        records_amount: int = 0
+        await message.answer(
+            hello_regular_user(message.from_user.username, avalable_rentals, total_rentals, records_amount),
+            reply_markup=create_first_regular_keyboard())
     # elif UserRole.OWNER in user.roles:
     #     await message.answer(hello_owner_user(message.from_user.username), reply_markup=create_first_owner_keyboard())
 
