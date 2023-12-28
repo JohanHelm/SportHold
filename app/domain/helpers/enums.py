@@ -1,4 +1,4 @@
-from enum import Enum, IntFlag
+from enum import IntFlag, IntEnum
 
 
 class DaysOfWeek(IntFlag):
@@ -30,7 +30,7 @@ class UserRole(IntFlag):
         return "|".join(val.name for val in UserRole if self.value & val)
 
 
-class UserStatus(Enum):
+class UserStatus(IntEnum):
     INACTIVE = 0
     ACTIVE = 1
 
@@ -38,7 +38,7 @@ class UserStatus(Enum):
         return self.name
 
 
-class SlotStatus(Enum):
+class SlotStatus(IntEnum):
     INACTIVE = 0
     ACTIVE = 1
 
@@ -46,7 +46,7 @@ class SlotStatus(Enum):
         return self.name
 
 
-class SlotType(Enum):
+class SlotType(IntEnum):
     ACCESSIBLE = 0
     RESTRICTED = 1
 
@@ -54,7 +54,7 @@ class SlotType(Enum):
         return self.name
 
 
-class ScheduleStatus(Enum):
+class ScheduleStatus(IntEnum):
     INACTIVE = 0
     ACTIVE = 1
 
@@ -62,7 +62,7 @@ class ScheduleStatus(Enum):
         return self.name
 
 
-class RentalTypes(Enum):
+class RentalTypes(IntEnum):
     REGULAR = 0
 
     def custom_print(self):

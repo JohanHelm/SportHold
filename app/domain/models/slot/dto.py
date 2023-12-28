@@ -6,6 +6,7 @@ from app.domain.helpers.enums import SlotType, DaysOfWeek, ScheduleStatus
 
 # вся киллер фича - тут
 class SlotModel(BaseModel):
+    schedule_id: Optional[int] = Field()
     status: Optional[int] = Field(default=ScheduleStatus.INACTIVE)
     started: Optional[datetime] = Field(default=datetime.now())
     ended: Optional[datetime] = Field(default=date.today() + timedelta(minutes=30))

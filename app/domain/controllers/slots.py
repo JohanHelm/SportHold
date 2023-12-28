@@ -2,7 +2,7 @@ from typing import Set
 from datetime import date, datetime, timedelta
 
 from app.domain.models.schedule.dto import ScheduleModel
-from app.domain.helpers.enums import DaysOfWeek, ScheduleStatus, SlotStatus, SlotType
+from app.domain.helpers.enums import DaysOfWeek, ScheduleStatus, SlotType
 from app.domain.models.slot.dto import SlotModel, SlotData
 
 
@@ -15,11 +15,11 @@ class SlotManager:
     def is_date_in_schedule(self, schedule: ScheduleModel, date: date):
         if schedule.status == ScheduleStatus.INACTIVE:
             return False
-        if schedule.started > date.date():
+        if schedule.started > date.today():
             return False
-        if schedule.ended < date.date():
+        if schedule.ended < date.today():
             return False
-        if DaysOfWeek(2 ** date.date().isoweekday()) not in schedule.mask_weekdays:
+        if DaysOfWeek(2 ** date.today().isoweekday()) not in schedule.mask_days:
             return False
         return True
 
@@ -42,7 +42,7 @@ class SlotManager:
         while s + timedelta(minutes=slot_time) <= e:
             if s + timedelta(minutes=slot_time) <= e:
                 temporary_slot = SlotModel(
-                    started=s, ended=s + timedelta(minutes=slot_time)
+                    started=s, ended=s + timedelta(minutes=slot_time), schedule_id = schedule.id
                 )
                 time_slots.append(temporary_slot)
             s += timedelta(minutes=slot_time)
@@ -74,11 +74,11 @@ class SlotManager:
         allowed_slots = []
         forbidden_slots = []
         for schedule in access_schedule:
-            schedule_slots = self.get_time_intervals_from_schedule(schedule, date)
+            schedule_slots = self.get_time_slots_from_schedule(schedule, date)
             allowed_slots.extend(schedule_slots)
 
         for schedule in restrict_schedule:
-            schedule_slots = self.get_time_intervals_from_schedule(schedule, date)
+            schedule_slots = self.get_time_slots_from_schedule(schedule, date)
             forbidden_slots.extend(schedule_slots)
 
         cleaned_slots = self.remove_overlapping_time_intervals(

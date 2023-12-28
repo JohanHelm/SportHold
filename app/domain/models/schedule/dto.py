@@ -6,6 +6,7 @@ from app.domain.helpers.enums import SlotType, DaysOfWeek, ScheduleStatus
 
 # вся киллер фича - тут
 class ScheduleModel(BaseModel):
+    id: Optional[int] = Field()
     name: Optional[str] = Field(default=None)
     description: Optional[str] = Field(default=None)
     mask_days: Optional[int] = Field(default=DaysOfWeek.ALL)
