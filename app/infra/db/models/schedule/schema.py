@@ -29,7 +29,7 @@ class Schedule(Base):
     status: Mapped[int] = mapped_column(Integer, default=ScheduleStatus.INACTIVE)
     started: Mapped[DateTime] = mapped_column(DateTime, default=date.today())
     ended: Mapped[DateTime] = mapped_column(
-        Integer, default=date.today() + timedelta(days=30)
+        DateTime, default=date.today() + timedelta(days=30)
     )
     created: Mapped[DateTime] = mapped_column(DateTime, default=datetime.now())
     slot_type: Mapped[int] = mapped_column(Integer, default=SlotType.ACCESSIBLE)

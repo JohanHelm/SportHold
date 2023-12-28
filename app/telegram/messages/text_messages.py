@@ -12,14 +12,13 @@ def hello_owner_user(user_name: str) -> str:
 
 def display_rental_info(rental: Rental) -> str:
     return f"Наименование: {rental.name}\n" \
-           f"Категория: {rental.category}\n" \
            f"Описание: {rental.description}"
 
 
 def display_rental_slots(slot: SlotData) -> str:
-    slot_date = slot.start.strftime("%d.%m.%Y г.")
-    slot_start_time = slot.start.strftime("%H:%M")
-    slot_end_time = slot.end.strftime("%H:%M")
+    slot_date = slot.started.strftime("%d.%m.%Y г.")
+    slot_start_time = slot.started.strftime("%H:%M")
+    slot_end_time = slot.ended.strftime("%H:%M")
     return f" Дата: {slot_date}\n" \
            f" Время: {slot_start_time} - {slot_end_time}"
 

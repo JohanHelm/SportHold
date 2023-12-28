@@ -27,9 +27,10 @@ async def process_start_command(message: Message, db_session):
             await session.commit()
             logger.info(f"Bot: We've got new user here. His name: {message.from_user.username},"
                         f" user_id: {message.from_user.id}")
+            user = create_user
         await session.refresh(user)
     # TODO логика ветвления в зависимости от роли пользователя
-    if UserRole.REGULAR.value == user.roles:
+    if UserRole.REGULAR in UserRole(user.roles):
         await message.answer(hello_regular_user(message.from_user.username),
                              reply_markup=create_first_regular_keyboard())
     # elif UserRole.OWNER in user.roles:

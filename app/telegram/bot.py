@@ -16,8 +16,7 @@ async def start_bot():
         token=settings.BOT_TOKEN,
     )
     dp: Dispatcher = Dispatcher(storage=storage)  # сторейдж заменить на редиску
-    dp.include_routers(commands.router)
-    # dp.include_routers(commands.router, regular_user_handlers.router)  # подумать, как регистрировать сразу все роутеры
+    dp.include_routers(commands.router, regular_user_handlers.router)  # подумать, как регистрировать сразу все роутеры
     dp.update.middleware(LoggingMiddleware()) # подумать, как регистрировать сразу все сидлвари
     dp.update.middleware(DbSessionMiddleware(uri=settings.DB.URI, echo=False))
     scheduler = AsyncIOScheduler()
