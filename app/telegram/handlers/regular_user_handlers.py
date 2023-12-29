@@ -5,6 +5,8 @@ from sqlalchemy.orm import selectinload
 from aiogram import Router, F
 from aiogram.types import CallbackQuery
 
+from loguru import logger
+
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
@@ -47,12 +49,11 @@ async def get_rental_with_suitable_schedules(db_session, db_offset):
             select(Schedule)
             .where(Schedule.rental_id == current_rental.id)
             .where(Schedule.status == ScheduleStatus.ACTIVE)
-            .where(Schedule.started >= date.today())
-            .where(Schedule.ended <= date.today())
             .order_by(Schedule.slot_type)
         )
 
-        current_rental_schedules = rows_schedules.scalars()
+        current_rental_schedules = rows_schedules.scalars().all()
+        logger.debug(current_rental_schedules)
         return current_rental, current_rental_schedules
 
 
@@ -111,16 +112,15 @@ async def shift_show_rentals(
     F.data == "new_booking", StateFilter(ShowRentalSlots.choosing_rental_number)
 )
 async def show_rentals_slots(callback: CallbackQuery, state: FSMContext, db_session):
-    rental_number = (await state.get_data())["choosing_rental_number"]
-    async with db_session() as session:
-        result = await session.execute(
-            select(Rental).options(selectinload(Rental.schedules))
-        )
-        rentals = result.scalars().all()
-        rentals_schedules = rentals[rental_number].schedules
+    db_offset = (await state.get_data())["db_offset"]
+
+    _, current_rental_schedules = await get_rental_with_suitable_schedules(
+        db_session=db_session, db_offset=db_offset
+    )
+
     date = datetime.today()
     manager = SlotManager()
-    slots: SlotData = manager.generate_time_intervals(rentals_schedules, date=date)
+    slots: SlotData = manager.generate_time_intervals(current_rental_schedules, date=date)
     await state.set_state(ShowRentalSlots.choosing_slot_page)
     slot_page = 0
     await state.update_data(choosing_slot_page=slot_page)
@@ -129,7 +129,7 @@ async def show_rentals_slots(callback: CallbackQuery, state: FSMContext, db_sess
     start_slice = slot_page * slots_per_page
     end_slice = start_slice + slots_per_page
     await callback.message.edit_text(
-        text=display_booking_info(rentals_schedules[0]),
+        text=display_booking_info(current_rental_schedules[0]),
         reply_markup=create_slot_pagination_keyboard(
             slots.slots[start_slice:end_slice],
             slot_page,
@@ -150,21 +150,26 @@ async def shift_show_rentals_slots(
         callback.data.split("/")[1]
     )
     await state.update_data(choosing_slot_page=slot_page)
-    async with db_session() as session:
-        result = await session.execute(
-            select(Rental).options(selectinload(Rental.schedules))
-        )
-        rentals = result.scalars().all()
-        rental_number = (await state.get_data())["choosing_rental_number"]
-        rentals_schedules = rentals[rental_number].schedules
+    # async with db_session() as session:
+    #     result = await session.execute(
+    #         select(Rental).options(selectinload(Rental.schedules))
+    #     )
+    #     rentals = result.scalars().all()
+    #     rental_number = (await state.get_data())["choosing_rental_number"]
+    #     rentals_schedules = rentals[rental_number].schedules
+    db_offset = (await state.get_data())["db_offset"]
+    _, current_rental_schedules = await get_rental_with_suitable_schedules(
+        db_session=db_session, db_offset=db_offset
+    )
+
     date = datetime.today()
     manager = SlotManager()
-    slots = manager.generate_time_intervals(rentals_schedules, date=date)
+    slots = manager.generate_time_intervals(current_rental_schedules, date=date)
     slots_per_page = 4
     start_slice = slot_page * slots_per_page
     end_slice = start_slice + slots_per_page
     await callback.message.edit_text(
-        text=display_booking_info(rentals_schedules[0]),
+        text=display_booking_info(current_rental_schedules[0]),
         reply_markup=create_slot_pagination_keyboard(
             slots.slots[start_slice:end_slice],
             slot_page,
@@ -199,17 +204,25 @@ async def shift_show_rentals_slots(
     StateFilter(ShowRentalSlots.choosing_slot_page),
 )
 async def back_to_rentals(callback: CallbackQuery, state: FSMContext, db_session):
-    rental_number = (await state.get_data())["choosing_rental_number"]
+    db_offset = (await state.get_data())["db_offset"]
     await state.set_state(ShowRentalSlots.choosing_rental_number)
-    async with db_session() as session:
-        result = await session.execute(
-            select(Rental).options(selectinload(Rental.schedules))
-        )
-        rentals = result.scalars().all()
-        rentals_schedules = rentals[rental_number].schedules
+
+    current_rental, current_rental_schedules = await get_rental_with_suitable_schedules(
+        db_session=db_session, db_offset=db_offset
+    )
+
+    # async with db_session() as session:
+    #     result = await session.execute(
+    #         select(Rental).options(selectinload(Rental.schedules))
+    #     )
+    #     rentals = result.scalars().all()
+    #     rentals_schedules = rentals[rental_number].schedules
+
+    rental_for_user_count = await get_rentals_for_user_count(db_session=db_session)
+
     await callback.message.edit_text(
-        text=display_rental_info(rentals[rental_number], rentals_schedules[0]),
-        reply_markup=create_rental_pagination_keyboard(rental_number + 1, len(rentals)),
+        text=display_rental_info(current_rental, current_rental_schedules),
+        reply_markup=create_rental_pagination_keyboard(db_offset + 1, rental_for_user_count),
     )
 
 

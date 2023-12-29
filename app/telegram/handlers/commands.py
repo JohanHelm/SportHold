@@ -27,20 +27,19 @@ async def process_start_command(message: Message, db_session):
         )
         user = result.scalar()
         if not user:
-            create_user = User(
+            user = User(
                 id=message.from_user.id,
                 username=f"@{message.from_user.username}",
                 fullname=message.from_user.full_name,
             )
-            session.add(create_user)
+            session.add(user)
             await session.commit()
             logger.info(
                 f"Bot: We've got new user here. His name: {message.from_user.username},"
                 f" user_id: {message.from_user.id}"
             )
-            user = create_user
-        await session.refresh(user)
-    # TODO логика ветвления в зависимости от роли пользователя
+            await session.refresh(user)
+
     if UserRole.REGULAR in UserRole(user.roles):
         avalable_rentals: int = await get_rentals_for_user_count(db_session=db_session)
         total_rentals = avalable_rentals
