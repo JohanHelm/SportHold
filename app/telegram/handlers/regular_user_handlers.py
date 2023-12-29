@@ -1,4 +1,5 @@
 from datetime import datetime
+from sqlalchemy import func
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
 from aiogram import Router, F
@@ -9,6 +10,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 
 from app.telegram.keyboards.regular_user_kb import (
+    RentalsCallbackFactory,
     create_rental_pagination_keyboard,
     create_slot_pagination_keyboard,
     create_first_regular_keyboard,
@@ -25,6 +27,26 @@ from app.domain.models.slot.dto import SlotModel, SlotData
 router: Router = Router()
 
 
+async def get_rentals_count(db_session):
+    async with db_session() as session:
+        rental_count = await session.scalar(select(func.count(Rental.id)))
+        return rental_count
+
+
+async def get_rental_with_schedule(db_session, db_offset):
+    async with db_session() as session:
+        row = await session.execute(
+            select(Rental)
+            .group_by(Rental.id)
+            .offset(db_offset)
+            .limit(1)
+            .options(selectinload(Rental.schedules))
+        )
+        current_rental = row.scalar()
+        current_rental_schedules = current_rental.schedules
+        return current_rental, current_rental_schedules
+
+
 class ShowRentalSlots(StatesGroup):
     choosing_rental_number = State()
     choosing_slot_page = State()
@@ -32,49 +54,38 @@ class ShowRentalSlots(StatesGroup):
 
 @router.callback_query(F.data == "show_rentals", StateFilter(None))
 async def show_rentals(callback: CallbackQuery, state: FSMContext, db_session):
+    db_offset = 0
     await state.set_state(ShowRentalSlots.choosing_rental_number)
-    rental_number = 0
-    await state.update_data(choosing_rental_number=rental_number)
-    # TODO: предлагаю пагинацию делать через offset\limit в запросе с order_by по rental.id
-    # TODO: т.е. мы отсортировываем по возрастанию ID и с помощью оффсета смещаем SELECT
-    # TODO: таким образом у нас не нарушится порядок, в котором мы показываем объекты
-    # TODO: соот-но в состояние можно хранить инфо про текущий offset и count объектов
-    async with db_session() as session:
-        # TODO: Объектов в базе может и не быть, необходимо эту логику проработать
-        result = await session.execute(
-            select(Rental).options(selectinload(Rental.schedules))
-        )
-        rentals = result.scalars().all()
-        # TODO: а что если объект добавлен, но у него нет ни одного расписания или ни одного активного расписания?
-        # TODO: Или нет расписаний, которые на данный момент действуют - started < now() < ended ?
-        rentals_schedules = rentals[rental_number].schedules
-    # TODO Переписать display_rental_info чтобы принимала список расписаний и выводила рабочее время и перерывы.
-    # TODO тут должна быть какая то логика, если активных расписаний нет
-    # TODO предполагаю, что в display_rental_info уйдеи список активных расписаний, действующих на текущий момент
+    await state.update_data(db_offset=db_offset)
+    rental_count = await get_rentals_count(db_session=db_session)
+    current_rental, current_rental_schedules = await get_rental_with_schedule(
+        db_session=db_session, db_offset=db_offset
+    )
     await callback.message.edit_text(
-        text=display_rental_info(rentals[rental_number], rentals_schedules[0]),
-        reply_markup=create_rental_pagination_keyboard(rental_number + 1, len(rentals)),
+        text=display_rental_info(current_rental, current_rental_schedules),
+        reply_markup=create_rental_pagination_keyboard(db_offset + 1, rental_count),
     )
 
 
 @router.callback_query(
-    F.data.startswith("shift_show_rentals"),
+    RentalsCallbackFactory.filter(),
     StateFilter(ShowRentalSlots.choosing_rental_number),
 )
-async def shift_show_rentals(callback: CallbackQuery, state: FSMContext, db_session):
-    rental_number = (await state.get_data())["choosing_rental_number"] + int(
-        callback.data.split("/")[1]
+async def shift_show_rentals(
+    callback: CallbackQuery,
+    state: FSMContext,
+    db_session,
+    callback_data: RentalsCallbackFactory,
+):
+    db_offset = (await state.get_data())["db_offset"] + (callback_data.step)
+    await state.update_data(db_offset=db_offset)
+    rental_count = await get_rentals_count(db_session=db_session)
+    current_rental, current_rental_schedules = await get_rental_with_schedule(
+        db_session=db_session, db_offset=db_offset
     )
-    await state.update_data(choosing_rental_number=rental_number)
-    async with db_session() as session:
-        result = await session.execute(
-            select(Rental).options(selectinload(Rental.schedules))
-        )
-        rentals = result.scalars().all()
-        rentals_schedules = rentals[rental_number].schedules
     await callback.message.edit_text(
-        text=display_rental_info(rentals[rental_number], rentals_schedules[0]),
-        reply_markup=create_rental_pagination_keyboard(rental_number + 1, len(rentals)),
+        text=display_rental_info(current_rental, current_rental_schedules),
+        reply_markup=create_rental_pagination_keyboard(db_offset + 1, rental_count),
     )
 
 

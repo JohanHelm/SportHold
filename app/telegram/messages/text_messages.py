@@ -1,3 +1,4 @@
+from typing import List
 from app.infra.db.models.rental.schema import Rental
 from app.infra.db.models.schedule.schema import Schedule
 from app.domain.controllers.slots import SlotData
@@ -27,7 +28,7 @@ def hello_owner_user(user_name: str) -> str:
 
 
 # TODO в базе schedule.hour_start и schedule.hour_end должны быть datetime или time
-def display_rental_info(rental: Rental, schedule: Schedule) -> str:
+def display_rental_info(rental: Rental, schedules: List[Schedule]) -> str:
     # schedule_start_time = schedule.hour_start.strftime("%H:%M")
     # schedule_end_time = schedule.hour_end.strftime("%H:%M")
 
@@ -44,8 +45,8 @@ def display_rental_info(rental: Rental, schedule: Schedule) -> str:
         f"Наименование: {rental.name}\n"
         f"Описание: {rental.description}\n"
         f"Расписание:\n"
-        f"       Время работы: {schedule.started} - {schedule.ended}\n"
-        f"       Cлоты для записи:  {schedule.slot_time} минут\n"
+        # f"       Время работы: {schedule.started} - {schedule.ended}\n" тут предполагаем, что приходит множество расписаний
+        # f"       Cлоты для записи:  {schedule.slot_time} минут\n"
         f"Близжайший свободный слот ---?\n"
         f"Мои записи на этом объекте"
     )

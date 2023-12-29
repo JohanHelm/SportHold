@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict, Field
-from typing import Optional
+from typing import List, Optional
 from datetime import date, datetime, timedelta
 from app.domain.helpers.enums import SlotType, DaysOfWeek, ScheduleStatus
 
@@ -23,3 +23,6 @@ class ScheduleModel(BaseModel):
 
     def __hash__(self) -> int:  # change to FROZEN pydantic
         return self.name.__hash__()  # or self.id.__hash__()
+
+class ScheduleData(BaseModel):
+    schedules: List[ScheduleModel]
