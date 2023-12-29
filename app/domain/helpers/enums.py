@@ -1,6 +1,20 @@
 from enum import IntFlag, IntEnum
 
 
+DaysOfWeekLangDict = {
+    "ru": {
+        "Monday": "Пн",
+        "Tuesday": "Вт",
+        "Wednesday": "Ср",
+        "Thursday": "Чт",
+        "Friday": "Пт",
+        "Saturday": "Сб",
+        "Sunday": "Вс",
+        "ALL": "Пн-Вс",
+    }
+}
+
+
 class DaysOfWeek(IntFlag):
     Monday = 1
     Tuesday = 2
@@ -13,7 +27,9 @@ class DaysOfWeek(IntFlag):
     NONE = 0
 
     def custom_print(self):
-        return "|".join(val.name for val in DaysOfWeek if self.value & val)
+        return ",".join(
+            DaysOfWeekLangDict["ru"][val.name] for val in DaysOfWeek if self.value & val
+        )
 
 
 class UserRole(IntFlag):

@@ -27,38 +27,20 @@ def hello_owner_user(user_name: str) -> str:
     )
 
 
-# def display_rental_info(rental: Rental) -> str:
-#     return f"Наименование: {rental.name}\n" \
-#            f"Описание: {rental.description}"
-
-
-# TODO в базе schedule.hour_start и schedule.hour_end должны быть datetime или time
 def display_rental_info(rental: Rental, schedules: List[Schedule]) -> str:
-    # schedule_start_time = schedule.hour_start.strftime("%H:%M")
-    # schedule_end_time = schedule.hour_end.strftime("%H:%M")
+    template_rental = f"{rental.name}\n" f"{rental.description}\n\n"
 
-    # TODO: предполагаю, что ответ состоит из 4-х частей
-    # TODO: 1-я часть - инфо про сам объект
-    # TODO: 2-я часть - итерационно собирается из расписаний и текст в зависимости от их типа слотов - разрешающих или запрещающих
-    # TODO: Время работы - для разрешающего
-    # TODO: Время перерыва - для запрещающего
-    # TODO: 3-я часть - данные про слоты
-    # TODO: 4-я часть данные про записи пользователя на этом объекте
-    # TODO: в конце их просто контакенировать
-    template_rental = (
-        f"Наименование: {rental.name}\n" f"Описание: {rental.description}\n"
-    )
-
-    templte_schedule = f"Расписание:\n"
+    access_schedule = "Время работы:\n\n"
+    restrict_schedule = "Перерывы:\n\n"
     for schedule in schedules:
         match schedule.slot_type:
             case SlotType.ACCESSIBLE:
-                templte_schedule += f"       Время работы: дни недели - {DaysOfWeek(schedule.mask_days).custom_print()}, с {schedule.hour_start} по {schedule.hour_end}\n"
+                access_schedule += f"📅 c {schedule.started.strftime('%d.%m.%Y')} по {schedule.ended.strftime('%d.%m.%Y')}\n"
+                access_schedule += f"📌 {DaysOfWeek(schedule.mask_days).custom_print()} ⏰ {schedule.hour_start} - {schedule.hour_end}\n"
             case SlotType.RESTRICTED:
-                templte_schedule += f"       Время перерыва: дни недели - {DaysOfWeek(schedule.mask_days).custom_print()}, с {schedule.hour_start} по {schedule.hour_end}\n"
-    return template_rental + templte_schedule
-    # f"Близжайший свободный слот ---?\n",
-    # f"Мои записи на этом объекте"
+                restrict_schedule += f"📅 c {schedule.started.strftime('%d.%m.%Y')} по {schedule.ended.strftime('%d.%m.%Y')}\n"
+                restrict_schedule += f"📌 {DaysOfWeek(schedule.mask_days).custom_print()} ⏰ {schedule.hour_start} - {schedule.hour_end}\n"
+    return template_rental + access_schedule + "\n" + restrict_schedule
 
 
 def display_rental_slots(slot: SlotData) -> str:

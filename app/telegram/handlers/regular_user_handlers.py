@@ -77,7 +77,9 @@ async def show_rentals(callback: CallbackQuery, state: FSMContext, db_session):
         )
         await callback.message.edit_text(
             text=display_rental_info(current_rental, current_rental_schedules),
-            reply_markup=create_rental_pagination_keyboard(db_offset + 1, rental_for_user_count),
+            reply_markup=create_rental_pagination_keyboard(
+                db_offset + 1, rental_for_user_count
+            ),
         )
     else:
         await callback.message.edit_text(
@@ -120,7 +122,9 @@ async def show_rentals_slots(callback: CallbackQuery, state: FSMContext, db_sess
 
     current_date = datetime.today()
     manager = SlotManager()
-    slots: SlotData = manager.generate_time_intervals(current_rental_schedules, date=current_date)
+    slots: SlotData = manager.generate_time_intervals(
+        current_rental_schedules, date=current_date
+    )
     await state.set_state(ShowRentalSlots.choosing_slot_page)
     slot_page = 0
     await state.update_data(choosing_slot_page=slot_page)
@@ -172,15 +176,12 @@ async def shift_show_rentals_slots(
 
 
 @router.callback_query(
-    F.data.startswith("book_in_slot"),
-    StateFilter(ShowRentalSlots.choosing_slot_page)
+    F.data.startswith("book_in_slot"), StateFilter(ShowRentalSlots.choosing_slot_page)
 )
-async def book_in_slot(
-        callback: CallbackQuery, state: FSMContext, db_session
-):
+async def book_in_slot(callback: CallbackQuery, state: FSMContext, db_session):
     slot_number = int(callback.data.split()[1])
-    slot_page = (await state.get_data())['choosing_slot_page']
-    db_offset = (await state.get_data())['db_offset']
+    slot_page = (await state.get_data())["choosing_slot_page"]
+    db_offset = (await state.get_data())["db_offset"]
     current_rental, current_rental_schedules = await get_rental_with_suitable_schedules(
         db_session=db_session, db_offset=db_offset
     )
@@ -211,8 +212,6 @@ async def book_in_slot(
         session.add(record)
         await session.commit()
 
-
-
     # Создать слот в базе
     # Cоздать рекорд в базе
 
@@ -233,7 +232,9 @@ async def back_to_rentals(callback: CallbackQuery, state: FSMContext, db_session
     rental_for_user_count = await get_rentals_for_user_count(db_session=db_session)
     await callback.message.edit_text(
         text=display_rental_info(current_rental, current_rental_schedules),
-        reply_markup=create_rental_pagination_keyboard(db_offset + 1, rental_for_user_count),
+        reply_markup=create_rental_pagination_keyboard(
+            db_offset + 1, rental_for_user_count
+        ),
     )
 
 
