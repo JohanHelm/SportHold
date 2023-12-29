@@ -2,6 +2,7 @@ from aiogram import Router, F
 from aiogram.filters.chat_member_updated import ChatMemberUpdatedFilter, MEMBER, KICKED
 from aiogram.filters import CommandStart, Command
 from aiogram.types import Message, ChatMemberUpdated
+from aiogram.fsm.context import FSMContext
 from loguru import logger
 from sqlalchemy.future import select
 
@@ -20,7 +21,8 @@ router.my_chat_member.filter(F.chat.type == "private")
 
 
 @router.message(CommandStart())
-async def process_start_command(message: Message, db_session):
+async def process_start_command(message: Message, db_session, state: FSMContext):
+    await state.clear()
     async with db_session() as session:
         result = await session.execute(
             select(User).where(User.id == message.from_user.id)

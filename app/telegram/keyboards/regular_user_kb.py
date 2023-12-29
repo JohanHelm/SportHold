@@ -51,7 +51,7 @@ def create_slot_pagination_keyboard(
         slot_end_time = slot.ended.strftime("%H:%M")
         btn_text = f"{slot_start_time} - {slot_end_time} Свободно!"
         slot_btn = InlineKeyboardButton(
-            text=btn_text, callback_data=f"sign_up_to_slot {slot_page} {index}"
+            text=btn_text, callback_data=f"book_in_slot {index}"
         )
         kb_builder.row(slot_btn)
     backward_btn = InlineKeyboardButton(text="<<", callback_data="shift_show_slots/-1")

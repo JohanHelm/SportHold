@@ -1,13 +1,13 @@
 from pydantic import BaseModel, ConfigDict, Field
 from typing import List, Optional
 from datetime import date, datetime, timedelta
-from app.domain.helpers.enums import SlotType, DaysOfWeek, ScheduleStatus
+from app.domain.helpers.enums import SlotType, SlotStatus, ScheduleStatus
 
 
 # вся киллер фича - тут
 class SlotModel(BaseModel):
     schedule_id: Optional[int] = Field()
-    status: Optional[int] = Field(default=ScheduleStatus.INACTIVE)
+    status: Optional[int] = Field(default=SlotStatus.INACTIVE)
     started: Optional[datetime] = Field(default=datetime.now())
     ended: Optional[datetime] = Field(default=date.today() + timedelta(minutes=30))
     created: Optional[datetime] = Field(default=datetime.now())

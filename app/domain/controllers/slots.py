@@ -42,7 +42,7 @@ class SlotManager:
         while s + timedelta(minutes=slot_time) <= e:
             if s + timedelta(minutes=slot_time) <= e:
                 temporary_slot = SlotModel(
-                    started=s, ended=s + timedelta(minutes=slot_time), schedule_id = schedule.id
+                    started=s, ended=s + timedelta(minutes=slot_time), schedule_id=schedule.id
                 )
                 time_slots.append(temporary_slot)
             s += timedelta(minutes=slot_time)
