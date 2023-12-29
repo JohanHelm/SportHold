@@ -30,7 +30,7 @@ from app.domain.models.slot.dto import SlotModel, SlotData
 router: Router = Router()
 
 
-async def get_rentals_for_user_count(db_session):
+async def get_rentals_for_user_count(db_session) -> int:
     async with db_session() as session:
         rental_count = await session.scalar(select(func.count(Rental.id)))
         return rental_count

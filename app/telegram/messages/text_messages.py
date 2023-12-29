@@ -1,4 +1,5 @@
 from typing import List
+from app.domain.helpers.enums import DaysOfWeek, SlotType
 from app.infra.db.models.rental.schema import Rental
 from app.infra.db.models.schedule.schema import Schedule
 from app.domain.controllers.slots import SlotData
@@ -44,16 +45,20 @@ def display_rental_info(rental: Rental, schedules: List[Schedule]) -> str:
     # TODO: 3-я часть - данные про слоты
     # TODO: 4-я часть данные про записи пользователя на этом объекте
     # TODO: в конце их просто контакенировать
-
-    return (
-        f"Наименование: {rental.name}\n"
-        f"Описание: {rental.description}\n"
-        f"Расписание:\n"
-        # f"       Время работы: {schedule.started} - {schedule.ended}\n" тут предполагаем, что приходит множество расписаний
-        # f"       Cлоты для записи:  {schedule.slot_time} минут\n"
-        f"Близжайший свободный слот ---?\n"
-        f"Мои записи на этом объекте"
+    template_rental = (
+        f"Наименование: {rental.name}\n" f"Описание: {rental.description}\n"
     )
+
+    templte_schedule = f"Расписание:\n"
+    for schedule in schedules:
+        match schedule.slot_type:
+            case SlotType.ACCESSIBLE:
+                templte_schedule += f"       Время работы: дни недели - {DaysOfWeek(schedule.mask_days).custom_print()}, с {schedule.hour_start} по {schedule.hour_end}\n"
+            case SlotType.RESTRICTED:
+                templte_schedule += f"       Время перерыва: дни недели - {DaysOfWeek(schedule.mask_days).custom_print()}, с {schedule.hour_start} по {schedule.hour_end}\n"
+    return template_rental + templte_schedule
+    # f"Близжайший свободный слот ---?\n",
+    # f"Мои записи на этом объекте"
 
 
 def display_rental_slots(slot: SlotData) -> str:
