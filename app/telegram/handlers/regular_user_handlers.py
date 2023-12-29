@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from sqlalchemy import func
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
@@ -8,6 +8,8 @@ from aiogram.types import CallbackQuery
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
+from app.domain.helpers.enums import ScheduleStatus
+from app.infra.db.models.schedule.schema import Schedule
 
 from app.telegram.keyboards.regular_user_kb import (
     RentalsCallbackFactory,
@@ -33,17 +35,23 @@ async def get_rentals_count(db_session):
         return rental_count
 
 
-async def get_rental_with_schedule(db_session, db_offset):
+async def get_rental_with_suitable_schedules(db_session, db_offset):
     async with db_session() as session:
-        row = await session.execute(
-            select(Rental)
-            .group_by(Rental.id)
-            .offset(db_offset)
-            .limit(1)
-            .options(selectinload(Rental.schedules))
+        row_rental = await session.execute(
+            select(Rental).group_by(Rental.id).offset(db_offset).limit(1)
         )
-        current_rental = row.scalar()
-        current_rental_schedules = current_rental.schedules
+        current_rental = row_rental.scalar()
+
+        row_schedules = await session.execute(
+            select(Schedule)
+            .where(Schedule.rental_id == current_rental.id)
+            .where(Schedule.status == ScheduleStatus.ACTIVE)
+            .where(Schedule.started >= date.today())
+            .where(Schedule.ended <= date.today())
+            .order_by(Schedule.slot_type)
+        )
+
+        current_rental_schedules = row_schedules.scalars()
         return current_rental, current_rental_schedules
 
 
@@ -58,7 +66,7 @@ async def show_rentals(callback: CallbackQuery, state: FSMContext, db_session):
     await state.set_state(ShowRentalSlots.choosing_rental_number)
     await state.update_data(db_offset=db_offset)
     rental_count = await get_rentals_count(db_session=db_session)
-    current_rental, current_rental_schedules = await get_rental_with_schedule(
+    current_rental, current_rental_schedules = await get_rental_with_suitable_schedules(
         db_session=db_session, db_offset=db_offset
     )
     await callback.message.edit_text(
@@ -80,7 +88,7 @@ async def shift_show_rentals(
     db_offset = (await state.get_data())["db_offset"] + (callback_data.step)
     await state.update_data(db_offset=db_offset)
     rental_count = await get_rentals_count(db_session=db_session)
-    current_rental, current_rental_schedules = await get_rental_with_schedule(
+    current_rental, current_rental_schedules = await get_rental_with_suitable_schedules(
         db_session=db_session, db_offset=db_offset
     )
     await callback.message.edit_text(
