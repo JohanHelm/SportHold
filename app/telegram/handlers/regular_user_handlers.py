@@ -22,6 +22,7 @@ from app.telegram.messages.text_messages import (
     display_rental_info,
     display_booking_info,
     hello_regular_user,
+    no_rentals_in_db,
 )
 from app.infra.db.models.rental.schema import Rental
 from app.domain.models.slot.dto import SlotModel, SlotData
@@ -29,7 +30,7 @@ from app.domain.models.slot.dto import SlotModel, SlotData
 router: Router = Router()
 
 
-async def get_rentals_count(db_session):
+async def get_rentals_for_user_count(db_session):
     async with db_session() as session:
         rental_count = await session.scalar(select(func.count(Rental.id)))
         return rental_count
@@ -42,7 +43,7 @@ async def get_rental_with_suitable_schedules(db_session, db_offset):
         )
         current_rental = row_rental.scalar()
 
-        row_schedules = await session.execute(
+        rows_schedules = await session.execute(
             select(Schedule)
             .where(Schedule.rental_id == current_rental.id)
             .where(Schedule.status == ScheduleStatus.ACTIVE)
@@ -51,7 +52,7 @@ async def get_rental_with_suitable_schedules(db_session, db_offset):
             .order_by(Schedule.slot_type)
         )
 
-        current_rental_schedules = row_schedules.scalars()
+        current_rental_schedules = rows_schedules.scalars()
         return current_rental, current_rental_schedules
 
 
@@ -65,14 +66,23 @@ async def show_rentals(callback: CallbackQuery, state: FSMContext, db_session):
     db_offset = 0
     await state.set_state(ShowRentalSlots.choosing_rental_number)
     await state.update_data(db_offset=db_offset)
-    rental_count = await get_rentals_count(db_session=db_session)
-    current_rental, current_rental_schedules = await get_rental_with_suitable_schedules(
-        db_session=db_session, db_offset=db_offset
-    )
-    await callback.message.edit_text(
-        text=display_rental_info(current_rental, current_rental_schedules),
-        reply_markup=create_rental_pagination_keyboard(db_offset + 1, rental_count),
-    )
+    rental_for_user_count = await get_rentals_for_user_count(db_session=db_session)
+    if rental_for_user_count:
+        (
+            current_rental,
+            current_rental_schedules,
+        ) = await get_rental_with_suitable_schedules(
+            db_session=db_session, db_offset=db_offset
+        )
+        await callback.message.edit_text(
+            text=display_rental_info(current_rental, current_rental_schedules),
+            reply_markup=create_rental_pagination_keyboard(db_offset + 1, rental_for_user_count),
+        )
+    else:
+        await callback.message.edit_text(
+            text=no_rentals_in_db(rental_for_user_count, rental_for_user_count),
+            reply_markup=create_first_regular_keyboard(),
+        )
 
 
 @router.callback_query(
@@ -87,7 +97,7 @@ async def shift_show_rentals(
 ):
     db_offset = (await state.get_data())["db_offset"] + (callback_data.step)
     await state.update_data(db_offset=db_offset)
-    rental_count = await get_rentals_count(db_session=db_session)
+    rental_count = await get_rentals_for_user_count(db_session=db_session)
     current_rental, current_rental_schedules = await get_rental_with_suitable_schedules(
         db_session=db_session, db_offset=db_offset
     )

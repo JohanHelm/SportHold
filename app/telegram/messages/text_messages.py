@@ -15,6 +15,10 @@ def hello_regular_user(
     )
 
 
+def no_rentals_in_db(avalable_rentals: int, total_rentals: int) -> str:
+    return f"Вам доступно объектов - {avalable_rentals} из {total_rentals}.\n"
+
+
 def hello_owner_user(user_name: str) -> str:
     return (
         f"Привет, {user_name}!\n"
