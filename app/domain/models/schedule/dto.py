@@ -1,6 +1,6 @@
 from pydantic import BaseModel, ConfigDict, Field
 from typing import List, Optional
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, time
 from app.domain.helpers.enums import SlotType, DaysOfWeek, ScheduleStatus
 
 
@@ -16,8 +16,8 @@ class ScheduleModel(BaseModel):
     created: Optional[datetime] = Field(default=date.today())
     slot_type: Optional[int] = Field(default=SlotType.ACCESSIBLE)
     slot_time: Optional[int] = Field(None, ge=1, le=1440)
-    hour_start: Optional[int] = Field(None, ge=0, le=24)
-    hour_end: Optional[int] = Field(None, ge=0, le=24)
+    hour_start: Optional[time] = Field(default=time(9))
+    hour_end: Optional[time] = Field(default=time(18))
 
     model_config = ConfigDict(from_attributes=True, arbitrary_types_allowed=True)
 

@@ -1,8 +1,9 @@
 import asyncio
+from datetime import time
 
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from app.infra.db.models import *
-
+from app.domain.helpers.enums import ScheduleStatus, SlotType, DaysOfWeek
 
 uri = "postgresql+asyncpg://postgres:qwerty123@127.0.0.1:5432/dev"
 engine = create_async_engine(uri, echo=False)
@@ -33,8 +34,17 @@ async def add_test_data():
 
         schedule = Schedule(name="Basic",
                             description="Basic schedule for pin-pong table",
+                            status=ScheduleStatus.ACTIVE,
                             )
         schedule.rental = rental
+        schedule0 = Schedule(name="Basic_break",
+                             description="Basic schedule for pin-pong table break",
+                             slot_type=SlotType.RESTRICTED,
+                             hour_start=time(13),
+                             hour_end=time(14),
+                             status=ScheduleStatus.ACTIVE,
+                             )
+        schedule0.rental = rental
         schedule1 = Schedule(name="Basic",
                             description="Basic schedule for exercise bike",
                             )

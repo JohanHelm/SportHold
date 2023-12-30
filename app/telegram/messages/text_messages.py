@@ -36,10 +36,12 @@ def display_rental_info(rental: Rental, schedules: List[Schedule]) -> str:
         match schedule.slot_type:
             case SlotType.ACCESSIBLE:
                 access_schedule += f"📅 c {schedule.started.strftime('%d.%m.%Y')} по {schedule.ended.strftime('%d.%m.%Y')}\n"
-                access_schedule += f"📌 {DaysOfWeek(schedule.mask_days).custom_print()} ⏰ {schedule.hour_start} - {schedule.hour_end}\n"
+                access_schedule += f"📌 {DaysOfWeek(schedule.mask_days).custom_print()}\n" \
+                                   f" ⏰ {schedule.hour_start.strftime('%H:%M')} - {schedule.hour_end.strftime('%H:%M')}\n"
             case SlotType.RESTRICTED:
                 restrict_schedule += f"📅 c {schedule.started.strftime('%d.%m.%Y')} по {schedule.ended.strftime('%d.%m.%Y')}\n"
-                restrict_schedule += f"📌 {DaysOfWeek(schedule.mask_days).custom_print()} ⏰ {schedule.hour_start} - {schedule.hour_end}\n"
+                restrict_schedule += f"📌 {DaysOfWeek(schedule.mask_days).custom_print()}\n" \
+                                     f" ⏰ {schedule.hour_start.strftime('%H:%M')} - {schedule.hour_end.strftime('%H:%M')}\n"
     return template_rental + access_schedule + "\n" + restrict_schedule
 
 

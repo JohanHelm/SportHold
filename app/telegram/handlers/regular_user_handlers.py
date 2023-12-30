@@ -202,7 +202,6 @@ async def book_in_slot(callback: CallbackQuery, state: FSMContext, db_session):
         )
         session.add(slot)
         await session.commit()
-        logger.info(f"new slot created {choosen_slot}")
         await session.refresh(slot)
         record = Record(
             user_id=callback.from_user.id,
@@ -211,9 +210,6 @@ async def book_in_slot(callback: CallbackQuery, state: FSMContext, db_session):
         )
         session.add(record)
         await session.commit()
-
-    # Создать слот в базе
-    # Cоздать рекорд в базе
 
     await callback.message.edit_text(text=str(slot.id))
 

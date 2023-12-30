@@ -1,9 +1,9 @@
 from typing import TYPE_CHECKING, List
 
-from sqlalchemy import DateTime, Integer, String, ForeignKey
+from sqlalchemy import DateTime, Integer, String, ForeignKey, Time
 from sqlalchemy.orm import Mapped, relationship
 from sqlalchemy.orm import mapped_column
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, time
 
 from app.domain.helpers.enums import ScheduleStatus, SlotType, DaysOfWeek
 
@@ -34,8 +34,8 @@ class Schedule(Base):
     created: Mapped[DateTime] = mapped_column(DateTime, default=datetime.now())
     slot_type: Mapped[int] = mapped_column(Integer, default=SlotType.ACCESSIBLE)
     slot_time: Mapped[int] = mapped_column(Integer, default=30)
-    hour_start: Mapped[int] = mapped_column(Integer, default=9)
-    hour_end: Mapped[int] = mapped_column(Integer, default=18)
+    hour_start: Mapped[Time] = mapped_column(Time, default=time(9))
+    hour_end: Mapped[Time] = mapped_column(Time, default=time(18))
 
     rental: Mapped["Rental"] = relationship(back_populates="schedules")
     slots: Mapped[List["Slot"]] = relationship(back_populates="schedule")

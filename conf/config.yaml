@@ -5,8 +5,8 @@ PRODUCTION:
   conf_env: "prod nev"
 TEST:
   conf_env: "test env"
-  # BOT_TOKEN: "6842489173:AAGqId4WukbkbNyPo3zkEq7w3fW-ZSJ0s0g"
-  BOT_TOKEN: "6327357287:AAHJv7IiKekmSeU3qYjbFlR7Mxc6Thaa-yk"
+  BOT_TOKEN: "6842489173:AAGqId4WukbkbNyPo3zkEq7w3fW-ZSJ0s0g"
+#  BOT_TOKEN: "6327357287:AAHJv7IiKekmSeU3qYjbFlR7Mxc6Thaa-yk"
   BOT_URL: "https://t.me/SportHold_bot"
   DB:
     URI: "postgresql+asyncpg://postgres:qwerty123@127.0.0.1:5432/dev"
