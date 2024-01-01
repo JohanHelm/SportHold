@@ -1,19 +1,13 @@
 from datetime import date, datetime
-from sqlalchemy import func
-from sqlalchemy.future import select
-from sqlalchemy.orm import selectinload
+
 from aiogram import Router, F
 from aiogram.types import CallbackQuery
-
-from loguru import logger
-
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from app.domain.helpers.enums import ScheduleStatus
-from app.infra.db.models.schedule.schema import Schedule
-from app.infra.db.models.slot.schema import Slot
-from app.infra.db.models.record.schema import Record
+
+from app.domain.models.slot.dto import SlotModel, SlotData
+from app.domain.controllers.slots import SlotManager
 
 from app.telegram.keyboards.regular_user_kb import (
     RentalsCallbackFactory,
@@ -21,8 +15,9 @@ from app.telegram.keyboards.regular_user_kb import (
     create_slot_pagination_keyboard,
     create_first_regular_keyboard,
     create_user_records_keyboard,
+    create_user_records_simple_keyboard,
 )
-from app.domain.controllers.slots import SlotManager
+
 from app.telegram.messages.text_messages import (
     display_rental_info,
     display_booking_info,
@@ -30,34 +25,17 @@ from app.telegram.messages.text_messages import (
     no_rentals_in_db,
     display_user_records,
 )
-from app.infra.db.models.rental.schema import Rental
-from app.domain.models.slot.dto import SlotModel, SlotData
+
+from app.telegram.utils.db_queries import (
+    get_rental_with_suitable_schedules,
+    get_rentals_for_user_count,
+    get_records_for_user_count,
+    create_slot_in_db,
+    create_record_in_db,
+    get_user_records,
+)
 
 router: Router = Router()
-
-
-async def get_rentals_for_user_count(db_session) -> int:
-    async with db_session() as session:
-        rental_count = await session.scalar(select(func.count(Rental.id)))
-        return rental_count
-
-
-async def get_rental_with_suitable_schedules(db_session, db_offset):
-    async with db_session() as session:
-        row_rental = await session.execute(
-            select(Rental).group_by(Rental.id).offset(db_offset).limit(1)
-        )
-        current_rental = row_rental.scalar()
-
-        rows_schedules = await session.execute(
-            select(Schedule)
-            .where(Schedule.rental_id == current_rental.id)
-            .where(Schedule.status == ScheduleStatus.ACTIVE)
-            .order_by(Schedule.slot_type)
-        )
-
-        current_rental_schedules = rows_schedules.scalars().all()
-        return current_rental, current_rental_schedules
 
 
 class ShowRentalSlots(StatesGroup):
@@ -89,6 +67,14 @@ async def show_rentals(callback: CallbackQuery, state: FSMContext, db_session):
             text=no_rentals_in_db(rental_for_user_count, rental_for_user_count),
             reply_markup=create_first_regular_keyboard(),
         )
+
+
+@router.callback_query(F.data == "show_user_records")
+async def show_user_records(callback: CallbackQuery, db_session):
+    user_records = await get_user_records(db_session, callback.from_user.id)
+    await callback.message.edit_text(
+        text=display_user_records(),
+        reply_markup=create_user_records_simple_keyboard(user_records))
 
 
 @router.callback_query(
@@ -163,7 +149,7 @@ async def shift_show_rentals_slots(
     )
     current_date = datetime.today()
     manager = SlotManager()
-    slots = manager.generate_time_intervals(current_rental_schedules, date=current_date)
+    slots: SlotData = manager.generate_time_intervals(current_rental_schedules, date=current_date)
     slots_per_page = 4
     start_slice = slot_page * slots_per_page
     end_slice = start_slice + slots_per_page
@@ -194,34 +180,10 @@ async def book_in_slot(callback: CallbackQuery, state: FSMContext, db_session):
     slots_per_page = 4
     start_slice = slot_page * slots_per_page
     end_slice = start_slice + slots_per_page
-    choosen_slot = slots.slots[start_slice:end_slice][slot_number]
-    async with db_session() as session:
-        slot = Slot(
-            rental_id=current_rental.id,
-            schedule_id=choosen_slot.schedule_id,
-            started=choosen_slot.started,
-            ended=choosen_slot.ended,
-            # created=datetime.now(),
-        )
-        session.add(slot)
-        await session.commit()
-        await session.refresh(slot)
-        record = Record(
-            user_id=callback.from_user.id,
-            slot_id=slot.id,
-            rental_id=current_rental.id,
-        )
-        session.add(record)
-        await session.commit()
-        row_records = await session.execute(
-            select(Record)
-            .where(Record.user_id == callback.from_user.id)
-            .options(selectinload(Record.slot))
-            .options(selectinload(Record.rental))
-        )
-        user_records = row_records.scalars().all()
-
-
+    choosen_slot: SlotModel = slots.slots[start_slice:end_slice][slot_number]
+    new_slot = await create_slot_in_db(db_session, current_rental, choosen_slot)
+    await create_record_in_db(db_session, callback.from_user.id, new_slot, current_rental)
+    user_records = await get_user_records(db_session, callback.from_user.id)
     await callback.message.edit_text(
         text=display_user_records(),
         reply_markup=create_user_records_keyboard(user_records),
@@ -277,12 +239,12 @@ async def back_to_rentals(callback: CallbackQuery, state: FSMContext, db_session
 @router.callback_query(F.data == "to_main_menu")
 async def to_main_menu(callback: CallbackQuery, state: FSMContext, db_session):
     await state.clear()
-    avalable_rentals: int = 2
-    total_rentals: int = 2
-    records_amount: int = 0
+    available_rentals: int = await get_rentals_for_user_count(db_session=db_session)
+    total_rentals = available_rentals
+    records_amount: int = await get_records_for_user_count(db_session, callback.from_user.id)
     await callback.message.edit_text(
         hello_regular_user(
-            callback.from_user.username, avalable_rentals, total_rentals, records_amount
+            callback.from_user.username, available_rentals, total_rentals, records_amount
         ),
         reply_markup=create_first_regular_keyboard(),
     )

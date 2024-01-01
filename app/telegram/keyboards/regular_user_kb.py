@@ -22,7 +22,7 @@ def create_first_regular_keyboard() -> InlineKeyboardMarkup:
     show_rentals_btn = InlineKeyboardButton(
         text="Доступные объекты!", callback_data="show_rentals"
     )
-    user_records_btn = InlineKeyboardButton(text="Мои записи", callback_data="show_my_records")
+    user_records_btn = InlineKeyboardButton(text="Мои записи", callback_data="show_user_records")
     kb_builder.row(show_rentals_btn, user_records_btn)
     return kb_builder.as_markup()
 
@@ -102,5 +102,22 @@ def create_user_records_keyboard(user_records: list[Record]
     main_menu_btn = InlineKeyboardButton(text="В меню", callback_data="to_main_menu")
     kb_builder.row(back_to_rentals_btn)
     kb_builder.row(to_previous_rental)
+    kb_builder.row(main_menu_btn)
+    return kb_builder.as_markup()
+
+
+def create_user_records_simple_keyboard(user_records: list[Record]) -> InlineKeyboardMarkup:
+    kb_builder = InlineKeyboardBuilder()
+    for index, record in enumerate(user_records):
+        record_date = record.slot.started.strftime("%d %B %Y")
+        record_start_time = record.slot.started.strftime("%H:%M")
+        record_end_time = record.slot.ended.strftime("%H:%M")
+        rental_name = record.rental.name
+        btn_text = f"{record_date}. {record_start_time} - {record_end_time}. Удалить"
+        record_btn = InlineKeyboardButton(
+            text=btn_text, callback_data=f"delete_record {index}"
+        )
+        kb_builder.row(record_btn)
+    main_menu_btn = InlineKeyboardButton(text="В меню", callback_data="to_main_menu")
     kb_builder.row(main_menu_btn)
     return kb_builder.as_markup()

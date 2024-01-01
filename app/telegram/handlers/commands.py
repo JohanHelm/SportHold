@@ -8,7 +8,10 @@ from sqlalchemy.future import select
 
 from app.domain.helpers.enums import UserRole, UserStatus
 from app.infra.db.models.user.schema import User
-from app.telegram.handlers.regular_user_handlers import get_rentals_for_user_count
+from app.telegram.utils.db_queries import (
+    get_rentals_for_user_count,
+    get_records_for_user_count,
+)
 from app.telegram.messages.text_messages import (
     help_message,
     hello_regular_user,
@@ -43,13 +46,13 @@ async def process_start_command(message: Message, db_session, state: FSMContext)
             await session.refresh(user)
 
     if UserRole.REGULAR in UserRole(user.roles):
-        avalable_rentals: int = await get_rentals_for_user_count(db_session=db_session)
-        total_rentals = avalable_rentals
-        records_amount: int = 0
+        available_rentals: int = await get_rentals_for_user_count(db_session=db_session)
+        total_rentals = available_rentals
+        records_amount: int = await get_records_for_user_count(db_session, message.from_user.id)
         await message.answer(
             hello_regular_user(
                 message.from_user.username,
-                avalable_rentals,
+                available_rentals,
                 total_rentals,
                 records_amount,
             ),
