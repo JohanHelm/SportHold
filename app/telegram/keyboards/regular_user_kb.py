@@ -109,20 +109,3 @@ async def create_user_records_keyboard(user_records: list[Record], state: FSMCon
     main_menu_btn = InlineKeyboardButton(text="В меню", callback_data="to_main_menu")
     kb_builder.row(main_menu_btn)
     return kb_builder.as_markup()
-
-
-def create_user_records_simple_keyboard(user_records: list[Record]) -> InlineKeyboardMarkup:
-    kb_builder = InlineKeyboardBuilder()
-    for index, record in enumerate(user_records):
-        record_date = record.slot.started.strftime("%d %B %Y")
-        record_start_time = record.slot.started.strftime("%H:%M")
-        record_end_time = record.slot.ended.strftime("%H:%M")
-        # rental_name = record.rental.name
-        btn_text = f"{record_date}. {record_start_time} - {record_end_time}. Удалить"
-        record_btn = InlineKeyboardButton(
-            text=btn_text, callback_data=f"delete_record/{record.id}"
-        )
-        kb_builder.row(record_btn)
-    main_menu_btn = InlineKeyboardButton(text="В меню", callback_data="to_main_menu")
-    kb_builder.row(main_menu_btn)
-    return kb_builder.as_markup()
