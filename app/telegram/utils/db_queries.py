@@ -78,3 +78,9 @@ async def get_user_records(db_session, user_id) -> list[Record]:
         )
         user_records = row_records.scalars().all()
     return user_records
+
+async def delete_user_record(db_session, record_id) -> None:
+    async with db_session() as session:
+        await session.execute(Record.__table__.delete().where(Record.id == record_id))
+        await session.commit()
+

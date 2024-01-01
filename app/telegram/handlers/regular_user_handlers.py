@@ -4,10 +4,11 @@ from aiogram import Router, F
 from aiogram.types import CallbackQuery
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import State, StatesGroup
+from aiogram.fsm.state import default_state
 
 from app.domain.models.slot.dto import SlotModel, SlotData
 from app.domain.controllers.slots import SlotManager
+from app.telegram.states.common import FSMRegularUser
 
 from app.telegram.keyboards.regular_user_kb import (
     RentalsCallbackFactory,
@@ -15,7 +16,6 @@ from app.telegram.keyboards.regular_user_kb import (
     create_slot_pagination_keyboard,
     create_first_regular_keyboard,
     create_user_records_keyboard,
-    create_user_records_simple_keyboard,
 )
 
 from app.telegram.messages.text_messages import (
@@ -33,20 +33,21 @@ from app.telegram.utils.db_queries import (
     create_slot_in_db,
     create_record_in_db,
     get_user_records,
+    delete_user_record,
 )
 
 router: Router = Router()
 
 
-class ShowRentalSlots(StatesGroup):
-    choosing_rental_number = State()
-    choosing_slot_page = State()
+# class ShowRentalSlots(StatesGroup):
+#     choosing_rental_number = State()
+#     choosing_slot_page = State()
 
 
 @router.callback_query(F.data == "show_rentals", StateFilter(None))
 async def show_rentals(callback: CallbackQuery, state: FSMContext, db_session):
     db_offset = 0
-    await state.set_state(ShowRentalSlots.choosing_rental_number)
+    await state.set_state(FSMRegularUser.choosing_rental_number)
     await state.update_data(db_offset=db_offset)
     rental_for_user_count = await get_rentals_for_user_count(db_session=db_session)
     if rental_for_user_count:
@@ -69,17 +70,17 @@ async def show_rentals(callback: CallbackQuery, state: FSMContext, db_session):
         )
 
 
-@router.callback_query(F.data == "show_user_records")
-async def show_user_records(callback: CallbackQuery, db_session):
+@router.callback_query(F.data == "show_user_records", StateFilter(None))
+async def show_user_records(callback: CallbackQuery, state: FSMContext, db_session):
     user_records = await get_user_records(db_session, callback.from_user.id)
     await callback.message.edit_text(
         text=display_user_records(),
-        reply_markup=create_user_records_simple_keyboard(user_records))
+        reply_markup=await create_user_records_keyboard(user_records, state))
 
 
 @router.callback_query(
     RentalsCallbackFactory.filter(),
-    StateFilter(ShowRentalSlots.choosing_rental_number),
+    StateFilter(FSMRegularUser.choosing_rental_number),
 )
 async def shift_show_rentals(
     callback: CallbackQuery,
@@ -100,7 +101,7 @@ async def shift_show_rentals(
 
 
 @router.callback_query(
-    F.data == "new_booking", StateFilter(ShowRentalSlots.choosing_rental_number)
+    F.data == "new_booking", StateFilter(FSMRegularUser.choosing_rental_number)
 )
 async def show_rentals_slots(callback: CallbackQuery, state: FSMContext, db_session):
     db_offset = (await state.get_data())["db_offset"]
@@ -114,7 +115,7 @@ async def show_rentals_slots(callback: CallbackQuery, state: FSMContext, db_sess
     slots: SlotData = manager.generate_time_intervals(
         current_rental_schedules, date=current_date
     )
-    await state.set_state(ShowRentalSlots.choosing_slot_page)
+    await state.set_state(FSMRegularUser.choosing_slot_page)
     slot_page = 0
     await state.update_data(choosing_slot_page=slot_page)
     # TODO Сейчас параметр slots_per_page хардкод, в перспективе надо вынеси его в настройки объекта для оунера
@@ -134,7 +135,7 @@ async def show_rentals_slots(callback: CallbackQuery, state: FSMContext, db_sess
 
 @router.callback_query(
     F.data.startswith("shift_show_slots"),
-    StateFilter(ShowRentalSlots.choosing_slot_page),
+    StateFilter(FSMRegularUser.choosing_slot_page),
 )
 async def shift_show_rentals_slots(
     callback: CallbackQuery, state: FSMContext, db_session
@@ -165,7 +166,7 @@ async def shift_show_rentals_slots(
 
 
 @router.callback_query(
-    F.data.startswith("book_in_slot"), StateFilter(ShowRentalSlots.choosing_slot_page)
+    F.data.startswith("book_in_slot"), StateFilter(FSMRegularUser.choosing_slot_page)
 )
 async def book_in_slot(callback: CallbackQuery, state: FSMContext, db_session):
     slot_number = int(callback.data.split()[1])
@@ -184,14 +185,28 @@ async def book_in_slot(callback: CallbackQuery, state: FSMContext, db_session):
     new_slot = await create_slot_in_db(db_session, current_rental, choosen_slot)
     await create_record_in_db(db_session, callback.from_user.id, new_slot, current_rental)
     user_records = await get_user_records(db_session, callback.from_user.id)
+    # TODO Добавить пагинацию по объектам и записям и датам
     await callback.message.edit_text(
         text=display_user_records(),
-        reply_markup=create_user_records_keyboard(user_records),
+        reply_markup=await create_user_records_keyboard(user_records, state),
     )
 
 
 @router.callback_query(
-    F.data.startswith("to_previous_slots_page"), StateFilter(ShowRentalSlots.choosing_slot_page)
+    F.data.startswith("delete_record"), StateFilter(FSMRegularUser.choosing_slot_page, default_state)
+)
+async def delete_record(callback: CallbackQuery, state: FSMContext, db_session):
+    await delete_user_record(db_session, int(callback.data.split("/")[1]))
+    # TODO добавить удаление или освобождение слота
+    user_records = await get_user_records(db_session, callback.from_user.id)
+    await callback.message.edit_text(
+        text=display_user_records(),
+        reply_markup=await create_user_records_keyboard(user_records, state),
+    )
+
+
+@router.callback_query(
+    F.data == "to_previous_slots_page", StateFilter(FSMRegularUser.choosing_slot_page)
 )
 async def to_previous_slots_page(callback: CallbackQuery, state: FSMContext, db_session):
     slot_page = (await state.get_data())["choosing_slot_page"]
@@ -217,12 +232,12 @@ async def to_previous_slots_page(callback: CallbackQuery, state: FSMContext, db_
 
 
 @router.callback_query(
-    F.data.startswith("back_to_rentals"),
-    StateFilter(ShowRentalSlots.choosing_slot_page),
+    F.data == "back_to_rentals",
+    StateFilter(FSMRegularUser.choosing_slot_page),
 )
 async def back_to_rentals(callback: CallbackQuery, state: FSMContext, db_session):
     db_offset = (await state.get_data())["db_offset"]
-    await state.set_state(ShowRentalSlots.choosing_rental_number)
+    await state.set_state(FSMRegularUser.choosing_rental_number)
 
     current_rental, current_rental_schedules = await get_rental_with_suitable_schedules(
         db_session=db_session, db_offset=db_offset

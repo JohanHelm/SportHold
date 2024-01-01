@@ -2,9 +2,10 @@ import locale
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram.filters.callback_data import CallbackData
+from aiogram.fsm.context import FSMContext
 
 from app.infra.db.models.record.schema import Record
-
+from app.telegram.states.common import FSMRegularUser
 
 locale.setlocale(locale.LC_ALL, 'ru_RU.UTF-8')
 
@@ -79,7 +80,7 @@ def create_slot_pagination_keyboard(
     return kb_builder.as_markup()
 
 
-def create_user_records_keyboard(user_records: list[Record]
+async def create_user_records_keyboard(user_records: list[Record], state: FSMContext
                                  ) -> InlineKeyboardMarkup:
     kb_builder = InlineKeyboardBuilder()
     for index, record in enumerate(user_records):
@@ -89,19 +90,23 @@ def create_user_records_keyboard(user_records: list[Record]
         rental_name = record.rental.name
         btn_text = f"{record_date}. {record_start_time} - {record_end_time}. Удалить"
         record_btn = InlineKeyboardButton(
-            text=btn_text, callback_data=f"delete_record {index}"
+            text=btn_text, callback_data=f"delete_record/{record.id}"
         )
         kb_builder.row(record_btn)
     # backward_btn = InlineKeyboardButton(text="<<", callback_data="shift_show_slots/-1")
     # forward_btn = InlineKeyboardButton(text=">>", callback_data="shift_show_slots/+1")
+    user_state = await state.get_state()
+    if user_state == FSMRegularUser.choosing_slot_page:
+        back_to_rentals_btn = InlineKeyboardButton(
+            text="К списку объектов", callback_data="back_to_rentals"
+        )
+        to_previous_rental = InlineKeyboardButton(
+            text="К последнему объекту", callback_data="to_previous_slots_page"
+        )
+        kb_builder.row(back_to_rentals_btn)
+        kb_builder.row(to_previous_rental)
 
-    back_to_rentals_btn = InlineKeyboardButton(
-        text="К списку объектов", callback_data="back_to_rentals"
-    )
-    to_previous_rental = InlineKeyboardButton(text="К последнему объекту", callback_data="to_previous_slots_page")
     main_menu_btn = InlineKeyboardButton(text="В меню", callback_data="to_main_menu")
-    kb_builder.row(back_to_rentals_btn)
-    kb_builder.row(to_previous_rental)
     kb_builder.row(main_menu_btn)
     return kb_builder.as_markup()
 
@@ -112,10 +117,10 @@ def create_user_records_simple_keyboard(user_records: list[Record]) -> InlineKey
         record_date = record.slot.started.strftime("%d %B %Y")
         record_start_time = record.slot.started.strftime("%H:%M")
         record_end_time = record.slot.ended.strftime("%H:%M")
-        rental_name = record.rental.name
+        # rental_name = record.rental.name
         btn_text = f"{record_date}. {record_start_time} - {record_end_time}. Удалить"
         record_btn = InlineKeyboardButton(
-            text=btn_text, callback_data=f"delete_record {index}"
+            text=btn_text, callback_data=f"delete_record/{record.id}"
         )
         kb_builder.row(record_btn)
     main_menu_btn = InlineKeyboardButton(text="В меню", callback_data="to_main_menu")
