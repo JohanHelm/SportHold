@@ -57,6 +57,10 @@ def display_booking_info(schedule: Schedule) -> str:
     return f"Описание брониования: {schedule.description}"
 
 
+def display_user_records() -> str:
+    return f"Вы записаны в следующие слоты:\n"
+
+
 help_message = (
     f"Краткая инструкция по использованию ботом.\n"
     f"Ссылка на канал с видеоинструкциями.\n"

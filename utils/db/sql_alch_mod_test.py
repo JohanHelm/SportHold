@@ -46,11 +46,13 @@ async def add_test_data():
                              )
         schedule0.rental = rental
         schedule1 = Schedule(name="Basic",
-                            description="Basic schedule for exercise bike",
+                             description="Basic schedule for exercise bike",
+                             status=ScheduleStatus.ACTIVE,
                             )
         schedule1.rental = rental1
         schedule2 = Schedule(name="Common",
                              description="Common schedule for different rentals",
+                             status=ScheduleStatus.ACTIVE,
                              )
         schedule2.rental = rental2
         # slot = Slot(started_at=datetime(2023, 12, 1, 12, 12), duration=30, status="PLANNED")

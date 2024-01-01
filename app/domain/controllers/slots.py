@@ -37,8 +37,8 @@ class SlotManager:
         end = schedule.hour_end
         current_date = date
         time_slots = []
-        s = datetime(current_date.year, current_date.month, current_date.day, start, 0)
-        e = datetime(current_date.year, current_date.month, current_date.day, end, 0)
+        s = datetime(current_date.year, current_date.month, current_date.day, start.hour, start.minute)
+        e = datetime(current_date.year, current_date.month, current_date.day, end.hour, end.minute)
         while s + timedelta(minutes=slot_time) <= e:
             if s + timedelta(minutes=slot_time) <= e:
                 temporary_slot = SlotModel(
@@ -53,7 +53,7 @@ class SlotManager:
         for slot in allowed_slots:
             overlap = False
             for forbidden_slot in forbidden_slots:
-                if slot.start < forbidden_slot.end and slot.end > forbidden_slot.start:
+                if slot.started < forbidden_slot.ended and slot.ended > forbidden_slot.started:
                     overlap = True
                     break
             if not overlap:

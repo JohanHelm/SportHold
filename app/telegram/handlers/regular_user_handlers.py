@@ -1,6 +1,7 @@
 from datetime import date, datetime
 from sqlalchemy import func
 from sqlalchemy.future import select
+from sqlalchemy.orm import selectinload
 from aiogram import Router, F
 from aiogram.types import CallbackQuery
 
@@ -19,6 +20,7 @@ from app.telegram.keyboards.regular_user_kb import (
     create_rental_pagination_keyboard,
     create_slot_pagination_keyboard,
     create_first_regular_keyboard,
+    create_user_records_keyboard,
 )
 from app.domain.controllers.slots import SlotManager
 from app.telegram.messages.text_messages import (
@@ -26,6 +28,7 @@ from app.telegram.messages.text_messages import (
     display_booking_info,
     hello_regular_user,
     no_rentals_in_db,
+    display_user_records,
 )
 from app.infra.db.models.rental.schema import Rental
 from app.domain.models.slot.dto import SlotModel, SlotData
@@ -210,8 +213,45 @@ async def book_in_slot(callback: CallbackQuery, state: FSMContext, db_session):
         )
         session.add(record)
         await session.commit()
+        row_records = await session.execute(
+            select(Record)
+            .where(Record.user_id == callback.from_user.id)
+            .options(selectinload(Record.slot))
+            .options(selectinload(Record.rental))
+        )
+        user_records = row_records.scalars().all()
 
-    await callback.message.edit_text(text=str(slot.id))
+
+    await callback.message.edit_text(
+        text=display_user_records(),
+        reply_markup=create_user_records_keyboard(user_records),
+    )
+
+
+@router.callback_query(
+    F.data.startswith("to_previous_slots_page"), StateFilter(ShowRentalSlots.choosing_slot_page)
+)
+async def to_previous_slots_page(callback: CallbackQuery, state: FSMContext, db_session):
+    slot_page = (await state.get_data())["choosing_slot_page"]
+    db_offset = (await state.get_data())["db_offset"]
+    current_rental, current_rental_schedules = await get_rental_with_suitable_schedules(
+        db_session=db_session, db_offset=db_offset
+    )
+    current_date = datetime.today()
+    manager = SlotManager()
+    slots = manager.generate_time_intervals(current_rental_schedules, date=current_date)
+    slots_per_page = 4
+    start_slice = slot_page * slots_per_page
+    end_slice = start_slice + slots_per_page
+    await callback.message.edit_text(
+        text=display_booking_info(current_rental_schedules[0]),
+        reply_markup=create_slot_pagination_keyboard(
+            slots.slots[start_slice:end_slice],
+            slot_page,
+            len(slots.slots),
+            slots_per_page,
+        ),
+    )
 
 
 @router.callback_query(
