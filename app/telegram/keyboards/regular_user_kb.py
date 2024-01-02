@@ -1,8 +1,9 @@
 import locale
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from aiogram.utils.keyboard import InlineKeyboardBuilder
+
 from aiogram.filters.callback_data import CallbackData
 from aiogram.fsm.context import FSMContext
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from app.infra.db.models.record.schema import Record
 from app.telegram.states.common import FSMRegularUser
@@ -37,21 +38,18 @@ def create_rental_pagination_keyboard(db_offset, rental_count) -> InlineKeyboard
         text=f"{db_offset}/{rental_count} Новое бронирование",
         callback_data="new_booking",
     )
-
+    kb_builder.row(new_sign_up_button)
     if db_offset == 1:
-        kb_builder.row(new_sign_up_button)
         kb_builder.row(main_menu_btn, forward_btn)
     elif db_offset == rental_count:
-        kb_builder.row(new_sign_up_button)
         kb_builder.row(main_menu_btn, backward_btn)
     else:
-        kb_builder.row(new_sign_up_button)
         kb_builder.row(main_menu_btn, backward_btn, forward_btn)
     return kb_builder.as_markup()
 
 
 def create_slot_pagination_keyboard(
-    slots, slot_page, total_slots, slots_per_page
+        slots, slot_page, total_slots, slots_per_page
 ) -> InlineKeyboardMarkup:
     kb_builder = InlineKeyboardBuilder()
     for index, slot in enumerate(slots):
@@ -68,33 +66,32 @@ def create_slot_pagination_keyboard(
     back_to_rentals_btn = InlineKeyboardButton(
         text="К списку объектов", callback_data="back_to_rentals"
     )
+    kb_builder.row(back_to_rentals_btn)
     if slot_page == 0:
-        kb_builder.row(back_to_rentals_btn)
         kb_builder.row(main_menu_btn, forward_btn)
     elif (slot_page + 1) * slots_per_page >= total_slots:
-        kb_builder.row(back_to_rentals_btn)
         kb_builder.row(main_menu_btn, backward_btn)
     else:
-        kb_builder.row(back_to_rentals_btn)
         kb_builder.row(main_menu_btn, backward_btn, forward_btn)
     return kb_builder.as_markup()
 
 
-async def create_user_records_keyboard(user_records: list[Record], state: FSMContext
-                                 ) -> InlineKeyboardMarkup:
+async def create_user_records_keyboard(
+        user_records_to_rental: list[Record],
+        state: FSMContext,
+        rental_with_record_num: int,
+        rentals_with_user_records_amount: int,
+) -> InlineKeyboardMarkup:
     kb_builder = InlineKeyboardBuilder()
-    for index, record in enumerate(user_records):
+    for record in user_records_to_rental:
         record_date = record.slot.started.strftime("%d %B %Y")
         record_start_time = record.slot.started.strftime("%H:%M")
         record_end_time = record.slot.ended.strftime("%H:%M")
-        rental_name = record.rental.name
         btn_text = f"{record_date}. {record_start_time} - {record_end_time}. Удалить"
         record_btn = InlineKeyboardButton(
-            text=btn_text, callback_data=f"delete_record/{record.id}"
+            text=btn_text, callback_data=f"delete_record/{record.id}/{record.slot_id}"
         )
         kb_builder.row(record_btn)
-    # backward_btn = InlineKeyboardButton(text="<<", callback_data="shift_show_slots/-1")
-    # forward_btn = InlineKeyboardButton(text=">>", callback_data="shift_show_slots/+1")
     user_state = await state.get_state()
     if user_state == FSMRegularUser.choosing_slot_page:
         back_to_rentals_btn = InlineKeyboardButton(
@@ -105,7 +102,15 @@ async def create_user_records_keyboard(user_records: list[Record], state: FSMCon
         )
         kb_builder.row(back_to_rentals_btn)
         kb_builder.row(to_previous_rental)
-
+    backward_btn = InlineKeyboardButton(text="<<", callback_data="shift_user_records/-1")
+    forward_btn = InlineKeyboardButton(text=">>", callback_data="shift_user_records/+1")
     main_menu_btn = InlineKeyboardButton(text="В меню", callback_data="to_main_menu")
-    kb_builder.row(main_menu_btn)
+    if rentals_with_user_records_amount <= 1:
+        kb_builder.row(main_menu_btn)
+    elif rental_with_record_num == 0 and rentals_with_user_records_amount > 1:
+        kb_builder.row(main_menu_btn, forward_btn)
+    elif rental_with_record_num + 1 == rentals_with_user_records_amount and rentals_with_user_records_amount > 1:
+        kb_builder.row(main_menu_btn, backward_btn)
+    else:
+        kb_builder.row(main_menu_btn, backward_btn, forward_btn)
     return kb_builder.as_markup()

@@ -1,6 +1,7 @@
 from typing import List
 from app.domain.helpers.enums import DaysOfWeek, SlotType
 from app.infra.db.models.rental.schema import Rental
+from app.infra.db.models.record.schema import Record
 from app.infra.db.models.schedule.schema import Schedule
 from app.domain.controllers.slots import SlotData
 
@@ -31,7 +32,7 @@ def display_rental_info(rental: Rental, schedules: List[Schedule]) -> str:
     template_rental = f"{rental.name}\n" f"{rental.description}\n\n"
 
     access_schedule = "Время работы:\n\n"
-    restrict_schedule = "Перерывы:\n\n"
+    restrict_schedule = "Без перерывов!\n\n"
     for schedule in schedules:
         match schedule.slot_type:
             case SlotType.ACCESSIBLE:
@@ -39,6 +40,7 @@ def display_rental_info(rental: Rental, schedules: List[Schedule]) -> str:
                 access_schedule += f"📌 {DaysOfWeek(schedule.mask_days).custom_print()}\n" \
                                    f" ⏰ {schedule.hour_start.strftime('%H:%M')} - {schedule.hour_end.strftime('%H:%M')}\n"
             case SlotType.RESTRICTED:
+                restrict_schedule = "Перерывы:\n\n"
                 restrict_schedule += f"📅 c {schedule.started.strftime('%d.%m.%Y')} по {schedule.ended.strftime('%d.%m.%Y')}\n"
                 restrict_schedule += f"📌 {DaysOfWeek(schedule.mask_days).custom_print()}\n" \
                                      f" ⏰ {schedule.hour_start.strftime('%H:%M')} - {schedule.hour_end.strftime('%H:%M')}\n"
@@ -57,8 +59,14 @@ def display_booking_info(schedule: Schedule) -> str:
     return f"Описание брониования: {schedule.description}"
 
 
-def display_user_records() -> str:
-    return f"Вы записаны в следующие слоты:\n"
+def display_user_records(user_records_to_rental: list[Record]) -> str:
+    if user_records_to_rental:
+        rental = user_records_to_rental[0].rental
+        return f"{rental.name}\n" f"{rental.description}\n\n" \
+               f"Вы записаны в следующие слоты:\n" \
+               f"Нажмите на кнопку чтобы удалить запись."
+    else:
+        return f"У вас нет актуальных записей."
 
 
 help_message = (

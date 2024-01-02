@@ -1,6 +1,7 @@
 from sqlalchemy import func
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
+from typing import Any
 
 from app.domain.models.slot.dto import SlotModel, SlotData
 from app.infra.db.models.schedule.schema import Schedule
@@ -68,19 +69,36 @@ async def create_record_in_db(db_session, user_id, slot: Slot, current_rental: R
     return record
 
 
-async def get_user_records(db_session, user_id) -> list[Record]:
-    async with db_session() as session:
-        row_records = await session.execute(
-            select(Record)
-            .where(Record.user_id == user_id)
-            .options(selectinload(Record.slot))
-            .options(selectinload(Record.rental))
-        )
-        user_records = row_records.scalars().all()
-    return user_records
-
 async def delete_user_record(db_session, record_id) -> None:
     async with db_session() as session:
         await session.execute(Record.__table__.delete().where(Record.id == record_id))
         await session.commit()
 
+
+async def delete_slot_by_id(db_session, slot_id) -> None:
+    async with db_session() as session:
+        await session.execute(Slot.__table__.delete().where(Slot.id == slot_id))
+        await session.commit()
+
+async def get_rentals_with_user_records(db_session, user_id) -> tuple[Any]:
+    async with db_session() as session:
+        row_records = await session.execute(
+            select(Record)
+            .where(Record.user_id == user_id)
+        )
+        user_records = row_records.scalars().all()
+        rentals_with_user_records = tuple(set(map(lambda record: record.rental_id, user_records)))
+        return rentals_with_user_records
+
+
+async def get_user_records_to_rental(db_session, user_id, rental_id) -> list[Record]:
+    async with db_session() as session:
+        row_records = await session.execute(
+            select(Record)
+            .where(Record.user_id == user_id)
+            .where(Record.rental_id == rental_id)
+            .options(selectinload(Record.slot))
+            .options(selectinload(Record.rental))
+        )
+        user_records_to_rental = row_records.scalars().all()
+    return user_records_to_rental
