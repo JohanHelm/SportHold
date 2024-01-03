@@ -1,3 +1,4 @@
+from datetime import date
 from typing import List
 from app.domain.helpers.enums import DaysOfWeek, SlotType
 from app.infra.db.models.rental.schema import Rental
@@ -55,8 +56,10 @@ def display_rental_slots(slot: SlotData) -> str:
 
 
 # TODO здесь выводить описание политики бронирования
-def display_booking_info(schedule: Schedule) -> str:
-    return f"Описание брониования: {schedule.description}"
+def display_booking_info(schedule: Schedule, current_date: date) -> str:
+    current_date = current_date.strftime("%d.%m.%Y г.")
+    return f"Описание брониования: {schedule.description}\n" \
+           f"На {current_date}"
 
 
 def display_user_records(user_records_to_rental: list[Record]) -> str:

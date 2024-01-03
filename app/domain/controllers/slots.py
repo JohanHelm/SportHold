@@ -23,7 +23,7 @@ class SlotManager:
             return False
         return True
 
-    def suitable_schedules(self, schedules, date: datetime) -> Set[ScheduleModel]:
+    def suitable_schedules(self, schedules, date: date) -> Set[ScheduleModel]:
         suitable_schedules = set(
             schedule
             for schedule in schedules
@@ -31,7 +31,7 @@ class SlotManager:
         )
         return suitable_schedules
 
-    def get_time_slots_from_schedule(self, schedule, date):
+    def get_time_slots_from_schedule(self, schedule, date: date):
         slot_time = schedule.slot_time
         start = schedule.hour_start
         end = schedule.hour_end
