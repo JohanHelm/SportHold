@@ -24,7 +24,7 @@ class Rental(Base):
     description: Mapped[str] = mapped_column(String)
     created: Mapped[DateTime] = mapped_column(DateTime, default=datetime.now())
     type: Mapped[int] = mapped_column(Integer, default=RentalTypes.REGULAR)
-
+    days_to_book_in: Mapped[int] = mapped_column(Integer, default=15)
     schedules: Mapped[List["Schedule"]] = relationship(back_populates="rental")
     slots: Mapped[List["Slot"]] = relationship(back_populates="rental")
     records: Mapped[List["Record"]] = relationship(back_populates="rental")
@@ -36,7 +36,7 @@ class Rental(Base):
             f"type: {RentalTypes(self.type).custom_print()}, "
             f"name: {self.name}, "
             f"description: {self.description} "
-            f"created: {self.created_at}, "
+            f"created: {self.created}, "
             f"schedules: {len(self.schedules)} "
             f"slots: {len(self.slots)} "
             f"records: {len(self.records)}"

@@ -16,6 +16,7 @@ from app.telegram.keyboards.regular_user_kb import (
     create_slot_pagination_keyboard,
     create_first_regular_keyboard,
     create_user_records_keyboard,
+    create_date_pagination_keyboard,
 )
 
 from app.telegram.messages.text_messages import (
@@ -24,6 +25,7 @@ from app.telegram.messages.text_messages import (
     hello_regular_user,
     no_rentals_in_db,
     display_user_records,
+    display_date_selection_info,
 )
 
 from app.telegram.utils.db_queries import (
@@ -109,6 +111,33 @@ async def shift_show_rentals(
         text=display_rental_info(current_rental, current_rental_schedules),
         reply_markup=create_rental_pagination_keyboard(db_offset + 1, rental_count),
     )
+
+
+@router.callback_query(
+    F.data == "select_booking_date", StateFilter(FSMRegularUser.choosing_rental_number)
+)
+async def select_booking_date(callback: CallbackQuery, state: FSMContext, db_session):
+    db_offset = (await state.get_data())["db_offset"]
+    current_rental, _ = await get_rental_with_suitable_schedules(
+        db_session=db_session, db_offset=db_offset
+    )
+    current_date = date.today() + timedelta(days=1)
+
+    await callback.message.edit_text(
+        text=display_date_selection_info(current_rental),
+        reply_markup=create_date_pagination_keyboard(current_date, current_rental.days_to_book_in),
+    )
+
+
+@router.callback_query(
+    F.data.startswith("booking_date"), StateFilter(FSMRegularUser.choosing_rental_number)
+)
+async def booking_date(callback: CallbackQuery, state: FSMContext, db_session):
+
+    await callback.message.edit_text(
+        text=callback.data,
+    )
+
 
 
 @router.callback_query(

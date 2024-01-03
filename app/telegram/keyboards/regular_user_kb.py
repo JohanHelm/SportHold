@@ -1,5 +1,5 @@
 import locale
-
+from datetime import date, timedelta
 from aiogram.filters.callback_data import CallbackData
 from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
@@ -36,7 +36,7 @@ def create_rental_pagination_keyboard(db_offset, rental_count) -> InlineKeyboard
     main_menu_btn = InlineKeyboardButton(text="В меню", callback_data="to_main_menu")
     new_sign_up_button = InlineKeyboardButton(
         text=f"{db_offset}/{rental_count} Новое бронирование",
-        callback_data="new_booking",
+        callback_data="select_booking_date",
     )
     kb_builder.row(new_sign_up_button)
     if db_offset == 1:
@@ -47,6 +47,26 @@ def create_rental_pagination_keyboard(db_offset, rental_count) -> InlineKeyboard
         kb_builder.row(main_menu_btn, backward_btn, forward_btn)
     return kb_builder.as_markup()
 
+
+def create_date_pagination_keyboard(current_date, days_to_book_in) -> InlineKeyboardMarkup:
+    kb_builder = InlineKeyboardBuilder()
+    date_buttons: list[InlineKeyboardButton] = []
+    date_range = [date.fromordinal(_) for _ in range(
+        current_date.toordinal(),
+        (current_date + timedelta(days=days_to_book_in)).toordinal())]
+    for day in date_range:
+        button_text = day.strftime("%d.%m.%Y г.")
+        date_buttons.append(InlineKeyboardButton(
+            text=str(day),
+            callback_data=f"booking_date/{day}"))
+    kb_builder.row(*date_buttons, width=3)
+    back_to_rentals_btn = InlineKeyboardButton(
+        text="К списку объектов", callback_data="back_to_rentals"
+    )
+    main_menu_btn = InlineKeyboardButton(text="В меню", callback_data="to_main_menu")
+    kb_builder.row(back_to_rentals_btn)
+    kb_builder.row(main_menu_btn)
+    return kb_builder.as_markup()
 
 def create_slot_pagination_keyboard(
         slots, slot_page, total_slots, slots_per_page

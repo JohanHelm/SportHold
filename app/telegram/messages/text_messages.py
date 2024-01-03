@@ -48,6 +48,10 @@ def display_rental_info(rental: Rental, schedules: List[Schedule]) -> str:
     return template_rental + access_schedule + "\n" + restrict_schedule
 
 
+def display_date_selection_info(rental: Rental) -> str:
+    return f"Выберите дату для записи на \n{rental.name}"
+
+
 def display_rental_slots(slot: SlotData) -> str:
     slot_date = slot.started.strftime("%d.%m.%Y г.")
     slot_start_time = slot.started.strftime("%H:%M")
