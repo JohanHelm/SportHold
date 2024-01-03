@@ -1,4 +1,4 @@
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 
 from aiogram import Router, F
 from aiogram.types import CallbackQuery
@@ -120,7 +120,7 @@ async def show_rentals_slots(callback: CallbackQuery, state: FSMContext, db_sess
     _, current_rental_schedules = await get_rental_with_suitable_schedules(
         db_session=db_session, db_offset=db_offset
     )
-
+    # Запись возможна с завтрашнего дня!!!
     current_date = date.today() + timedelta(days=1)
     manager = SlotManager()
     slots: SlotData = manager.generate_time_intervals(
