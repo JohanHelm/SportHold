@@ -34,11 +34,11 @@ def create_rental_pagination_keyboard(db_offset, rental_count) -> InlineKeyboard
     backward_btn = InlineKeyboardButton(text="<<", callback_data=back_callback_data)
     forward_btn = InlineKeyboardButton(text=">>", callback_data=forward_callback_data)
     main_menu_btn = InlineKeyboardButton(text="В меню", callback_data="to_main_menu")
-    new_sign_up_button = InlineKeyboardButton(
-        text=f"{db_offset}/{rental_count} Новое бронирование",
+    select_booking_date_btn = InlineKeyboardButton(
+        text="К выбору даты записи.",
         callback_data="select_booking_date",
     )
-    kb_builder.row(new_sign_up_button)
+    kb_builder.row(select_booking_date_btn)
     if db_offset == 1:
         kb_builder.row(main_menu_btn, forward_btn)
     elif db_offset == rental_count:
@@ -57,7 +57,7 @@ def create_date_pagination_keyboard(current_date, days_to_book_in) -> InlineKeyb
     for day in date_range:
         button_text = day.strftime("%d.%m.%Y г.")
         date_buttons.append(InlineKeyboardButton(
-            text=str(day),
+            text=button_text,
             callback_data=f"booking_date/{day}"))
     kb_builder.row(*date_buttons, width=3)
     back_to_rentals_btn = InlineKeyboardButton(
@@ -67,6 +67,7 @@ def create_date_pagination_keyboard(current_date, days_to_book_in) -> InlineKeyb
     kb_builder.row(back_to_rentals_btn)
     kb_builder.row(main_menu_btn)
     return kb_builder.as_markup()
+
 
 def create_slot_pagination_keyboard(
         slots, slot_page, total_slots, slots_per_page
