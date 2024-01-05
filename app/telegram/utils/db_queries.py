@@ -87,7 +87,7 @@ async def get_rentals_with_user_records(db_session, user_id) -> tuple[Any]:
             .where(Record.user_id == user_id)
         )
         user_records = row_records.scalars().all()
-        rentals_with_user_records = tuple(set(map(lambda record: record.rental_id, user_records)))
+        rentals_with_user_records = tuple({record.rental_id for record in user_records})
         return rentals_with_user_records
 
 
