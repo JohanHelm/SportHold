@@ -12,7 +12,7 @@ class SlotManager:
     Обрабатывает кортеж расписаний на день - выдает список слотов на день
     """
 
-    def is_date_in_schedule(self, schedule: ScheduleModel, date: date):
+    def is_date_in_schedule(self, schedule: ScheduleModel, date: date) -> bool:
         if schedule.status == ScheduleStatus.INACTIVE:
             return False
         if schedule.started > date.today():
@@ -31,7 +31,7 @@ class SlotManager:
         )
         return suitable_schedules
 
-    def get_time_slots_from_schedule(self, schedule, date: date):
+    def get_time_slots_from_schedule(self, schedule, date: date) -> list[SlotModel]:
         slot_time = schedule.slot_time
         start = schedule.hour_start
         end = schedule.hour_end
@@ -60,7 +60,7 @@ class SlotManager:
                 cleaned_slots.append(slot)
         return cleaned_slots
 
-    def generate_time_intervals(self, schedules, date) -> SlotData:
+    def generate_time_intervals(self, schedules, occupied_slots, date) -> SlotData:
         access_schedule = [
             schedule
             for schedule in schedules
@@ -72,7 +72,7 @@ class SlotManager:
             if SlotType(schedule.slot_type) == SlotType.RESTRICTED
         ]
         allowed_slots = []
-        forbidden_slots = []
+        forbidden_slots = occupied_slots
         for schedule in access_schedule:
             schedule_slots = self.get_time_slots_from_schedule(schedule, date)
             allowed_slots.extend(schedule_slots)

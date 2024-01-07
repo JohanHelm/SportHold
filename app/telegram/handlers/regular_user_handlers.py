@@ -38,6 +38,7 @@ from app.telegram.utils.db_queries import (
     delete_slot_by_id,
     get_rentals_with_user_records,
     get_user_records_to_rental,
+    get_occupied_slots,
 )
 
 router: Router = Router()
@@ -138,12 +139,13 @@ async def show_rentals_slots(callback: CallbackQuery, state: FSMContext, db_sess
     await state.update_data(choosing_booking_date=selected_date)
     db_offset = (await state.get_data())["db_offset"]
 
-    _, current_rental_schedules = await get_rental_with_suitable_schedules(
+    current_rental, current_rental_schedules = await get_rental_with_suitable_schedules(
         db_session=db_session, db_offset=db_offset
     )
+    occupied_slots = await get_occupied_slots(db_session, current_rental, selected_date)
     manager = SlotManager()
     slots: SlotData = manager.generate_time_intervals(
-        current_rental_schedules, date=selected_date
+        current_rental_schedules, occupied_slots, date=selected_date,
     )
     await state.set_state(FSMRegularUser.choosing_slot_page)
     slot_page = 0
@@ -175,12 +177,13 @@ async def shift_show_rentals_slots(
     )
     await state.update_data(choosing_slot_page=slot_page)
     db_offset = (await state.get_data())["db_offset"]
-    _, current_rental_schedules = await get_rental_with_suitable_schedules(
+    current_rental, current_rental_schedules = await get_rental_with_suitable_schedules(
         db_session=db_session, db_offset=db_offset
     )
     selected_date = (await state.get_data())["choosing_booking_date"]
+    occupied_slots = await get_occupied_slots(db_session, current_rental, selected_date)
     manager = SlotManager()
-    slots: SlotData = manager.generate_time_intervals(current_rental_schedules, date=selected_date)
+    slots: SlotData = manager.generate_time_intervals(current_rental_schedules, occupied_slots, date=selected_date)
     slots_per_page = 4
     start_slice = slot_page * slots_per_page
     end_slice = start_slice + slots_per_page
@@ -206,8 +209,9 @@ async def book_in_slot(callback: CallbackQuery, state: FSMContext, db_session):
         db_session=db_session, db_offset=db_offset
     )
     selected_date = (await state.get_data())["choosing_booking_date"]
+    occupied_slots = await get_occupied_slots(db_session, current_rental, selected_date)
     manager = SlotManager()
-    slots = manager.generate_time_intervals(current_rental_schedules, date=selected_date)
+    slots: SlotData = manager.generate_time_intervals(current_rental_schedules, occupied_slots, date=selected_date)
     slots_per_page = 4
     start_slice = slot_page * slots_per_page
     end_slice = start_slice + slots_per_page
@@ -289,8 +293,9 @@ async def to_previous_slots_page(callback: CallbackQuery, state: FSMContext, db_
         db_session=db_session, db_offset=db_offset
     )
     selected_date = (await state.get_data())["choosing_booking_date"]
+    occupied_slots = await get_occupied_slots(db_session, current_rental, selected_date)
     manager = SlotManager()
-    slots = manager.generate_time_intervals(current_rental_schedules, date=selected_date)
+    slots: SlotData = manager.generate_time_intervals(current_rental_schedules, occupied_slots, date=selected_date)
     slots_per_page = 4
     start_slice = slot_page * slots_per_page
     end_slice = start_slice + slots_per_page

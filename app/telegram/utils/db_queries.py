@@ -1,4 +1,4 @@
-from sqlalchemy import func
+from sqlalchemy import func, cast, Date
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
 from typing import Any
@@ -102,3 +102,14 @@ async def get_user_records_to_rental(db_session, user_id, rental_id) -> list[Rec
         )
         user_records_to_rental = row_records.scalars().all()
     return user_records_to_rental
+
+
+async def get_occupied_slots(db_session, current_rental: Rental, selected_date) -> list[Slot]:
+    async with db_session() as session:
+        row_slots = await session.execute(
+            select(Slot)
+            .where(Slot.rental_id == current_rental.id)
+            .where(cast(Slot.started, Date) == selected_date)
+        )
+        occupied_slots = row_slots.scalars().all()
+    return occupied_slots
