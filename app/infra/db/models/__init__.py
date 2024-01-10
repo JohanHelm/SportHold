@@ -10,3 +10,4 @@ from .schedule.schema import Schedule
 from .slot.schema import Slot
 from .rental.schema import Rental
 from .record.schema import Record
+from .policy.schema import Policy

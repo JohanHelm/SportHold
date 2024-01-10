@@ -18,7 +18,7 @@ class Policy(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     rental_id: Mapped[int] = mapped_column(ForeignKey("rentals.id"), unique=False)
-    rental: Mapped[Rental] = relationship(back_populates="policy")
+    rental: Mapped["Rental"] = relationship(back_populates="policy")
     created: Mapped[DateTime] = mapped_column(DateTime, default=datetime.now())
     book_limit_days: Mapped[int] = mapped_column(Integer)
     need_user_phone: Mapped[bool] = mapped_column(Boolean)

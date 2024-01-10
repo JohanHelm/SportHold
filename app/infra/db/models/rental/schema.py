@@ -25,7 +25,7 @@ class Rental(Base):
     description: Mapped[str] = mapped_column(String)
     created: Mapped[DateTime] = mapped_column(DateTime, default=datetime.now())
     type: Mapped[int] = mapped_column(Integer, default=RentalTypes.REGULAR)
-    policy: Mapped[Policy] = relationship(back_populates="rental")
+    policy: Mapped["Policy"] = relationship(back_populates="rental")
     schedules: Mapped[List["Schedule"]] = relationship(back_populates="rental")
     slots: Mapped[List["Slot"]] = relationship(back_populates="rental")
     records: Mapped[List["Record"]] = relationship(back_populates="rental")
