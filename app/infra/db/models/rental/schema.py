@@ -13,6 +13,7 @@ if TYPE_CHECKING:
     from ..schedule.schema import Schedule
     from ..slot.schema import Slot
     from ..record.schema import Record
+    from ..policy.schema import Policy
 
 
 class Rental(Base):
@@ -24,7 +25,7 @@ class Rental(Base):
     description: Mapped[str] = mapped_column(String)
     created: Mapped[DateTime] = mapped_column(DateTime, default=datetime.now())
     type: Mapped[int] = mapped_column(Integer, default=RentalTypes.REGULAR)
-    days_to_book_in: Mapped[int] = mapped_column(Integer, default=15)
+    policy: Mapped[Policy] = relationship(back_populates="rental")
     schedules: Mapped[List["Schedule"]] = relationship(back_populates="rental")
     slots: Mapped[List["Slot"]] = relationship(back_populates="rental")
     records: Mapped[List["Record"]] = relationship(back_populates="rental")
