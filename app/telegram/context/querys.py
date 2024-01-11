@@ -5,6 +5,7 @@ class RentalQuerys:
 
 class Records:
     SHOW_RECORDS = "show_records"
+    SHOW_USER_RECORDS = "show_user_records"
 
 class Nav:
     TO_MAIN = "to_main_menu"

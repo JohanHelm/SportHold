@@ -2,6 +2,7 @@ from aiogram.types import InlineKeyboardButton
 
 from app.telegram.context.querys import Book, Nav, Records, RentalQuerys
 from app.telegram.context.callbacks import (
+    booking_date_callback_data,
     rental_back_callback_data,
     rental_forward_callback_data,
 )
@@ -28,3 +29,7 @@ SELECT_BOOKING_DATE_BTN = InlineKeyboardButton(
     text="К выбору даты записи.",
     callback_data=Book.SELECT_BOOK_DAY,
 )
+
+def calendar_button(button_text, day):
+    data = booking_date_callback_data(day)
+    return InlineKeyboardButton(text=button_text, callback_data=data)

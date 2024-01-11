@@ -20,6 +20,7 @@ class Policy(Base):
     rental_id: Mapped[int] = mapped_column(ForeignKey("rentals.id"), unique=False)
     rental: Mapped["Rental"] = relationship(back_populates="policy")
     created: Mapped[DateTime] = mapped_column(DateTime, default=datetime.now())
+    # TODO: добавить гэп по времени, раньше которого записываться нельзя, сейчас хардкодом проставлено +1 день в хэндлере
     book_limit_days: Mapped[int] = mapped_column(Integer)
     need_user_phone: Mapped[bool] = mapped_column(Boolean)
     need_confirm: Mapped[bool] = mapped_column(Boolean)

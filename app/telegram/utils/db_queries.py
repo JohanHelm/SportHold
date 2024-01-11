@@ -5,6 +5,7 @@ from sqlalchemy.orm import selectinload
 from typing import Any
 
 from app.domain.models.slot.dto import SlotModel, SlotData
+from app.infra.db.models.policy.schema import Policy
 from app.infra.db.models.schedule.schema import Schedule
 from app.infra.db.models.slot.schema import Slot
 from app.infra.db.models.record.schema import Record
@@ -43,6 +44,20 @@ async def get_rental_with_suitable_schedules(db_session, db_offset):
 
         current_rental_schedules = rows_schedules.scalars().all()
         return current_rental, current_rental_schedules
+
+
+async def get_rental_book_policy(db_session, db_offset):
+    async with db_session() as session:
+        row_rental = await session.execute(
+            select(Rental).group_by(Rental.id).offset(db_offset).limit(1)
+        )
+        current_rental = row_rental.scalar()
+
+        policy = await session.execute(
+            select(Policy).where(Policy.rental_id == current_rental.id).limit(1)
+        )
+        current_policy = policy.scalar()
+        return current_policy
 
 
 async def create_slot_in_db(

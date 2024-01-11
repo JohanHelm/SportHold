@@ -16,6 +16,7 @@ from .buttons import (
     RENTAL_BACKWARD_BTN,
     BTN_GO_TO_MAIN,
     BTN_BACK_TO_RENTALS,
+    calendar_button,
 )
 
 locale.setlocale(locale.LC_ALL, "ru_RU.UTF-8")
@@ -40,6 +41,7 @@ def create_rental_pagination_keyboard(db_offset, rental_count) -> InlineKeyboard
     return kb_builder.as_markup()
 
 
+# TODO: взять существующий aiogram-calendar
 def create_date_pagination_keyboard(
     current_date, days_to_book_in
 ) -> InlineKeyboardMarkup:
@@ -53,9 +55,10 @@ def create_date_pagination_keyboard(
         )
     ]
     for day in date_range:
-        button_text = day.strftime("%d.%m.%Y г.")
         date_buttons.append(
-            InlineKeyboardButton(text=button_text, callback_data=f"booking_date/{day}")
+            calendar_button(
+                button_text=day.strftime("%d.%m.%Y г."), day=day.toordinal()
+            )
         )
     kb_builder.row(*date_buttons, width=3)
     kb_builder.row(BTN_BACK_TO_RENTALS)
