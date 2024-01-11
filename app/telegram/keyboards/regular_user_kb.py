@@ -7,43 +7,36 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from app.infra.db.models.record.schema import Record
 from app.telegram.context.querys import Book, Nav, Records, RentalQuerys
 from app.telegram.context.states import FSMRegularUser
-from app.telegram.context.callbacks import back_callback_data, forward_callback_data
+
+from .buttons import (
+    SHOW_RENTALS_BTN,
+    USER_RECORDS_BTN,
+    SELECT_BOOKING_DATE_BTN,
+    RENTAL_FORWARD_BTN,
+    RENTAL_BACKWARD_BTN,
+    BTN_GO_TO_MAIN,
+    BTN_BACK_TO_RENTALS,
+)
 
 locale.setlocale(locale.LC_ALL, "ru_RU.UTF-8")
-
-BTN_GO_TO_MAIN = InlineKeyboardButton(text="В меню", callback_data=Nav.TO_MAIN)
-BTN_BACK_TO_RENTALS = InlineKeyboardButton(
-    text="К списку объектов", callback_data=RentalQuerys.BACK
-)
 
 
 def create_first_regular_keyboard() -> InlineKeyboardMarkup:
     kb_builder = InlineKeyboardBuilder()
-    show_rentals_btn = InlineKeyboardButton(
-        text="Доступные объекты!", callback_data=RentalQuerys.SHOW_RENTALS
-    )
-    user_records_btn = InlineKeyboardButton(
-        text="Мои записи", callback_data=Records.SHOW_RECORDS
-    )
-    kb_builder.row(show_rentals_btn, user_records_btn)
+    kb_builder.row(SHOW_RENTALS_BTN, USER_RECORDS_BTN)
     return kb_builder.as_markup()
 
 
 def create_rental_pagination_keyboard(db_offset, rental_count) -> InlineKeyboardMarkup:
     kb_builder = InlineKeyboardBuilder()
-    backward_btn = InlineKeyboardButton(text="<<", callback_data=back_callback_data)
-    forward_btn = InlineKeyboardButton(text=">>", callback_data=forward_callback_data)
-    select_booking_date_btn = InlineKeyboardButton(
-        text="К выбору даты записи.",
-        callback_data=Book.SELECT_BOOK_DAY,
-    )
-    kb_builder.row(select_booking_date_btn)
-    if db_offset == 1:
-        kb_builder.row(BTN_GO_TO_MAIN, forward_btn)
-    elif db_offset == rental_count:
-        kb_builder.row(BTN_GO_TO_MAIN, backward_btn)
-    else:
-        kb_builder.row(BTN_GO_TO_MAIN, backward_btn, forward_btn)
+    kb_builder.row(SELECT_BOOKING_DATE_BTN)
+    match db_offset:
+        case 1:
+            kb_builder.row(BTN_GO_TO_MAIN, RENTAL_FORWARD_BTN)
+        case last_rental if last_rental == rental_count:
+            kb_builder.row(BTN_GO_TO_MAIN, RENTAL_BACKWARD_BTN)
+        case _:
+            kb_builder.row(BTN_GO_TO_MAIN, RENTAL_BACKWARD_BTN, RENTAL_FORWARD_BTN)
     return kb_builder.as_markup()
 
 
