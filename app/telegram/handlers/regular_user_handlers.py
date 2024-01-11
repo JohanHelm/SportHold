@@ -8,10 +8,9 @@ from aiogram.fsm.state import default_state
 
 from app.domain.models.slot.dto import SlotModel, SlotData
 from app.domain.controllers.slots import SlotManager
-from app.telegram.states.common import FSMRegularUser
+from app.telegram.context.states import FSMRegularUser
 
 from app.telegram.keyboards.regular_user_kb import (
-    RentalsCallbackFactory,
     create_rental_pagination_keyboard,
     create_slot_pagination_keyboard,
     create_first_regular_keyboard,
@@ -44,32 +43,6 @@ from app.telegram.utils.db_queries import (
 router: Router = Router()
 
 
-@router.callback_query(F.data == "show_rentals", StateFilter(None))
-async def show_rentals(callback: CallbackQuery, state: FSMContext, db_session):
-    db_offset = 0
-    await state.set_state(FSMRegularUser.choosing_rental_number)
-    await state.update_data(db_offset=db_offset)
-    rental_for_user_count = await get_rentals_for_user_count(db_session=db_session)
-    if rental_for_user_count:
-        (
-            current_rental,
-            current_rental_schedules,
-        ) = await get_rental_with_suitable_schedules(
-            db_session=db_session, db_offset=db_offset
-        )
-        await callback.message.edit_text(
-            text=display_rental_info(current_rental, current_rental_schedules),
-            reply_markup=create_rental_pagination_keyboard(
-                db_offset + 1, rental_for_user_count
-            ),
-        )
-    else:
-        await callback.message.edit_text(
-            text=no_rentals_in_db(rental_for_user_count, rental_for_user_count),
-            reply_markup=create_first_regular_keyboard(),
-        )
-
-
 @router.callback_query(F.data == "show_user_records", StateFilter(None))
 async def show_user_records(callback: CallbackQuery, state: FSMContext, db_session):
     rental_with_record_num = 0
@@ -90,28 +63,6 @@ async def show_user_records(callback: CallbackQuery, state: FSMContext, db_sessi
             state,
             rental_with_record_num,
             len(rentals_with_user_records)))
-
-
-@router.callback_query(
-    RentalsCallbackFactory.filter(),
-    StateFilter(FSMRegularUser.choosing_rental_number),
-)
-async def shift_show_rentals(
-    callback: CallbackQuery,
-    state: FSMContext,
-    db_session,
-    callback_data: RentalsCallbackFactory,
-):
-    db_offset = (await state.get_data())["db_offset"] + callback_data.step
-    await state.update_data(db_offset=db_offset)
-    rental_count = await get_rentals_for_user_count(db_session=db_session)
-    current_rental, current_rental_schedules = await get_rental_with_suitable_schedules(
-        db_session=db_session, db_offset=db_offset
-    )
-    await callback.message.edit_text(
-        text=display_rental_info(current_rental, current_rental_schedules),
-        reply_markup=create_rental_pagination_keyboard(db_offset + 1, rental_count),
-    )
 
 
 @router.callback_query(

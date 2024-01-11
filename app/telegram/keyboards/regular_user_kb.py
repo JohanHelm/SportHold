@@ -6,23 +6,17 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from app.infra.db.models.record.schema import Record
-from app.telegram.states.common import FSMRegularUser
-
+from app.telegram.context.querys import RentalQuerys
+from app.telegram.context.states import FSMRegularUser
+from app.telegram.context.callbacks import back_callback_data, forward_callback_data
 locale.setlocale(locale.LC_ALL, 'ru_RU.UTF-8')
 
-
-class RentalsCallbackFactory(CallbackData, prefix="rentals"):
-    step: int
-
-
-forward_callback_data = RentalsCallbackFactory(step=1).pack()
-back_callback_data = RentalsCallbackFactory(step=-1).pack()
 
 
 def create_first_regular_keyboard() -> InlineKeyboardMarkup:
     kb_builder = InlineKeyboardBuilder()
     show_rentals_btn = InlineKeyboardButton(
-        text="Доступные объекты!", callback_data="show_rentals"
+        text="Доступные объекты!", callback_data=RentalQuerys.SHOW_RENTALS
     )
     user_records_btn = InlineKeyboardButton(text="Мои записи", callback_data="show_user_records")
     kb_builder.row(show_rentals_btn, user_records_btn)
