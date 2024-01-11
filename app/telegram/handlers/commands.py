@@ -61,8 +61,6 @@ async def process_start_command(message: Message, db_session, state: FSMContext)
             ),
             reply_markup=create_first_regular_keyboard(),
         )
-    # elif UserRole.OWNER in user.roles:
-    #     await message.answer(hello_owner_user(message.from_user.username), reply_markup=create_first_owner_keyboard())
 
 
 @router.message(Command(commands="help"))
