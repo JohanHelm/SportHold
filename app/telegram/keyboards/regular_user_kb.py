@@ -5,7 +5,6 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from app.infra.db.models.record.schema import Record
-from app.telegram.context.querys import Book, Nav, Records, RentalQuerys
 from app.telegram.context.states import FSMRegularUser
 
 from .buttons import (

@@ -8,11 +8,11 @@ from app.telegram.handlers import (
     rental_calendar,
     rental_viewer,
     user_records,
+    rental_slots,
 )
 from app.telegram.middlewares.logging import LoggingMiddleware
 from app.telegram.middlewares.db import DbSessionMiddleware
 from utils.conf.config import SettingsLoader
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 
 async def start_bot():
@@ -22,7 +22,7 @@ async def start_bot():
     bot: Bot = Bot(
         token=settings.BOT_TOKEN,
     )
-    dp: Dispatcher = Dispatcher(storage=storage)  # сторейдж заменить на редиску
+    dp: Dispatcher = Dispatcher(storage=storage)
     dp.include_routers(
         commands.router,
         bot_block_unblock.router,
@@ -30,17 +30,13 @@ async def start_bot():
         rental_viewer.router,
         rental_calendar.router,
         user_records.router,
-    )  # подумать, как регистрировать сразу все роутеры
-    dp.update.middleware(
-        LoggingMiddleware()
-    )  # подумать, как регистрировать сразу все сидлвари
+        rental_slots.router,
+    )
+    dp.update.middleware(LoggingMiddleware())
     dp.update.middleware(DbSessionMiddleware(uri=settings.DB.URI, echo=False))
-    scheduler = AsyncIOScheduler()
 
     try:
-        scheduler.start()
         await bot.delete_webhook(drop_pending_updates=True)
         await dp.start_polling(bot)
     finally:
-        scheduler.shutdown(wait=False)
         await bot.session.close()
