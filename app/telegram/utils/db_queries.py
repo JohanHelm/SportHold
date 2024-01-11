@@ -1,3 +1,4 @@
+from loguru import logger
 from sqlalchemy import func, cast, Date
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
@@ -20,7 +21,9 @@ async def get_rentals_for_user_count(db_session) -> int:
 
 async def get_records_for_user_count(db_session, user_id) -> int:
     async with db_session() as session:
-        records_count = await session.scalar(select(func.count(Record.id)).where(Record.user_id == user_id))
+        records_count = await session.scalar(
+            select(func.count(Record.id)).where(Record.user_id == user_id)
+        )
         return records_count
 
 
@@ -42,7 +45,9 @@ async def get_rental_with_suitable_schedules(db_session, db_offset):
         return current_rental, current_rental_schedules
 
 
-async def create_slot_in_db(db_session, current_rental: Rental, choosen_slot: SlotModel) -> Slot:
+async def create_slot_in_db(
+    db_session, current_rental: Rental, choosen_slot: SlotModel
+) -> Slot:
     async with db_session() as session:
         slot = Slot(
             rental_id=current_rental.id,
@@ -57,7 +62,9 @@ async def create_slot_in_db(db_session, current_rental: Rental, choosen_slot: Sl
     return slot
 
 
-async def create_record_in_db(db_session, user_id, slot: Slot, current_rental: Rental) -> Record:
+async def create_record_in_db(
+    db_session, user_id, slot: Slot, current_rental: Rental
+) -> Record:
     async with db_session() as session:
         record = Record(
             user_id=user_id,
@@ -81,11 +88,11 @@ async def delete_slot_by_id(db_session, slot_id) -> None:
         await session.execute(Slot.__table__.delete().where(Slot.id == slot_id))
         await session.commit()
 
+
 async def get_rentals_with_user_records(db_session, user_id) -> tuple[Any]:
     async with db_session() as session:
         row_records = await session.execute(
-            select(Record)
-            .where(Record.user_id == user_id)
+            select(Record).where(Record.user_id == user_id)
         )
         user_records = row_records.scalars().all()
         rentals_with_user_records = tuple({record.rental_id for record in user_records})
@@ -105,7 +112,9 @@ async def get_user_records_to_rental(db_session, user_id, rental_id) -> list[Rec
     return user_records_to_rental
 
 
-async def get_occupied_slots(db_session, current_rental: Rental, selected_date) -> list[Slot]:
+async def get_occupied_slots(
+    db_session, current_rental: Rental, selected_date
+) -> list[Slot]:
     async with db_session() as session:
         row_slots = await session.execute(
             select(Slot)
@@ -118,9 +127,27 @@ async def get_occupied_slots(db_session, current_rental: Rental, selected_date) 
 
 async def set_user_status(db_session, user_id, status: UserStatus):
     async with db_session() as session:
-        result = await session.execute(
-            select(User).where(User.id == user_id)
-        )
+        result = await session.execute(select(User).where(User.id == user_id))
         user = result.scalar()
         user.status = status
         await session.commit()
+
+
+async def get_user(db_session, user_id):
+    async with db_session() as session:
+        result = await session.execute(select(User).where(User.id == user_id))
+        user = result.scalar()
+        return user
+
+
+async def add_user(db_session, user_id, username, fullname):
+    user = User(id=user_id, username=f"@{username}", fullname=fullname)
+    async with db_session() as session:
+        session.add(user)
+        await session.commit()
+        logger.info(
+            f"Bot: We've got new user here. His name: {username},"
+            f" user_id: {user_id}"
+        )
+        await session.refresh(user)
+    return user

@@ -10,8 +10,10 @@ from aiogram.enums.chat_type import ChatType
 from app.domain.helpers.enums import UserRole, UserStatus
 from app.infra.db.models.user.schema import User
 from app.telegram.utils.db_queries import (
+    add_user,
     get_rentals_for_user_count,
     get_records_for_user_count,
+    get_user,
 )
 from app.telegram.messages.text_messages import (
     help_message,
@@ -27,24 +29,14 @@ router.my_chat_member.filter(F.chat.type == ChatType.PRIVATE)
 @router.message(CommandStart())
 async def process_start_command(message: Message, db_session, state: FSMContext):
     await state.clear()
-    async with db_session() as session:
-        result = await session.execute(
-            select(User).where(User.id == message.from_user.id)
+    user = await get_user(db_session=db_session, user_id=message.from_user.id)
+    if not user:
+        user = await add_user(
+            db_session=db_session,
+            user_id=message.from_user.id,
+            username=message.from_user.username,
+            fullname=message.from_user.full_name,
         )
-        user = result.scalar()
-        if not user:
-            user = User(
-                id=message.from_user.id,
-                username=f"@{message.from_user.username}",
-                fullname=message.from_user.full_name,
-            )
-            session.add(user)
-            await session.commit()
-            logger.info(
-                f"Bot: We've got new user here. His name: {message.from_user.username},"
-                f" user_id: {message.from_user.id}"
-            )
-            await session.refresh(user)
 
     if UserRole.REGULAR in UserRole(user.roles):
         available_rentals: int = await get_rentals_for_user_count(db_session=db_session)
@@ -66,6 +58,3 @@ async def process_start_command(message: Message, db_session, state: FSMContext)
 @router.message(Command(commands="help"))
 async def process_help_command(message: Message):
     await message.answer(help_message)
-
-
-
