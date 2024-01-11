@@ -1,14 +1,10 @@
-from aiogram import Router, F, types
-from aiogram import filters
-from aiogram.filters.chat_member_updated import ChatMemberUpdatedFilter, MEMBER, KICKED
+from aiogram import Router, F
 from aiogram.filters import CommandStart, Command
-from aiogram.types import Message, ChatMemberUpdated
+from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from loguru import logger
-from sqlalchemy.future import select
 from aiogram.enums.chat_type import ChatType
-from app.domain.helpers.enums import UserRole, UserStatus
-from app.infra.db.models.user.schema import User
+from app.domain.helpers.enums import UserRole
 from app.telegram.utils.db_queries import (
     add_user,
     get_rentals_for_user_count,
@@ -18,7 +14,6 @@ from app.telegram.utils.db_queries import (
 from app.telegram.messages.text_messages import (
     help_message,
     hello_regular_user,
-    hello_owner_user,
 )
 from app.telegram.keyboards.regular_user_kb import create_first_regular_keyboard
 
