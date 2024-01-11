@@ -7,6 +7,7 @@ from app.telegram.handlers import (
     regular_user_handlers,
     rental_calendar,
     rental_viewer,
+    user_records,
 )
 from app.telegram.middlewares.logging import LoggingMiddleware
 from app.telegram.middlewares.db import DbSessionMiddleware
@@ -28,6 +29,7 @@ async def start_bot():
         regular_user_handlers.router,
         rental_viewer.router,
         rental_calendar.router,
+        user_records.router,
     )  # подумать, как регистрировать сразу все роутеры
     dp.update.middleware(
         LoggingMiddleware()

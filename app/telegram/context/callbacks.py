@@ -10,7 +10,7 @@ class SlotsCallbackFactory(CallbackData, prefix="slots"):
     step: int
 
 
-class OrdinalDayFactory(CallbackData, prefix="calendar"):
+class RentalCalendarCallback(CallbackData, prefix="calendar"):
     day: int
 
 
@@ -22,4 +22,4 @@ slot_back_callback_data = RentalsCallbackFactory(step=-1).pack()
 
 
 def booking_date_callback_data(day: int):
-    return OrdinalDayFactory(day=day).pack()
+    return RentalCalendarCallback(day=day).pack()

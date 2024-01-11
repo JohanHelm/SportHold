@@ -7,6 +7,7 @@ from aiogram.fsm.context import FSMContext
 
 from app.domain.models.slot.dto import SlotData
 from app.domain.controllers.slots import SlotManager
+from app.telegram.context.callbacks import RentalCalendarCallback
 from app.telegram.context.querys import Book
 from app.telegram.context.states import FSMRegularUser
 
@@ -50,10 +51,16 @@ async def select_booking_date(callback: CallbackQuery, state: FSMContext, db_ses
 
 
 @router.callback_query(
-    F.data.startswith("booking_date"), StateFilter(FSMRegularUser.choosing_booking_date)
+    RentalCalendarCallback.filter(), StateFilter(FSMRegularUser.choosing_booking_date)
 )
-async def show_rentals_slots(callback: CallbackQuery, state: FSMContext, db_session):
-    selected_date = datetime.strptime(callback.data.split("/")[1], "%Y-%m-%d").date()
+async def show_rentals_slots(
+    callback: CallbackQuery,
+    state: FSMContext,
+    db_session,
+    callback_data: RentalCalendarCallback,
+):
+    selected_date = callback_data.day
+    selected_date = date.fromordinal(selected_date)
     await state.update_data(choosing_booking_date=selected_date)
     db_offset = (await state.get_data())["db_offset"]
 

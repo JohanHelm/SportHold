@@ -16,7 +16,7 @@ SHOW_RENTALS_BTN = InlineKeyboardButton(
     text="Доступные объекты!", callback_data=RentalQuerys.SHOW_RENTALS
 )
 USER_RECORDS_BTN = InlineKeyboardButton(
-    text="Мои записи", callback_data=Records.SHOW_RECORDS
+    text="Мои записи", callback_data=Records.SHOW_USER_RECORDS
 )
 
 RENTAL_BACKWARD_BTN = InlineKeyboardButton(
@@ -29,6 +29,7 @@ SELECT_BOOKING_DATE_BTN = InlineKeyboardButton(
     text="К выбору даты записи.",
     callback_data=Book.SELECT_BOOK_DAY,
 )
+
 
 def calendar_button(button_text, day):
     data = booking_date_callback_data(day)
