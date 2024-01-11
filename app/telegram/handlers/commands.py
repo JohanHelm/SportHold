@@ -68,23 +68,4 @@ async def process_help_command(message: Message):
     await message.answer(help_message)
 
 
-@router.my_chat_member(ChatMemberUpdatedFilter(member_status_changed=KICKED))
-async def user_blocked_bot(event: ChatMemberUpdated, db_session):
-    async with db_session() as session:
-        result = await session.execute(
-            select(User).where(User.id == event.from_user.id)
-        )
-        user = result.scalar()
-        user.status = UserStatus.INACTIVE.value
-        await session.commit()
 
-
-@router.my_chat_member(ChatMemberUpdatedFilter(member_status_changed=MEMBER))
-async def user_unblocked_bot(event: ChatMemberUpdated, db_session):
-    async with db_session() as session:
-        result = await session.execute(
-            select(User).where(User.id == event.from_user.id)
-        )
-        user = result.scalar()
-        user.status = UserStatus.ACTIVE.value
-        await session.commit()

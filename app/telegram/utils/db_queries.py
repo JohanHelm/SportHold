@@ -8,7 +8,8 @@ from app.infra.db.models.schedule.schema import Schedule
 from app.infra.db.models.slot.schema import Slot
 from app.infra.db.models.record.schema import Record
 from app.infra.db.models.rental.schema import Rental
-from app.domain.helpers.enums import ScheduleStatus
+from app.domain.helpers.enums import ScheduleStatus, UserStatus
+from app.infra.db.models.user.schema import User
 
 
 async def get_rentals_for_user_count(db_session) -> int:
@@ -113,3 +114,13 @@ async def get_occupied_slots(db_session, current_rental: Rental, selected_date) 
         )
         occupied_slots = row_slots.scalars().all()
     return occupied_slots
+
+
+async def set_user_status(db_session, user_id, status: UserStatus):
+    async with db_session() as session:
+        result = await session.execute(
+            select(User).where(User.id == user_id)
+        )
+        user = result.scalar()
+        user.status = status
+        await session.commit()
